@@ -11,3 +11,4 @@ pytest-timeout
 git+https://gitlab.csc.fi/dpres/xml-helpers.git@develop#egg=xml_helpers
 git+https://gitlab.csc.fi/dpres/mets.git@develop#egg=mets
 git+https://gitlab.csc.fi/dpres/premis.git@develop#egg=premis
+git+https://gitlab.csc.fi/dpres/file-scraper.git@develop#egg=file-scraper
