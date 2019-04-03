@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # vim:ft=python
-
+from __future__ import print_function
 import os
 import sys
 import optparse
@@ -35,10 +35,10 @@ def main(arguments=None):
 
     validator.schematron_validation(filename, options.schemapath)
 
-    print validator.messages
+    print(validator.messages)
 
     if len(validator.errors.strip('\n \t')) > 0:
-        print >>sys.stderr, validator.errors
+        print(validator.errors, file=sys.stderr)
 
     if not validator.document_valid():
         return 117

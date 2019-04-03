@@ -129,7 +129,7 @@ def check_bagit_mandatory_files(bagit_dir):
     :returns: 0 if ok, raise BagitError otherwise."""
     dirs_list = os.listdir(bagit_dir)
     if not set(['manifest-md5.txt', 'bagit.txt']).issubset(set(dirs_list)):
-        print dirs_list
+        print(dirs_list)
         raise BagitError("Directory %s is not bagit format compilant. "
                          "manifest-md5.txt and bagit.txt should exist." %
                          bagit_dir)

@@ -195,7 +195,7 @@ def test_ignore_alt_format_in_mimetype():
     }
     validator = JHoveHTML(metadata_info)
     validator.validate()
-    print validator.errors()
+
     assert validator.is_valid, validator.errors()
     assert validator.errors() == ""
 

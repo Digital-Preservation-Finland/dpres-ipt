@@ -46,7 +46,6 @@ def test_validation_valid(filename, schema, monkeypatch, capsys):
     validator = ipt.validator.xmllint.Xmllint(metadata_info)
 
     validator.validate()
-    print capsys.readouterr()
     assert validator.is_valid, "validator errors: %s" % validator.errors()
     assert "Validation success" in validator.messages()
     assert validator.errors() == ""
@@ -81,7 +80,6 @@ def test_validation_invalid(filename, capsys):
     validator = ipt.validator.xmllint.Xmllint(metadata_info)
 
     validator.validate()
-    print capsys.readouterr()
     assert not validator.is_valid
 
     # xmllint is using --noout, so the METS XML should not be printed to

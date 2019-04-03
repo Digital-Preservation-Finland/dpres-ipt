@@ -70,7 +70,7 @@ def check_checksums(mets_path):
                 continue
 
             if hex_digest == metadata_info["digest"]:
-                print _message(metadata_info, "Checksum OK")
+                print(_message(metadata_info, "Checksum OK"))
             else:
                 yield _message(metadata_info, "Invalid Checksum")
 
@@ -89,7 +89,7 @@ def main(arguments=None):
 
     returncode = 0
     for error_message in check_checksums(args.sip_path):
-        print error_message
+        print(error_message)
         returncode = 117
 
     return returncode

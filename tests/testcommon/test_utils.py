@@ -7,7 +7,7 @@ import shutil
 def run_command(cmd, close_fds=False, print_=True):
     """Run command in shell"""
     if print_ is True:
-        print cmd
+        print(cmd)
     proc = subprocess.Popen(cmd,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,

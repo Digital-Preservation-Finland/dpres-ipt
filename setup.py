@@ -14,7 +14,7 @@ def scripts_list():
         modulename = modulename.replace('.py', '')
         scriptname = modulename.replace('_', '-')
         scripts.append('%s = ipt.scripts.%s:main' % (scriptname, modulename))
-    print scripts
+    print(scripts)
     return scripts
 
 

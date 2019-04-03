@@ -17,8 +17,6 @@ def test_import_modules(package):
     project_path = os.path.abspath(os.path.join(
         os.path.dirname(__file__), '..'))
 
-    print 'Testing imports for package:', package
-
     package_path = os.path.join(project_path, package)
 
     import_count = 0
@@ -33,7 +31,6 @@ def test_import_modules(package):
                 module_name = module_name.replace('/__init__.py', '')
                 module_name = module_name.replace('/', '.')
 
-                print "Importing package:", module_name
                 module = __import__(module_name)
 
                 message = "Failed importing package %s" % module_name
@@ -49,7 +46,6 @@ def test_import_modules(package):
                 module_name = module_name.replace('.py', '')
                 module_name = module_name.replace('/', '.')
 
-                print "Importing module: ", module_name
                 module = __import__(module_name)
 
                 message = "Failed loading module %s" % module_name

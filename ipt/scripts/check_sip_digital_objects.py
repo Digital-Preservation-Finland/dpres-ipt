@@ -24,7 +24,7 @@ def main(arguments=None):
         args.linking_sip_type,
         args.linking_sip_id)
 
-    print xml_helpers.utils.serialize(report)
+    print(xml_helpers.utils.serialize(report))
 
     if contains_errors(report):
         return 117

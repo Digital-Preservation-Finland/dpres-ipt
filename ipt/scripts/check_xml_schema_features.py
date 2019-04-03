@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # vim:ft=python
 
+from __future__ import print_function
 import os
 import sys
 import optparse
@@ -44,8 +45,8 @@ def main(arguments=None):
 
     validate.validate()
 
-    print >> sys.stdout, validate.messages()
-    print >> sys.stderr, validate.errors()
+    print(validate.messages(), file=sys.stdout)
+    print(validate.errors(), file=sys.stderr)
 
     if not validate.is_valid:
         return 117

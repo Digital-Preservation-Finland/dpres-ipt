@@ -33,7 +33,7 @@ def main(arguments=None):
     (_, args) = parser.parse_args(arguments)
 
     if len(args) < 1:
-        print "ERROR: at least one argument needed"
+        print("ERROR: at least one argument needed")
         return 1
 
     if args[0] is None:
@@ -45,7 +45,7 @@ def main(arguments=None):
         html_path = os.path.join(os.path.dirname(args[0]), report_name)
 
     cmd = ['xsltproc', XSLT_PATH, args[0]]
-    print cmd
+    print(cmd)
 
     with open(html_path, "w") as html_file:
         proc = subprocess.Popen(
@@ -55,8 +55,8 @@ def main(arguments=None):
         (_, stderr) = proc.communicate()
 
     if len(stderr) > 0:
-        print "xsltproc had stderr output:"
-        print stderr
+        print("xsltproc had stderr output:")
+        print(stderr)
 
     ret = proc.returncode
     return ret

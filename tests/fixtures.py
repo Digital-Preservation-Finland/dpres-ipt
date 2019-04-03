@@ -11,7 +11,7 @@ from hashlib import md5
 import pytest
 from tests.testcommon.settings import TESTDATADIR
 
-from utils import Directory
+from tests.utils import Directory
 
 # Setup logging facility
 LOGGER = logging.getLogger('tests.fixtures')
