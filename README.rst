@@ -32,6 +32,7 @@ The following software is required for validation tools, depending on the file f
         * mets, see https://github.com/Digital-Preservation-Finland/mets
         * premis, see https://github.com/Digital-Preservation-Finland/premis
         * dpx-validator, see https://github.com/Digital-Preservation-Finland/dpx-validator
+        * file-scraper, see https://public-github-url-for-file-scraper-project.com/Digital-Preservation-Finland/file-scraper
         * libxml2 & libxslt / xmllint & xsltproc ( with exslt and Saxon line number extensions )
         * gcc
         * python-lxml
