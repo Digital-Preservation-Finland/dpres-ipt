@@ -2,7 +2,7 @@
 
 import sys
 import subprocess
-from io import StringIO
+from io import BytesIO
 
 
 def run_command(command):
@@ -44,8 +44,8 @@ def run_main(the_main_function, arguments):
 
     stdout_original = sys.stdout
     stderr_original = sys.stderr
-    stdout_buffer = StringIO()
-    stderr_buffer = StringIO()
+    stdout_buffer = BytesIO()
+    stderr_buffer = BytesIO()
 
     sys.stdout = stdout_buffer
     sys.stderr = stderr_buffer
