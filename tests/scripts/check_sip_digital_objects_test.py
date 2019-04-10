@@ -4,6 +4,7 @@ import os
 import uuid
 
 import pytest
+from file_scraper.iterator import iter_detectors
 import premis
 
 from tests import testcommon
@@ -11,13 +12,11 @@ from tests.testcommon import shell
 
 # Module to test
 from ipt.scripts.check_sip_digital_objects import main, validation, \
-    validation_report
+    validation_report, Scraper
 import ipt.validator.jhove
-
 
 METSDIR = os.path.abspath(
     os.path.join(testcommon.settings.TESTDATADIR, "mets"))
-
 
 TESTCASES = [
     {"testcase": 'Test valid sip package #1',
@@ -54,66 +53,65 @@ TESTCASES = [
      "filename": 'csc-test-metadata-text-plain',
      "expected_result": {
          "returncode": 0,
-         "stdout": ['Detected mimetype: text/html',
-                    'METS mimetype is text/plain, trying text detection',
-                    'Detected alternative mimetype: text/plain',
-                    'MIME type is correct. The '
-                    'digital object will be preserved as text/plain.'],
+         "stdout": ['File is a text file'],
          "stderr": ''}},
     {"testcase": 'Unsupported file version',
      "filename": 'CSC_test_unsupported_version',
+     "patch": {'version': '2.0'},
      "expected_result": {
          "returncode": 117,
-         "stdout": ['No validator for mimetype: '
-                    'application/warc version: 2.0'],
+         "stdout": ['Proper scraper was not found. The file was not analyzed.'],
          "stderr": ''}},
     {"testcase": 'Unsupported file mimetype, without version',
      "filename": 'CSC_test_unsupported_mimetype_no_version',
+     "patch": {'mimetype': 'application/kissa',
+               'version': ''},
      "expected_result": {
          "returncode": 117,
-         "stdout": ['No validator for mimetype: application/kissa version: '],
+         "stdout": ['Proper scraper was not found. The file was not analyzed.'],
          "stderr": ''}},
     {"testcase": 'Unsupported file mimetype',
      "filename": 'CSC_test_unsupported_mimetype',
+     "patch": {'mimetype': 'application/kissa',
+               'version': '1.0'},
      "expected_result": {
          "returncode": 117,
-         "stdout": ['No validator for mimetype: '
-                    'application/kissa version: 1.0'],
+         "stdout": ['Proper scraper was not found. The file was not analyzed.'],
          "stderr": ''}},
     {"testcase": 'Invalid mets, missing ADMID.',
      "filename": 'CSC_test_missing_admid',
+     "patch": {'mimetype': None,
+               'version': None},
      "expected_result": {
          "returncode": 117,
-         "stdout": ['No validator for mimetype: '
-                    'None version: None'],
+         "stdout": ['Proper scraper was not found. The file was not analyzed.'],
          "stderr": ''}},
     {"testcase": 'Invalid mets, missing amdSec',
      "filename": 'CSC_test_missing_amdSec',
+     "patch": {'mimetype': None,
+               'version': None},
      "expected_result": {
          "returncode": 117,
-         "stdout": ['No validator for mimetype: '
-                    'None version: None'],
+         "stdout": ['Proper scraper was not found. The file was not analyzed.'],
          "stderr": ''}},
     {"testcase": 'Invalid warc',
      "filename": 'csc-test-invalid-warc',
      "expected_result": {
          "returncode": 117,
-         "stdout": ['Validation failed: returncode 255',
-                    'warc errors at',
-                    'File version check error'],
+         "stdout": ['Proper scraper was not found. The file was not analyzed.'],
          "stderr": ''}},
     {"testcase": 'Invalid arc',
      "filename": 'csc-test-invalid-arc-invalid-start-byte',
      "expected_result": {
          "returncode": 117,
-         "stdout": ['Validation failed: returncode 1',
+         "stdout": ['Failed: returncode 1',
                     'Exception: missing headers'],
          "stderr": ''}},
     {"testcase": 'Invalid arc',
      "filename": 'csc-test-invalid-arc-xml-incompatible-string',
      "expected_result": {
          "returncode": 117,
-         "stdout": ['Validation failed: returncode 1',
+         "stdout": ['Failed: returncode 1',
                     'WARNING: Unable to parse HTTP-header: ',
                     'Exception: expected 14 bytes but only read 0'],
          "stderr": ''}},
@@ -121,11 +119,8 @@ TESTCASES = [
      "filename": 'csc-test-invalid-warc-not-gz',
      "expected_result": {
          "returncode": 117,
-         "stdout": ['Validation failed: returncode 255',
-                    'Exception: Not a gzipped file',
-                    'File version check error'],
+         "stdout": ['Proper scraper was not found. The file was not analyzed.'],
          "stderr": ''}}]
-
 
 """
 This list contains the following cases:
@@ -137,9 +132,9 @@ This list contains the following cases:
 RESULT_CASES = [
     # One validation event for one object
     [{"result": {"is_valid": True, "messages": "OK", "errors": None},
-     "metadata_info": {
-         "filename": "file.txt", "object_id": {
-             "type": "id-type", "value": "only-one-object"}}}],
+      "metadata_info": {
+          "filename": "file.txt", "object_id": {
+              "type": "id-type", "value": "only-one-object"}}}],
     # Two validation events for one object
     [{"result": {"is_valid": True, "messages": "OK", "errors": None},
       "metadata_info": {
@@ -167,16 +162,23 @@ RESULT_CASES = [
           "filename": "file2.txt", "object_id": {
               "type": "id-type",
               "value": "this-id-should-not-be-forgotten"}}}]
-    ]
+]
 
 
 @pytest.mark.parametrize(
     "case", TESTCASES, ids=[x['testcase'] for x in TESTCASES])
 @pytest.mark.usefixtures("monkeypatch_Popen")
-def test_check_sip_digital_objects(case):
+def test_check_sip_digital_objects(case, monkeypatch):
     """
     Test for check_sip_digital_objects
     """
+    try:
+        monkeypatch.setattr(Scraper, '_identify',
+                            patch_scraper_identify(**case['patch']))
+    except KeyError:
+        # Nothing to patch.
+        pass
+
     filename = os.path.join(
         testcommon.settings.TESTDATADIR, 'test-sips', case["filename"])
 
@@ -215,25 +217,6 @@ def test_validation_report(results, object_count, event_count):
 def patch_validate(monkeypatch):
     """Patch JHovePDF validator so that it always returns valid result"""
 
-    def _iter_validators(metadata_info):
-        """mock validate"""
-
-        class _Validator(object):
-            """dummy validator"""
-            # pylint: disable=too-few-public-methods
-
-            def __init__(self, metadata_info):
-                """init"""
-                self.metadata_info = metadata_info
-
-            def result(self):
-                """check result"""
-                if 'pdf' in self.metadata_info["filename"]:
-                    return 'success'
-                return 'failure'
-
-        yield _Validator(metadata_info)
-
     def _iter_metadata_info(foo, foob):
         """mock iter_metadata_info"""
         return [{"filename": "pdf", "use": '', 'errors': None},
@@ -243,9 +226,6 @@ def patch_validate(monkeypatch):
                 {"filename": "cdr", "use": "noo-file-format-validation",
                  "errors": None}]
 
-    monkeypatch.setattr(
-        ipt.scripts.check_sip_digital_objects, "iter_validators",
-        _iter_validators)
     monkeypatch.setattr(
         ipt.scripts.check_sip_digital_objects, "iter_metadata_info",
         _iter_metadata_info)
@@ -257,20 +237,10 @@ def test_native_marked():
     'no-file-format-validation'. This should validate only native file
     format"""
 
-    results = [file_ for file_ in validation(None)]
-
-    assert results == [
-        {"metadata_info": {
-            'filename': 'pdf', 'use': '', 'errors': None},
-         "result": "success"},
-        {"metadata_info": {
-            'filename': 'cdr', 'use': '', 'errors': None},
-         "result": "failure"},
-        {"metadata_info": {'filename': 'cdr',
-                           'use': 'noo-file-format-validation',
-                           'errors': None},
-         "result": "failure"}
-    ]
+    assert all(
+        ['no-file-format-validation' not in file_['metadata_info']['use'] for
+         file_ in validation(None)]
+    )
 
 
 @pytest.fixture(scope="function")
@@ -286,6 +256,21 @@ def patch_metadata_info(monkeypatch):
         _iter_metadata_info)
 
 
+def patch_scraper_identify(mimetype='', version=''):
+    """To monkeypatch Scraper-class's default behaviour."""
+
+    def _identify(obj):
+        obj.info = {}
+        for detector in iter_detectors():
+            tool = detector(obj.filename)
+            tool.detect()
+            obj.info[len(obj.info)] = tool.info
+            obj.mimetype = mimetype
+            obj.version = version
+
+    return _identify
+
+
 @pytest.mark.usefixtures('patch_metadata_info')
 def test_metadata_info_erros():
     """Test validation with native file format that has been marked with
@@ -299,4 +284,4 @@ def test_metadata_info_erros():
         'is_valid': False, 'messages': ('Failed parsing metadata, '
                                         'skipping validation.'),
         'errors': 'Cannot merge dicts', 'result': None
-        }
+    }

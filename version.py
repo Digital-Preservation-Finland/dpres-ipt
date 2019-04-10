@@ -29,7 +29,6 @@ VERSION_RE = re.compile('^Version: (.+)$', re.M)
 def call_git_describe():
     """Determine package version from Git describe command"""
     cmd = 'git describe --abbrev --tags --match v[0-9]*'.split()
-    print(' '.join(cmd))
     git = Popen(cmd, stdout=PIPE, stderr=PIPE)
     (stdout, _) = git.communicate()
     return stdout.strip()
@@ -49,9 +48,6 @@ def write_pkg_info():
             project_path).group(1)
     except AttributeError:
         version = '0.0'
-
-    print("{}: Writing version info to: {}".format(
-        __file__, os.path.abspath('PKG-INFO')))
 
     with open(os.path.join(project_path, 'PKG-INFO'), 'w') as pkginfo:
 
@@ -84,14 +80,11 @@ def get_version():
                 '-'.join(version_git.split('-')[2:])
             )
 
-        print("Version number from GIT repository:", version)
-
     else:
         write_pkg_info()
         # Extract the version from the PKG-INFO file.
         with open(os.path.join(project_path, 'PKG-INFO')) as pkginfo:
             version = VERSION_RE.search(pkginfo.read()).group(1)
-        print("Version number from PKG-INFO:", version)
 
     return version
 

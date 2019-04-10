@@ -28,6 +28,7 @@ def main():
         install_requires=[
             'python-mimeparse',
             'scandir',
+            'six',
             'wand',
             ('file-scraper@git+ssh://git@gitlab.csc.fi/dpres/file-scraper.git'
              '@develop#egg=file-scraper'),

@@ -3,11 +3,17 @@ coverage
 pytest-coverage
 dateutils
 scandir
+six
 pytest
 wand
 six
 python-mimeparse
 pytest-timeout
+
+opf-fido
+file-magic
+Pillow
+
 git+https://gitlab.csc.fi/dpres/xml-helpers.git@develop#egg=xml_helpers
 git+https://gitlab.csc.fi/dpres/mets.git@develop#egg=mets
 git+https://gitlab.csc.fi/dpres/premis.git@develop#egg=premis

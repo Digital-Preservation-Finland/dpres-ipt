@@ -10,7 +10,10 @@ import lxml.etree
 
 import xml_helpers.utils
 import premis
+from six import iteritems
+from file_scraper.scraper import Scraper
 
+from ipt.utils import scrape_plain_text
 from ipt.validator.utils import iter_metadata_info
 from ipt.validator.validators import iter_validators
 
@@ -43,7 +46,7 @@ def parse_arguments(arguments):
 
 
 def contains_errors(report):
-    events = report.findall('.//'+premis.premis_ns('eventOutcome'))
+    events = report.findall('.//' + premis.premis_ns('eventOutcome'))
     for event in events:
         if event.text == 'failure':
             return True
@@ -82,11 +85,23 @@ def validation(mets_path):
             }
 
         else:
-            validators = iter_validators(metadata_info)
-            for validator in validators:
+            scraper_obj = Scraper(metadata_info['filename'])
+            scraper_obj.scrape()
+            try:
+                if metadata_info['format']['mimetype'] == 'text/plain':
+                    scraper_obj = scrape_plain_text(scraper_obj)
+            except KeyError:
+                # Can happen that "format" is missing due to file being invalid.
+                pass
+
+            for _, info in iteritems(scraper_obj.info):
                 yield {
                     'metadata_info': metadata_info,
-                    'result': validator.result()
+                    'result': {
+                        'is_valid': scraper_obj.well_formed,
+                        'messages': info['messages'],
+                        'errors': info['errors']
+                    }
                 }
 
 
@@ -99,8 +114,8 @@ def validation_report(results, linking_sip_type, linking_sip_id):
     # Create PREMIS agent, only one agent is needed
     # TODO: Agent could be the used validator instead of script file
     agent_name = "check_sip_digital_objects.py-v0.0"
-    agent_id_value = 'preservation-agent-'+agent_name+'-' + \
-        str(uuid.uuid4())
+    agent_id_value = 'preservation-agent-' + agent_name + '-' + \
+                     str(uuid.uuid4())
     agent_id = premis.identifier(
         identifier_type='preservation-agent-id',
         identifier_value=agent_id_value, prefix='agent')
@@ -116,7 +131,6 @@ def validation_report(results, linking_sip_type, linking_sip_id):
 
         # Create PREMIS object only if not already in the report
         if metadata_info['object_id']['value'] not in object_list:
-
             object_list.add(metadata_info['object_id']['value'])
 
             dep_id = premis.identifier(

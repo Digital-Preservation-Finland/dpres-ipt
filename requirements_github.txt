@@ -3,10 +3,17 @@ coverage
 pytest-coverage
 dateutils
 scandir
+six
 pytest
 wand
 python-mimeparse
 pytest-timeout
+
+opf-fido
+file-magic
+Pillow
+
 git+https://github.com/Digital-Preservation-Finland/xml-helpers.git#egg=xml_helpers
 git+https://github.com/Digital-Preservation-Finland/mets.git#egg=mets
 git+https://github.com/Digital-Preservation-Finland/premis.git#egg=premis
+git+https://github.com/Digital-Preservation-Finland/file-scraper.git@develop#egg=file-scraper
