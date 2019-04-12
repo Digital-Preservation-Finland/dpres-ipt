@@ -11,8 +11,8 @@ from tests import testcommon
 from tests.testcommon import shell
 
 # Module to test
-from ipt.scripts.check_sip_digital_objects import main, validation, \
-    validation_report, Scraper
+from ipt.scripts.check_sip_digital_objects import (main, validation,
+                                                   validation_report)
 import ipt.validator.jhove
 
 METSDIR = os.path.abspath(
@@ -57,39 +57,31 @@ TESTCASES = [
          "stderr": ''}},
     {"testcase": 'Unsupported file version',
      "filename": 'CSC_test_unsupported_version',
-     "patch": {'version': '2.0'},
      "expected_result": {
          "returncode": 117,
-         "stdout": ['Proper scraper was not found. The file was not analyzed.'],
+         "stdout": ['No validator for mimetype: '
+                    'application/warc version: 2.0'],
          "stderr": ''}},
     {"testcase": 'Unsupported file mimetype, without version',
      "filename": 'CSC_test_unsupported_mimetype_no_version',
-     "patch": {'mimetype': 'application/kissa',
-               'version': ''},
      "expected_result": {
          "returncode": 117,
          "stdout": ['Proper scraper was not found. The file was not analyzed.'],
          "stderr": ''}},
     {"testcase": 'Unsupported file mimetype',
      "filename": 'CSC_test_unsupported_mimetype',
-     "patch": {'mimetype': 'application/kissa',
-               'version': '1.0'},
      "expected_result": {
          "returncode": 117,
          "stdout": ['Proper scraper was not found. The file was not analyzed.'],
          "stderr": ''}},
     {"testcase": 'Invalid mets, missing ADMID.',
      "filename": 'CSC_test_missing_admid',
-     "patch": {'mimetype': None,
-               'version': None},
      "expected_result": {
          "returncode": 117,
          "stdout": ['Proper scraper was not found. The file was not analyzed.'],
          "stderr": ''}},
     {"testcase": 'Invalid mets, missing amdSec',
      "filename": 'CSC_test_missing_amdSec',
-     "patch": {'mimetype': None,
-               'version': None},
      "expected_result": {
          "returncode": 117,
          "stdout": ['Proper scraper was not found. The file was not analyzed.'],
@@ -98,7 +90,8 @@ TESTCASES = [
      "filename": 'csc-test-invalid-warc',
      "expected_result": {
          "returncode": 117,
-         "stdout": ['Proper scraper was not found. The file was not analyzed.'],
+         "stdout": ['Failed: returncode 255',
+                    'warc errors at'],
          "stderr": ''}},
     {"testcase": 'Invalid arc',
      "filename": 'csc-test-invalid-arc-invalid-start-byte',
@@ -119,7 +112,8 @@ TESTCASES = [
      "filename": 'csc-test-invalid-warc-not-gz',
      "expected_result": {
          "returncode": 117,
-         "stdout": ['Proper scraper was not found. The file was not analyzed.'],
+         "stdout": ['Failed: returncode 255',
+                    'Exception: Not a gzipped file'],
          "stderr": ''}}]
 
 """
@@ -168,17 +162,10 @@ RESULT_CASES = [
 @pytest.mark.parametrize(
     "case", TESTCASES, ids=[x['testcase'] for x in TESTCASES])
 @pytest.mark.usefixtures("monkeypatch_Popen")
-def test_check_sip_digital_objects(case, monkeypatch):
+def test_check_sip_digital_objects(case):
     """
     Test for check_sip_digital_objects
     """
-    try:
-        monkeypatch.setattr(Scraper, '_identify',
-                            patch_scraper_identify(**case['patch']))
-    except KeyError:
-        # Nothing to patch.
-        pass
-
     filename = os.path.join(
         testcommon.settings.TESTDATADIR, 'test-sips', case["filename"])
 
@@ -217,6 +204,18 @@ def test_validation_report(results, object_count, event_count):
 def patch_validate(monkeypatch):
     """Patch JHovePDF validator so that it always returns valid result"""
 
+    def _iter_validator_results(metadata_info):
+        """mock validation result"""
+        """check result"""
+        is_valid = False
+        if 'pdf' in metadata_info["filename"]:
+            is_valid = True
+        yield {
+            'is_valid': is_valid,
+            'messages': '',
+            'errors': ''
+        }
+
     def _iter_metadata_info(foo, foob):
         """mock iter_metadata_info"""
         return [{"filename": "pdf", "use": '', 'errors': None},
@@ -225,6 +224,10 @@ def patch_validate(monkeypatch):
                  "errors": None},
                 {"filename": "cdr", "use": "noo-file-format-validation",
                  "errors": None}]
+
+    monkeypatch.setattr(
+        ipt.scripts.check_sip_digital_objects, "metadata_validation_results",
+        _iter_validator_results)
 
     monkeypatch.setattr(
         ipt.scripts.check_sip_digital_objects, "iter_metadata_info",
@@ -236,11 +239,12 @@ def test_native_marked():
     """Test validation with native file format that has been marked with
     'no-file-format-validation'. This should validate only native file
     format"""
-
+    collection = [result for result in validation(None)]
     assert all(
-        ['no-file-format-validation' not in file_['metadata_info']['use'] for
-         file_ in validation(None)]
+        ['no-file-format-validation' not in result['metadata_info']['use'] for
+         result in collection]
     )
+    assert any([result['result']['is_valid'] for result in collection])
 
 
 @pytest.fixture(scope="function")
@@ -254,21 +258,6 @@ def patch_metadata_info(monkeypatch):
     monkeypatch.setattr(
         ipt.scripts.check_sip_digital_objects, "iter_metadata_info",
         _iter_metadata_info)
-
-
-def patch_scraper_identify(mimetype='', version=''):
-    """To monkeypatch Scraper-class's default behaviour."""
-
-    def _identify(obj):
-        obj.info = {}
-        for detector in iter_detectors():
-            tool = detector(obj.filename)
-            tool.detect()
-            obj.info[len(obj.info)] = tool.info
-            obj.mimetype = mimetype
-            obj.version = version
-
-    return _identify
 
 
 @pytest.mark.usefixtures('patch_metadata_info')

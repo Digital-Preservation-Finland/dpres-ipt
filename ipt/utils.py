@@ -10,6 +10,7 @@ from fractions import Fraction
 import six
 
 import mimeparse
+from file_scraper.iterator import iter_scrapers
 from file_scraper.scrapers.textfile import CheckTextFile
 
 
@@ -287,7 +288,7 @@ def _filter_dicts(list1, list2, included_keys, parent_key, forcekeys):
     return (list1, list2)
 
 
-def scrape_plain_text(scraper_obj):
+def _scrape_plain_text(scraper_obj):
     """Adds another scrape process for text/plain scenario and updates the
     scraper object with new information.
 
@@ -299,3 +300,43 @@ def scrape_plain_text(scraper_obj):
     scraper_obj.info[len(scraper_obj.info)] = text_scraper.info
     scraper_obj.well_formed = text_scraper.well_formed
     return scraper_obj
+
+
+def metadata_validation_results(metadata_info):
+    """Validates the given metadata information with the given scraped object.
+
+    :param metadata_info: Metadata entry that was parsed from mets.xml.
+    :return: A generator to produce the validation results.
+    """
+
+    def _yield(is_valid, scr_obj):
+        # TODO: Hook IPT exclusive validation logic to compare scraping
+        #       information to metadata.
+        return {
+            'is_valid': is_valid,
+            'messages': scr_obj.messages(),
+            'errors': scr_obj.errors()
+        }
+
+    check_wellformed = True
+    if metadata_info['format']['mimetype'] == 'text/plain':
+        check_wellformed = False
+        scraper_obj_txt = CheckTextFile(metadata_info['filename'],
+                                        metadata_info['format']['mimetype'])
+        scraper_obj_txt.scrape_file()
+        is_well_formed_txt = scraper_obj_txt.well_formed
+        yield _yield(is_well_formed_txt,
+                     scraper_obj_txt)
+
+    for scraper_cls in iter_scrapers(metadata_info['format']['mimetype'],
+                                     metadata_info['format']['version'],
+                                     check_wellformed=True):
+        scraper_obj = scraper_cls(metadata_info['filename'],
+                                  metadata_info['format']['mimetype'],
+                                  check_wellformed)
+        scraper_obj.scrape_file()
+        try:
+            is_valid = is_well_formed_txt
+        except NameError:
+            is_valid = scraper_obj.well_formed
+        yield _yield(is_valid, scraper_obj.messages)
