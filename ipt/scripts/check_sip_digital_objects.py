@@ -10,9 +10,12 @@ import lxml.etree
 
 import xml_helpers.utils
 import premis
+from six import iteritems
+from file_scraper.scraper import Scraper
 
-from ipt.utils import metadata_validation_results
+from ipt.utils import scrape_plain_text
 from ipt.validator.utils import iter_metadata_info
+from ipt.validator.validators import iter_validators
 
 
 def main(arguments=None):
@@ -82,10 +85,23 @@ def validation(mets_path):
             }
 
         else:
-            for result in metadata_validation_results(metadata_info):
+            scraper_obj = Scraper(metadata_info['filename'])
+            scraper_obj.scrape()
+            try:
+                if metadata_info['format']['mimetype'] == 'text/plain':
+                    scraper_obj = scrape_plain_text(scraper_obj)
+            except KeyError:
+                # Can happen that "format" is missing due to file being invalid.
+                pass
+
+            for _, info in iteritems(scraper_obj.info):
                 yield {
                     'metadata_info': metadata_info,
-                    'result': result
+                    'result': {
+                        'is_valid': scraper_obj.well_formed,
+                        'messages': info['messages'],
+                        'errors': info['errors']
+                    }
                 }
 
 
