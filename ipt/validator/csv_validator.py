@@ -1,5 +1,4 @@
 """The CSV validator plugin"""
-import csv
 
 from ipt.validator.basevalidator import BaseValidator
 
@@ -19,8 +18,6 @@ class PythonCsv(BaseValidator):
     def __init__(self, metadata_info):
         super(PythonCsv, self).__init__(metadata_info)
 
-        self.filename = metadata_info['filename']
-
         if "addml" in metadata_info:
             self.charset = metadata_info['addml']['charset']
             self.record_separator = metadata_info['addml']['separator']
@@ -37,31 +34,3 @@ class PythonCsv(BaseValidator):
         if "addml" not in self.metadata_info:
             self.errors("ADDML data was expected, but not found")
             return
-
-        class _Dialect(csv.excel):
-            """Init dialect, example from Python csv.py library"""
-            strict = True
-            delimiter = self.delimiter
-            doublequote = True
-            lineterminator = self.record_separator
-
-        try:
-            with open(self.filename, 'rb') as csvfile:
-                reader = csv.reader(csvfile, _Dialect)
-                first_line = reader.next()
-
-                if len(self.header_fields) > 0 and \
-                        len(self.header_fields) != len(first_line):
-                    self.errors(
-                        "CSV validation error: field counts in the ADDML "
-                        "document and the CSV header don't match"
-                    )
-                    return
-                for _ in reader:
-                    pass
-
-        except csv.Error as exception:
-            self.errors("CSV validation error on line %s: %s" %
-                        (reader.line_num, exception))
-            return
-        self.messages("CSV validation OK")

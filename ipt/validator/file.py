@@ -2,9 +2,7 @@
 This is an File (libmagick) validator.
 """
 
-
 from ipt.validator.basevalidator import BaseValidator, Shell
-
 
 FILECMD_PATH = "/opt/file-5.30/bin/file"
 ENV = {'LD_LIBRARY_PATH': "/opt/file-5.30/lib64"}
@@ -17,9 +15,9 @@ class File(BaseValidator):
     _supported_mimetypes = {
         'application/vnd.oasis.opendocument.text': ['1.0', '1.1', '1.2'],
         'application/vnd.oasis.opendocument.spreadsheet':
-        ['1.0', '1.1', '1.2'],
+            ['1.0', '1.1', '1.2'],
         'application/vnd.oasis.opendocument.presentation':
-        ['1.0', '1.1', '1.2'],
+            ['1.0', '1.1', '1.2'],
         'application/vnd.oasis.opendocument.graphics': ['1.0', '1.1', '1.2'],
         'application/vnd.oasis.opendocument.formula': ['1.0', '1.1', '1.2'],
         'application/msword': ['8.0', '8.5', '9.0', '10.0', '11.0'],
@@ -28,7 +26,7 @@ class File(BaseValidator):
         'application/vnd.openxmlformats-officedocument.wordprocessingml.'
         'document': ['12.0', '14.0', '15.0'],
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-        ['12.0', '14.0', '15.0'],
+            ['12.0', '14.0', '15.0'],
         'application/vnd.openxmlformats-officedocument.presentationml.'
         'presentation': ['12.0', '14.0', '15.0'],
         # file-5.30 does not reliably recognize all DPX files
@@ -40,20 +38,9 @@ class File(BaseValidator):
     }
 
     def validate(self):
-        """
-        Check MIME type determined by libmagic
-        """
-        shell = Shell([
-            FILECMD_PATH, '-b', '--mime-type',
-            self.metadata_info['filename']], env=ENV)
-        self.messages(shell.stdout)
-        self.errors(shell.stderr)
-        mimetype = shell.stdout.strip()
-        if not self.metadata_info['format']['mimetype'] == mimetype:
+        """Check mimetype."""
+        if not self.mimetype == self.scraper.mimetype:
             self.errors("MIME type does not match")
-        else:
-            self.messages("MIME type is correct")
-            self.validator_info = self.metadata_info
 
 
 class FileTextPlain(BaseValidator):
@@ -67,54 +54,10 @@ class FileTextPlain(BaseValidator):
         'text/plain': ['']
     }
 
-    def file_mimetype(self, soft=False):
-        """Detect mimetype using file (libmagick) or with
-        the soft option that excludes libmagick.
-
-        :soft: use file with soft option if true
-
-        :returns: file mimetype
-        """
-        if soft:
-            shell = Shell([
-                FILECMD_PATH, '-be', 'soft', '--mime-type',
-                self.metadata_info['filename']], env=ENV)
-        else:
-            shell = Shell([
-                FILECMD_PATH, '-b', '--mime-type',
-                self.metadata_info['filename']], env=ENV)
-
-        self.errors(shell.stderr)
-        mimetype = shell.stdout.strip()
-
-        return mimetype
-
     def validate(self):
-        """
-        Check MIME type determined by libmagic
-        """
-
-        mimetype = self.file_mimetype()
-        self.messages('Detected mimetype: %s' % mimetype)
-
-        if self.metadata_info['format']['mimetype'] == mimetype:
-            self.messages("MIME type is correct")
-            self.validator_info = self.metadata_info
-            return
-
-        self.messages('METS mimetype is text/plain, trying text detection')
-
-        mimetype = self.file_mimetype(soft=True)
-
-        self.messages('Detected alternative mimetype: %s' % mimetype)
-
-        if self.metadata_info['format']['mimetype'] == mimetype:
-            self.messages("MIME type is correct. The "
-                          "digital object will be preserved as text/plain.")
-            self.validator_info = self.metadata_info
-            return
-
-        self.errors("MIME type does not match")
+        """Check mimetype."""
+        if not self.mimetype == self.scraper.mimetype:
+            self.errors("MIME type does not match")
 
 
 class FileEncoding(BaseValidator):
@@ -151,28 +94,18 @@ class FileEncoding(BaseValidator):
         return super(FileEncoding, cls).is_supported(metadata_info)
 
     def validate(self):
-        """
-        Check character encoding
-        """
-        shell = Shell([
-            FILECMD_PATH, '-b', '--mime-encoding',
-            self.metadata_info['filename']], env=ENV)
-        self.messages(shell.stdout)
-        self.errors(shell.stderr)
-        encoding = shell.stdout.strip()
+        """Check character encoding."""
+        encoding = self.scraper.streams[0]['charset']
 
         try:
-            if encoding in self._encodings[
-                    self.metadata_info['format']['charset']]:
+            expected = self._encodings[self.metadata_info['format']['charset']]
+            if encoding in expected:
                 self.messages("File encoding match found.")
-                self.validator_info = self.metadata_info
-
             else:
                 err = " ".join(
                     ["File encoding mismatch:", encoding, "was found, but",
                      self.metadata_info['format']['charset'], "was expected."])
                 self.errors(err)
-
         except KeyError:
             err = " ".join(
                 ["File encoding missing from metadata, it is mandatory for"

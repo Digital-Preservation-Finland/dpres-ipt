@@ -2,10 +2,7 @@
 This is an Office validator.
 """
 
-
-import tempfile
-import shutil
-from ipt.validator.basevalidator import BaseValidator, Shell
+from ipt.validator.basevalidator import BaseValidator
 
 
 class Office(BaseValidator):
@@ -32,16 +29,7 @@ class Office(BaseValidator):
     }
 
     def validate(self):
+        """No need for special implementation,
+        file-scraper should have handled all.
         """
-        Validate file
-        """
-        temp_dir = tempfile.mkdtemp()
-        try:
-            env = {'HOME': temp_dir}
-            shell = Shell([
-                'soffice', '--convert-to', 'pdf', '--outdir', temp_dir,
-                self.metadata_info['filename']], env=env)
-            self.errors(shell.stderr)
-            self.messages(shell.stdout)
-        finally:
-            shutil.rmtree(temp_dir)
+        pass

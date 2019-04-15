@@ -1,7 +1,5 @@
 """class for XML and HTML5 header encoding check with lxml. """
 
-from lxml import etree
-
 from ipt.validator.basevalidator import BaseValidator
 
 
@@ -17,14 +15,14 @@ class XmlEncoding(BaseValidator):
     }
 
     def validate(self):
-        parser = etree.XMLParser(dtd_validation=False, no_network=True,
-                                 recover=True)
-        fd = open(self.metadata_info['filename'])
-        tree = etree.parse(fd, parser)
-        if tree.docinfo.encoding == self.metadata_info['format']['charset']:
+        """Additional logic to check the XML's charset with the metadata is
+        required.
+        """
+        charset = self.scraper.streams[0]['charset']
+        if charset == self.metadata_info['format']['charset']:
             self.messages('Encoding metadata match found.')
         else:
             self.errors(' '.join(
-                ['Encoding metadata mismatch:', tree.docinfo.encoding,
-                 'was found, but', self.metadata_info['format']['charset'],
-                 'was expected.']))
+                ['Encoding metadata mismatch:',
+                 charset, 'was found, but',
+                 self.metadata_info['format']['charset'], 'was expected.']))

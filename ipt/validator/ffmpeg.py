@@ -4,9 +4,9 @@ achieved by doing a conversion. If conversion is succesful, file is
 interpred as a valid file. Container type is also validated with ffprobe.
 """
 
-import json
+from six import itervalues
 
-from ipt.validator.basevalidator import BaseValidator, Shell
+from ipt.validator.basevalidator import BaseValidator
 from ipt.utils import compare_lists_of_dicts, handle_div, find_max_complete
 
 MPEG1 = {"version": None, "mimetype": "video/MP1S"}
@@ -77,7 +77,7 @@ STREAM_MIMETYPES = {
     "mp3on4": "audio/mpeg",
     "mp3on4float": "audio/mpeg",
     "aac": "audio/mp4"
-    }
+}
 
 
 class FFMpeg(BaseValidator):
@@ -96,7 +96,6 @@ class FFMpeg(BaseValidator):
 
     def validate(self):
         """validate file."""
-        self.check_container_mimetype()
         if not set(self.metadata_info.keys()).intersection(
                 set(['audio', 'video', 'audio_streams', 'video_streams'])):
             self.errors('Stream metadata was not found.')
@@ -109,71 +108,6 @@ class FFMpeg(BaseValidator):
             self.check_streams('audio_streams')
         if 'video_streams' in self.metadata_info:
             self.check_streams('video_streams')
-        self.check_validity()
-
-    def check_container_mimetype(self):
-        """parse version from ffprobes stderr, which is in following format:
-
-            "format": {
-                "filename": "tests/data/02_filevalidation_data/mpg/mpg1.mpg",
-                "nb_streams": 1,
-                "format_name": "mpegvideo",
-                "format_long_name": "raw MPEG video",
-                "duration": "19.025400",
-                "size": "761016",
-                "bit_rate": "320000"
-            }
-        """
-        shell = Shell(
-            ['ffprobe', '-show_format', '-v',
-             'debug', '-print_format', 'json', self.metadata_info['filename']])
-        data = json.loads(str(shell.stdout))
-        format_data = data.get("format")
-
-        if format_data is None:
-            self.errors(
-                "No format data could be read. "
-                "FFprobe output: %s " % shell.stdout)
-            return
-
-        detected_format = None
-        for mimetype in CONTAINER_MIMETYPES:
-            if format_data.get("format_long_name") in mimetype["strings"]:
-                detected_format = mimetype["data"]
-
-        if not detected_format:
-            self.errors(
-                "No matching mimetype information could be found,"
-                "this might not be MPEG file."
-                "FFprobe output: %s" % shell.stdout)
-            return
-
-        if any(stream in self.metadata_info for stream in
-               ['audio_streams', 'video_streams']):
-            if self.metadata_info['format']['mimetype'] in NOT_CONTAINERS:
-                self.errors("Stream file format %s can not include streams,"
-                            " as decribed in metadata." % (
-                                self.metadata_info["format"]["mimetype"]))
-            elif any(stream in self.metadata_info for stream in
-                     ['audio', 'video']):
-                self.errors("AudioMD or VideoMD metadata included for"
-                            " container %s. This must be directed to"
-                            " the including streams." % (
-                                self.metadata_info["format"]["mimetype"]))
-
-    def check_validity(self):
-        """Check file validity. The validation logic is check that ffmpeg returncode
-        is 0 and nothing is found in stderr. FFmpeg lists faulty parts of mpeg
-        to stderr."""
-        shell = Shell([
-            'ffmpeg', '-v', 'error', '-i', self.metadata_info['filename'],
-            '-f', 'null', '-'])
-        if shell.returncode != 0 or shell.stderr != "":
-            self.errors(
-                "File %s not valid: %s" % (
-                    self.metadata_info['filename'], shell.stderr))
-            return
-        self.messages("%s is valid." % self.metadata_info['filename'])
 
     def check_streams(self, stream_type):
         """Check that streams inside container are what they are described in
@@ -219,13 +153,7 @@ class FFMpeg(BaseValidator):
             metadata = [self.metadata_info]
 
         found_streams = []
-        shell = Shell(
-            ['ffprobe', '-show_streams', '-show_format', '-print_format',
-             'json', self.metadata_info['filename']])
-
-        stream_data = json.loads(shell.stdout)
-
-        for stream in stream_data.get("streams", []):
+        for stream in itervalues(self.scraper.streams):
             new_stream = STREAM_PARSERS[stream_type](stream, stream_type)
             if not new_stream:
                 continue
@@ -286,7 +214,7 @@ def parse_video_streams(stream, stream_type):
 
     if "bit_rate" in stream:
         new_stream["video"]["bit_rate"] = \
-            handle_div(stream.get("bit_rate")+"/1000000")
+            handle_div(stream.get("bit_rate") + "/1000000")
     if "avg_frame_rate" in stream:
         new_stream["video"]["avg_frame_rate"] = \
             handle_div(stream.get("avg_frame_rate"))
@@ -318,10 +246,10 @@ def parse_audio_streams(stream, stream_type):
     new_stream["audio"]["bits_per_sample"] = stream.get("bits_per_sample")
     if "bit_rate" in stream:
         new_stream["audio"]["bit_rate"] = \
-            str(int(stream.get("bit_rate"))/1000)
+            str(int(stream.get("bit_rate")) / 1000)
     if "sample_rate" in stream:
         new_stream["audio"]["sample_rate"] = \
-            handle_div(stream.get("sample_rate")+"/1000")
+            handle_div(stream.get("sample_rate") + "/1000")
     new_stream["audio"]["channels"] = str(stream.get("channels"))
 
     new_stream["format"]["version"] = \

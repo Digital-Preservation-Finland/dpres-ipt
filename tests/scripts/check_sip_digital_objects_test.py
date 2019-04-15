@@ -11,8 +11,9 @@ from tests import testcommon
 from tests.testcommon import shell
 
 # Module to test
-from ipt.scripts.check_sip_digital_objects import main, validation, \
-    validation_report, Scraper
+from ipt.scripts.check_sip_digital_objects import (main, validation,
+                                                   validation_report)
+from ipt.validator.validators import Scraper
 import ipt.validator.jhove
 
 METSDIR = os.path.abspath(
@@ -60,7 +61,8 @@ TESTCASES = [
      "patch": {'version': '2.0'},
      "expected_result": {
          "returncode": 117,
-         "stdout": ['Proper scraper was not found. The file was not analyzed.'],
+         "stdout": ['No validator for mimetype: '
+                    'application/warc version: 2.0'],
          "stderr": ''}},
     {"testcase": 'Unsupported file mimetype, without version',
      "filename": 'CSC_test_unsupported_mimetype_no_version',
@@ -215,7 +217,20 @@ def test_validation_report(results, object_count, event_count):
 
 @pytest.fixture(scope="function")
 def patch_validate(monkeypatch):
-    """Patch JHovePDF validator so that it always returns valid result"""
+    """Patch metadata_validation_results so that it always returns valid
+    result for case pdf."""
+
+    def _iter_validator_results(metadata_info):
+        """mock validation result"""
+        """check result"""
+        is_valid = False
+        if 'pdf' in metadata_info["filename"]:
+            is_valid = True
+        yield {
+            'is_valid': is_valid,
+            'messages': '',
+            'errors': ''
+        }
 
     def _iter_metadata_info(foo, foob):
         """mock iter_metadata_info"""
@@ -227,6 +242,9 @@ def patch_validate(monkeypatch):
                  "errors": None}]
 
     monkeypatch.setattr(
+        ipt.scripts.check_sip_digital_objects, "metadata_validation_results",
+        _iter_validator_results)
+    monkeypatch.setattr(
         ipt.scripts.check_sip_digital_objects, "iter_metadata_info",
         _iter_metadata_info)
 
@@ -237,10 +255,12 @@ def test_native_marked():
     'no-file-format-validation'. This should validate only native file
     format"""
 
+    collection = [result for result in validation(None)]
     assert all(
-        ['no-file-format-validation' not in file_['metadata_info']['use'] for
-         file_ in validation(None)]
+        ['no-file-format-validation' not in result['metadata_info']['use'] for
+         result in collection]
     )
+    assert any([result['result']['is_valid'] for result in collection])
 
 
 @pytest.fixture(scope="function")

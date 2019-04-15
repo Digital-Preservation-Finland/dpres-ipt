@@ -10,7 +10,6 @@ from fractions import Fraction
 import six
 
 import mimeparse
-from file_scraper.scrapers.textfile import CheckTextFile
 
 
 class UnknownException(Exception):
@@ -285,17 +284,3 @@ def _filter_dicts(list1, list2, included_keys, parent_key, forcekeys):
                         dict2[key] = sublist2[0]
 
     return (list1, list2)
-
-
-def scrape_plain_text(scraper_obj):
-    """Adds another scrape process for text/plain scenario and updates the
-    scraper object with new information.
-
-    :param scraper_obj: Scraper object that has done its scraping.
-    :return: Updated scraper object.
-    """
-    text_scraper = CheckTextFile(scraper_obj.filename, scraper_obj.mimetype)
-    text_scraper.scrape_file()
-    scraper_obj.info[len(scraper_obj.info)] = text_scraper.info
-    scraper_obj.well_formed = text_scraper.well_formed
-    return scraper_obj

@@ -2,6 +2,11 @@
 
 # pylint: disable=unused-import
 import os
+
+from file_scraper.scraper import Scraper
+from file_scraper.scrapers.textfile import CheckTextFile
+from six import itervalues
+
 from ipt.validator.basevalidator import BaseValidator
 from ipt.validator.jhove import JHoveBase, JHovePDF, \
     JHoveTiff, JHoveJPEG, JHoveHTML, JHoveGif, JHoveTextUTF8, JHoveWAV
@@ -21,7 +26,7 @@ from ipt.validator.dpxv import DPXv
 from ipt.validator.vnu import Vnu
 
 
-def iter_validators(metadata_info):
+def iter_validators(metadata_info, scraper_obj=None):
     """
     Find a validator for digital object from given `metadata_info` record.
     :returns: validator class
@@ -42,15 +47,10 @@ def iter_validators(metadata_info):
         yield NonExistingFile(metadata_info)
         return
 
-    for cls in BaseValidator.__subclasses__():
+    for cls in (BaseValidator.__subclasses__() + JHoveBase.__subclasses__()):
         if cls.is_supported(metadata_info):
             found_validator = True
-            yield cls(metadata_info)
-
-    for cls in JHoveBase.__subclasses__():
-        if cls.is_supported(metadata_info):
-            found_validator = True
-            yield cls(metadata_info)
+            yield cls(metadata_info, scraper_obj)
 
     if not found_validator:
         yield UnknownFileFormat(metadata_info)
@@ -107,9 +107,41 @@ class NonExistingFile(object):
         """Return validation result
         """
         error_message = 'File %s does not exist' \
-            % self.metadata_info['filename']
+                        % self.metadata_info['filename']
 
         return {
             'is_valid': False,
             'messages': "",
             'errors': error_message}
+
+
+def metadata_validation_results(metadata_info):
+    """Validates the given metadata information with the given scraped object.
+
+    :param metadata_info: Metadata entry that was parsed from mets.xml.
+    :return: A generator to produce the validation results.
+    """
+
+    scraper_obj = Scraper(metadata_info['filename'])
+    try:
+        if metadata_info['format']['mimetype'] == _MIME_TEXT_PLAIN:
+            # TODO: Make scraper conduct text/plain specific scraping
+            pass
+    except KeyError:
+        # Can happen that "format" is missing due to file being invalid.
+        pass
+    scraper_obj.scrape()
+    for info in itervalues(scraper_obj.info):
+        if info['class'] in _FILE_SCRAPER_DETECTOR_CLASSES:
+            continue
+        yield {
+            'is_valid': scraper_obj.well_formed,
+            'messages': info['messages'],
+            'errors': info['errors'],
+        }
+    for validator in iter_validators(metadata_info, scraper_obj):
+        yield validator.result()
+
+
+_FILE_SCRAPER_DETECTOR_CLASSES = ('FidoDetector', 'MagicDetector')
+_MIME_TEXT_PLAIN = 'text/plain'

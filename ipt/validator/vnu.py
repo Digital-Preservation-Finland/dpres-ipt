@@ -3,7 +3,7 @@ A HTML5 validator module using The Nu Html Checker
 (https://validator.github.io/validator/)
 """
 
-from ipt.validator.basevalidator import BaseValidator, Shell
+from ipt.validator.basevalidator import BaseValidator
 
 VNU_PATH = "/usr/share/java/vnu/vnu.jar"
 
@@ -18,11 +18,7 @@ class Vnu(BaseValidator):
     }
 
     def validate(self):
+        """No need for special implementation,
+        file-scraper should have handled all.
         """
-        Validate file using vnu.jar
-        """
-        shell = Shell([
-            'java', '-jar', VNU_PATH, '--verbose',
-            self.metadata_info['filename']])
-        self.errors(shell.stderr)
-        self.messages(shell.stdout)
+        pass
