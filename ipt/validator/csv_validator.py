@@ -15,8 +15,8 @@ class PythonCsv(BaseValidator):
         'text/csv': [''],
     }
 
-    def __init__(self, metadata_info):
-        super(PythonCsv, self).__init__(metadata_info)
+    def __init__(self, metadata_info, scraper_obj=None):
+        super(PythonCsv, self).__init__(metadata_info, scraper_obj)
 
         if "addml" in metadata_info:
             self.charset = metadata_info['addml']['charset']

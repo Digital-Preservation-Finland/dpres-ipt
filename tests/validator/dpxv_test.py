@@ -1,4 +1,3 @@
-
 """
 Tests for DPX validator.
 """
@@ -6,7 +5,6 @@ Tests for DPX validator.
 import os
 import pytest
 from ipt.validator.dpxv import DPXv
-
 
 BASEPATH = "tests/data/02_filevalidation_data/dpx"
 
@@ -17,7 +15,7 @@ BASEPATH = "tests/data/02_filevalidation_data/dpx"
         ("valid_dpx.dpx", "image/x-dpx", "2.0")
     ]
 )
-def test_validate_valid_file(filename, mimetype, version):
+def test_validate_valid_file(filename, mimetype, version, create_scraper_obj):
     metadata_info = {
         'filename': os.path.join(BASEPATH, filename),
         'format': {
@@ -25,10 +23,10 @@ def test_validate_valid_file(filename, mimetype, version):
             'version': version
         }
     }
-
-    validator = DPXv(metadata_info)
+    scraper_obj = create_scraper_obj(metadata_info)
+    validator = DPXv(metadata_info, scraper_obj)
     validator.validate()
-    assert validator.is_valid
+    assert validator.is_valid and scraper_obj.well_formed
 
 
 @pytest.mark.parametrize(
@@ -38,7 +36,7 @@ def test_validate_valid_file(filename, mimetype, version):
         ("empty_file.dpx", "image/x-dpx", "2.0"),
     ]
 )
-def test_validate_invalid_file(filename, mimetype, version):
+def test_validate_invalid_file(filename, mimetype, version, create_scraper_obj):
     metadata_info = {
         'filename': os.path.join(BASEPATH, filename),
         'format': {
@@ -47,6 +45,7 @@ def test_validate_invalid_file(filename, mimetype, version):
         }
     }
 
-    validator = DPXv(metadata_info)
+    scraper_obj = create_scraper_obj(metadata_info)
+    validator = DPXv(metadata_info, scraper_obj)
     validator.validate()
-    assert not validator.is_valid
+    assert not validator.is_valid and not scraper_obj.well_formed

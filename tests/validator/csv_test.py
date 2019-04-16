@@ -23,7 +23,7 @@ VALID_WITH_HEADER = \
     'year,brand,model,detail,other\n' + VALID_CSV
 
 MISSING_END_QUOTE = VALID_CSV + \
-    '1999,Chevy,"Venture ""Extended Edition"","",4900.00\n'
+                    '1999,Chevy,"Venture ""Extended Edition"","",4900.00\n'
 
 DEFAULT_FORMAT = {
     "mimetype": "text/csv",
@@ -37,7 +37,8 @@ DEFAULT_ADDML = {
     "header_fields": ""}
 
 
-def run_validator(csv_text, addml=None, file_format=None, metadata_info=None):
+def run_validator(csv_text, addml=None, file_format=None, metadata_info=None,
+                  scraper_obj_func=None):
     """Write test data and run csv validation for the file"""
 
     if addml is None:
@@ -59,37 +60,35 @@ def run_validator(csv_text, addml=None, file_format=None, metadata_info=None):
                 }
 
             metadata_info["filename"] = outfile.name
-
-            validator = PythonCsv(metadata_info)
+            scraper_obj = scraper_obj_func(metadata_info)
+            validator = PythonCsv(metadata_info, scraper_obj)
             validator.validate()
         finally:
             os.unlink(outfile.name)
 
-    return validator
+    return validator, scraper_obj
 
 
-def test_valid_created_addml():
+def test_valid_created_addml(create_scraper_obj):
     """Test that CSV validator can handle the ADDML given from addml.py"""
     addml_tree = lxml.etree.parse(ADDML_PATH)
     addml = to_dict(addml_tree)
-    validator = run_validator("name; email", addml['addml'])
+    validator, scraper_obj = run_validator("name; email", addml['addml'],
+                                           scraper_obj_func=create_scraper_obj)
 
-    assert validator.is_valid, validator.messages() + validator.errors()
-    assert "CSV validation OK" in validator.messages()
-    assert validator.errors() == ""
+    assert validator.is_valid and scraper_obj.well_formed
 
 
-def test_valid_no_header():
+def test_valid_no_header(create_scraper_obj):
     """Test the validator with valid data from Wikipedia's CSV article"""
 
-    validator = run_validator(VALID_CSV)
+    validator, scraper_obj = run_validator(VALID_CSV,
+                                           scraper_obj_func=create_scraper_obj)
 
-    assert validator.is_valid, validator.messages() + validator.errors()
-    assert "CSV validation OK" in validator.messages()
-    assert validator.errors() == ""
+    assert validator.is_valid and scraper_obj.well_formed
 
 
-def test_valid_with_header():
+def test_valid_with_header(create_scraper_obj):
     """Test valid CSV with headers"""
 
     addml = {
@@ -99,14 +98,13 @@ def test_valid_with_header():
         "header_fields": ["year", "brand", "model", "detail", "other"]
     }
 
-    validator = run_validator(VALID_WITH_HEADER, addml)
+    validator, scraper_obj = run_validator(VALID_WITH_HEADER, addml,
+                                           scraper_obj_func=create_scraper_obj)
 
-    assert validator.is_valid, validator.messages() + validator.errors()
-    assert "CSV validation OK" in validator.messages()
-    assert validator.errors() == ""
+    assert validator.is_valid and scraper_obj.well_formed
 
 
-def test_single_field_csv():
+def test_single_field_csv(create_scraper_obj):
     """Test CSV which contains only single field.
 
     Here we provide original data, but use different field separator
@@ -118,14 +116,13 @@ def test_single_field_csv():
         "delimiter": ";",
         "header_fields": ["year,brand,model,detail,other"]}
 
-    validator = run_validator(VALID_WITH_HEADER, addml)
+    validator, scraper_obj = run_validator(VALID_WITH_HEADER, addml,
+                                           scraper_obj_func=create_scraper_obj)
 
-    assert validator.is_valid, validator.messages() + validator.errors()
-    assert "CSV validation OK" in validator.messages()
-    assert validator.errors() == ""
+    assert validator.is_valid and scraper_obj.well_formed
 
 
-def test_missing_header():
+def test_missing_header(create_scraper_obj):
     """Test in invalid csv validation"""
 
     addml = {
@@ -134,34 +131,31 @@ def test_missing_header():
         "delimiter": ",",
         "header_fields": ["MISSING HEADER"]}
 
-    validator = run_validator(VALID_WITH_HEADER, addml)
+    validator, scraper_obj = run_validator(VALID_WITH_HEADER, addml,
+                                           scraper_obj_func=create_scraper_obj)
 
-    assert not validator.is_valid, validator.messages() + validator.errors()
-    assert "CSV validation OK" not in validator.messages()
-    assert "CSV validation error: field counts" in validator.errors()
+    assert not validator.is_valid and not scraper_obj.well_formed
 
 
-def test_pdf_as_csv():
+def test_pdf_as_csv(create_scraper_obj):
     """Test CSV validator with PDF files"""
 
-    validator = run_validator(open(PDF_PATH).read())
+    validator, scraper_obj = run_validator(open(PDF_PATH).read(),
+                                           scraper_obj_func=create_scraper_obj)
 
-    assert not validator.is_valid, validator.messages() + validator.errors()
-    assert "CSV validation OK" not in validator.messages()
-    assert len(validator.errors()) > 0
+    assert not validator.is_valid and not scraper_obj.well_formed
 
 
-def test_missing_end_quote():
+def test_missing_end_quote(create_scraper_obj):
     """Test missing end quote"""
 
-    validator = run_validator(MISSING_END_QUOTE)
+    validator, scraper_obj = run_validator(MISSING_END_QUOTE,
+                                           scraper_obj_func=create_scraper_obj)
 
-    assert not validator.is_valid, validator.messages() + validator.errors()
-    assert "CSV validation OK" not in validator.messages()
-    assert len(validator.errors()) > 0
+    assert not validator.is_valid and not scraper_obj.well_formed
 
 
-def test_invalid_field_delimiter():
+def test_invalid_field_delimiter(create_scraper_obj):
     """Test different field separator than defined in addml"""
 
     addml = {
@@ -170,15 +164,13 @@ def test_invalid_field_delimiter():
         "delimiter": ";",
         "header_fields": ["year", "brand", "model", "detail", "other"]}
 
-    validator = run_validator(VALID_WITH_HEADER, addml)
+    validator, scraper_obj = run_validator(VALID_WITH_HEADER, addml,
+                                           scraper_obj_func=create_scraper_obj)
 
-    assert not validator.is_valid, validator.messages() + validator.errors()
-    assert "CSV validation error: field counts" in validator.errors()
-    assert "CSV validation OK" not in validator.messages()
-    assert len(validator.errors()) > 0
+    assert not validator.is_valid and not scraper_obj.well_formed
 
 
-def test_invalid_missing_addml_metadata_info():
+def test_invalid_missing_addml_metadata_info(create_scraper_obj):
     """Test valid CSV without providing ADDML data in metadata_info"""
 
     addml = {
@@ -191,9 +183,8 @@ def test_invalid_missing_addml_metadata_info():
         "format": DEFAULT_FORMAT
     }
 
-    validator = run_validator(VALID_WITH_HEADER, addml,
-                              metadata_info=metadata_info)
+    validator, scraper_obj = run_validator(VALID_WITH_HEADER, addml,
+                                           metadata_info=metadata_info,
+                                           scraper_obj_func=create_scraper_obj)
 
-    assert not validator.is_valid, validator.messages() + validator.errors()
-    assert "ADDML data was expected, but not found" in validator.errors()
-    assert "CSV validation OK" not in validator.messages()
+    assert not validator.is_valid and not scraper_obj.well_formed

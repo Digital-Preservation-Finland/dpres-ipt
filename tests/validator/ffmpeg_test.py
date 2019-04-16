@@ -9,7 +9,8 @@ TEST_DATA_PATH = 'tests/data/02_filevalidation_data/mpg'
 
 
 def check_ffmpeg_ok(filename, mimetype, version, video=None, audio=None,
-                    video_streams=None, audio_streams=None):
+                    video_streams=None, audio_streams=None,
+                    scraper_obj_func=None):
     """
     Checker function.
     """
@@ -21,7 +22,8 @@ def check_ffmpeg_ok(filename, mimetype, version, video=None, audio=None,
         "format": {
             "version": version,
             "mimetype": mimetype}
-        }
+    }
+    scraper_obj = scraper_obj_func(metadata_info)
     if video:
         metadata_info["video"] = video
     if audio:
@@ -31,15 +33,14 @@ def check_ffmpeg_ok(filename, mimetype, version, video=None, audio=None,
     if audio_streams:
         metadata_info["audio_streams"] = audio_streams
 
-    validator = FFMpeg(metadata_info=metadata_info)
+    validator = FFMpeg(metadata_info=metadata_info, scraper_obj=scraper_obj)
     validator.validate()
 
-    assert validator.messages() != ""
     assert validator.is_valid, validator.errors()
-    assert validator.errors() == ""
+    assert scraper_obj.well_formed, scraper_obj.errors()
 
 
-def test_mark_ffmpeg_ok():
+def test_mark_ffmpeg_ok(create_scraper_obj):
     """FFMpeg test."""
 
     check_ffmpeg_ok(
@@ -51,7 +52,8 @@ def test_mark_ffmpeg_ok():
             'width': '320',
             'height': '240',
             'display_aspect_ratio': '1.33',
-            'avg_frame_rate': '29.97'})
+            'avg_frame_rate': '29.97'},
+        scraper_obj_func=create_scraper_obj)
 
     check_ffmpeg_ok(
         filename="mpg2.mpg",
@@ -63,7 +65,8 @@ def test_mark_ffmpeg_ok():
              "video": {"width": '320',
                        "height": '240',
                        "display_aspect_ratio": '1.33',
-                       "avg_frame_rate": "29.97"}}])
+                       "avg_frame_rate": "29.97"}}],
+        scraper_obj_func=create_scraper_obj)
 
     check_ffmpeg_ok(
         filename="mp4.mp4",
@@ -81,7 +84,8 @@ def test_mark_ffmpeg_ok():
                         "version": None},
              "audio": {"sample_rate": "48",
                        "bit_rate": "384",
-                       "channels": "6"}}])
+                       "channels": "6"}}],
+        scraper_obj_func=create_scraper_obj)
 
     check_ffmpeg_ok(
         filename="valid_mp3.mp3",
@@ -89,11 +93,13 @@ def test_mark_ffmpeg_ok():
         version="1",
         audio={"sample_rate": "48",
                "bit_rate": "64",
-               "channels": "1"})
+               "channels": "1"},
+        scraper_obj_func=create_scraper_obj)
 
 
 def check_ffmpeg_nok(filename, mimetype, version, video=None, audio=None,
-                     video_streams=None, audio_streams=None):
+                     video_streams=None, audio_streams=None,
+                     scraper_obj_func=None):
     """
     Checker function.
     """
@@ -105,7 +111,7 @@ def check_ffmpeg_nok(filename, mimetype, version, video=None, audio=None,
         "format": {
             "version": version,
             "mimetype": mimetype}
-        }
+    }
     if video:
         metadata_info["video"] = video
     if audio:
@@ -115,14 +121,14 @@ def check_ffmpeg_nok(filename, mimetype, version, video=None, audio=None,
     if audio_streams:
         metadata_info["audio_streams"] = audio_streams
 
-    validator = FFMpeg(metadata_info=metadata_info)
+    scraper_obj = scraper_obj_func(metadata_info)
+    validator = FFMpeg(metadata_info=metadata_info, scraper_obj=scraper_obj)
     validator.validate()
 
     assert not validator.is_valid
-    assert validator.errors() != ""
 
 
-def test_mark_ffmpeg_nok():
+def test_mark_ffmpeg_nok(create_scraper_obj):
     """
     Test for failed validation
     """
@@ -136,7 +142,8 @@ def test_mark_ffmpeg_nok():
             'width': 320,
             'height': 240,
             'display_aspect_ratio': '1.33',
-            'avg_frame_rate': '29.97'})
+            'avg_frame_rate': '29.97'},
+        scraper_obj_func=create_scraper_obj)
 
     check_ffmpeg_nok(
         filename="mpg1_error2.mpg",
@@ -147,7 +154,8 @@ def test_mark_ffmpeg_nok():
             'width': 320,
             'height': 240,
             'display_aspect_ratio': '1.33',
-            'avg_frame_rate': '29.97'})
+            'avg_frame_rate': '29.97'},
+        scraper_obj_func=create_scraper_obj)
 
     check_ffmpeg_nok(
         filename="mp4_error.mp4",
@@ -165,7 +173,8 @@ def test_mark_ffmpeg_nok():
                         "version": None},
              "audio": {"sample_rate": "48",
                        "bit_rate": "384",
-                       "channels": "6"}}])
+                       "channels": "6"}}],
+        scraper_obj_func=create_scraper_obj)
 
     check_ffmpeg_nok(
         filename="mpg2_error.mpg",
@@ -175,7 +184,8 @@ def test_mark_ffmpeg_nok():
             "width": '320',
             "height": '240',
             'display_aspect_ratio': '1.33',
-            "avg_frame_rate": "29.97"})
+            "avg_frame_rate": "29.97"},
+        scraper_obj_func=create_scraper_obj)
 
     check_ffmpeg_nok(
         filename="mpg1.mpg",
@@ -185,7 +195,8 @@ def test_mark_ffmpeg_nok():
             'width': '320',
             'height': '240',
             'display_aspect_ratio': '1.33',
-            'avg_frame_rate': '29.97'})
+            'avg_frame_rate': '29.97'},
+        scraper_obj_func=create_scraper_obj)
 
     check_ffmpeg_nok(
         filename="unknown_mimetype.3gp",
@@ -201,13 +212,15 @@ def test_mark_ffmpeg_nok():
             {"format": {"mimetype": "audio/mpeg",
                         "version": "2"},
              "audio": {"sample_rate": "8",
-                       "channels": "1"}}])
+                       "channels": "1"}}],
+        scraper_obj_func=create_scraper_obj)
 
     check_ffmpeg_nok(
         filename="no_video.wav",
         mimetype="video/mpeg",
         version="1",
-        audio={"channels": "2"})
+        audio={"channels": "2"},
+        scraper_obj_func=create_scraper_obj)
 
     check_ffmpeg_nok(
         filename="mpg1.mpg",
@@ -227,9 +240,11 @@ def test_mark_ffmpeg_nok():
                        "height": '240',
                        "bit_rate": '0.32',
                        'display_aspect_ratio': '1.33',
-                       "avg_frame_rate": "29.97"}}])
+                       "avg_frame_rate": "29.97"}}],
+        scraper_obj_func=create_scraper_obj)
 
     check_ffmpeg_nok(
         filename="mpg1.mpg",
         mimetype="video/mpeg",
-        version="1")
+        version="1",
+        scraper_obj_func=create_scraper_obj)

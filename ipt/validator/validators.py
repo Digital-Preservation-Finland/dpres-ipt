@@ -7,6 +7,7 @@ from file_scraper.scraper import Scraper
 from file_scraper.scrapers.textfile import CheckTextFile
 from six import itervalues
 
+from ipt.utils import create_scraper_params
 from ipt.validator.basevalidator import BaseValidator
 from ipt.validator.jhove import JHoveBase, JHovePDF, \
     JHoveTiff, JHoveJPEG, JHoveHTML, JHoveGif, JHoveTextUTF8, JHoveWAV
@@ -24,6 +25,9 @@ from ipt.validator.pspp import PSPP
 from ipt.validator.verapdf import VeraPDF
 from ipt.validator.dpxv import DPXv
 from ipt.validator.vnu import Vnu
+
+_FILE_SCRAPER_DETECTOR_CLASSES = ('FidoDetector', 'MagicDetector')
+_MIME_TEXT_PLAIN = 'text/plain'
 
 
 def iter_validators(metadata_info, scraper_obj=None):
@@ -122,7 +126,8 @@ def metadata_validation_results(metadata_info):
     :return: A generator to produce the validation results.
     """
 
-    scraper_obj = Scraper(metadata_info['filename'])
+    scraper_obj = Scraper(metadata_info['filename'],
+                          **create_scraper_params(metadata_info))
     try:
         if metadata_info['format']['mimetype'] == _MIME_TEXT_PLAIN:
             # TODO: Make scraper conduct text/plain specific scraping
@@ -141,7 +146,3 @@ def metadata_validation_results(metadata_info):
         }
     for validator in iter_validators(metadata_info, scraper_obj):
         yield validator.result()
-
-
-_FILE_SCRAPER_DETECTOR_CLASSES = ('FidoDetector', 'MagicDetector')
-_MIME_TEXT_PLAIN = 'text/plain'

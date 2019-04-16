@@ -11,6 +11,16 @@ import six
 
 import mimeparse
 
+_SCRAPER_PARAM_ADDML_KEY_RELATION = (('fields', 'header_fields'),
+                                     ('separator', 'separator'),
+                                     ('delimiter', 'delimiter'))
+
+_FFMPEG_FILE_SCRAPER_KEY_SYNONYMS = (('frame_rate', 'avg_frame_rate'),
+                                     ('data_rate', 'bit_rate'),
+                                     ('dar', 'display_aspect_ratio'),
+                                     ('num_channels', 'channels'),
+                                     ('sampling_frequency', 'sample_rate'))
+
 
 class UnknownException(Exception):
     """Unknown error."""
@@ -284,3 +294,37 @@ def _filter_dicts(list1, list2, included_keys, parent_key, forcekeys):
                         dict2[key] = sublist2[0]
 
     return (list1, list2)
+
+
+def create_scraper_params(metadata_info):
+    """Creates a suitable dictionary for keyword arguments for Scraper.
+
+    :param metadata_info: Discovered metadata information in dictionary.
+    :return: Dictionary of the parameters that can be passed to Scraper.
+    """
+    params = {}
+    for scr_param_key, addml_key in _SCRAPER_PARAM_ADDML_KEY_RELATION:
+        try:
+            params[scr_param_key] = metadata_info['addml'][addml_key]
+        except KeyError:
+            # "addml_key"-key did not exist therefore no need to do anything.
+            pass
+    return params
+
+
+def synonymize_stream_keys(stream):
+    """Synonymizes the stream keys that is more appropriate for the mets
+    validation.
+    The stream keys are defined as is by file-scraper. Will throw
+    RuntimeException if the key that is being named to already exists.
+    """
+
+    for first_key, second_key in _FFMPEG_FILE_SCRAPER_KEY_SYNONYMS:
+        if hasattr(stream, second_key):
+            raise RuntimeError('Stream [%s] key already exists' % second_key)
+        try:
+            stream[second_key] = stream[first_key]
+        except KeyError:
+            # "scrape_key"-key did not exist therefore no need to do anything.
+            pass
+    return stream

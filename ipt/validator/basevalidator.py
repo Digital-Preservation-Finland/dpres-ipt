@@ -162,9 +162,11 @@ class BaseValidator(object):
 
     @property
     def is_valid(self):
-        """Validation result is valid when there are no error messages.
+        """Validation result is valid when there are no error messages and
+        scraped data is well formed.
         """
-        return not self._errors
+        return all((not self._errors,
+                    self.scraper.well_formed))
 
     def iter_related_scrapers(self):
         """Iterates through all relevant scrapers based on the provided

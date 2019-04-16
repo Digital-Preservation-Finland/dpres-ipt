@@ -13,6 +13,7 @@ pytest-timeout
 opf-fido
 file-magic
 Pillow
+pymediainfo
 
 git+https://gitlab.csc.fi/dpres/xml-helpers.git@develop#egg=xml_helpers
 git+https://gitlab.csc.fi/dpres/mets.git@develop#egg=mets
