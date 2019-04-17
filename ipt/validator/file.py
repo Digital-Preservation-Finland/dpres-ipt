@@ -2,7 +2,7 @@
 This is an File (libmagick) validator.
 """
 
-from ipt.validator.basevalidator import BaseValidator, Shell
+from ipt.validator.basevalidator import BaseValidator
 
 FILECMD_PATH = "/opt/file-5.30/bin/file"
 ENV = {'LD_LIBRARY_PATH': "/opt/file-5.30/lib64"}
@@ -99,7 +99,8 @@ class FileEncoding(BaseValidator):
 
         try:
             expected = self._encodings[self.metadata_info['format']['charset']]
-            if encoding in expected:
+            if any((encoding in expected,
+                    encoding == self.metadata_info['format']['charset'])):
                 self.messages("File encoding match found.")
             else:
                 err = " ".join(

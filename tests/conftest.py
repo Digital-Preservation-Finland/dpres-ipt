@@ -29,7 +29,12 @@ def create_scraper_obj():
     def _f(metadata_info):
         scraper_obj = Scraper(metadata_info['filename'],
                               **create_scraper_params(metadata_info))
-        scraper_obj.scrape()
+        try:
+            scraper_obj.scrape()
+        except ValueError:
+            # Happens when the file causes conflicting value errors
+            # between scrapers.
+            scraper_obj.well_formed = False
         return scraper_obj
 
     return _f
@@ -67,3 +72,30 @@ def monkeypatch_scraper_mime_csv(monkeypatch):
         'application/x-ia-arc': 'application/x-internet-archive',
         'text/plain': 'text/csv'
     })
+
+
+@pytest.fixture(scope='function')
+def monkeypatch_scraper_version_dict(monkeypatch):
+    """To monkeypatch Scraper's default constant's value.
+
+    At the time of this writing, there's a bug in Scraper for VERSION_DICT
+    constant where a value was accidentally defined as a set-type.
+    """
+    monkeypatch.setattr(
+        'file_scraper.detectors.VERSION_DICT',
+        {
+            'text/html': {'5': '5.0'},
+            'application/pdf': {'1a': 'A-1a', '1b': 'A-1b',
+                                '2a': 'A-2a', '2b': 'A-2b', '2u': 'A-2u',
+                                '3a': 'A-3a', '3b': 'A-3b', '3u': 'A-3u'},
+            'audio/x-wav': {'2 Generic': '2'},
+            'application/msword': {'97-2003': None},
+            'application/vnd.openxmlformats-officedocument'
+            '.wordprocessingml.document': {'2007 onwards': None},
+            'application/vnd.ms-powerpoint': {'97-2003': None},
+            'application/vnd.openxmlformats-officedocument'
+            '.presentationml.presentation': {'2007 onwards': None},
+            'application/vnd.ms-excel': {'8': None, '8X': None},
+            'application/vnd.openxmlformats-officedocument'
+            '.spreadsheetml.sheet': {'2007 onwards': None}
+        })
