@@ -6,7 +6,6 @@ import os
 import pytest
 from ipt.validator.vnu import Vnu
 
-
 BASEPATH = "tests/data/02_filevalidation_data/html/"
 
 
@@ -29,7 +28,7 @@ BASEPATH = "tests/data/02_filevalidation_data/html/"
         ],
     ]
 )
-def test_validate_valid_file(filename, is_valid, errors):
+def test_validate_valid_file(filename, is_valid, errors, create_scraper_obj):
     """
     Test validation of HTML5 files.
     """
@@ -41,18 +40,9 @@ def test_validate_valid_file(filename, is_valid, errors):
             'version': "5.0"
         }
     }
-
-    validator = Vnu(metadata_info)
+    scraper_obj = create_scraper_obj(metadata_info)
+    validator = Vnu(metadata_info, scraper_obj=scraper_obj)
     validator.validate()
 
     # Is validity expected?
     assert validator.is_valid is is_valid
-
-    # Is stderr output expected?
-    if errors == "":
-        assert validator.errors() == ""
-    else:
-        assert errors in validator.errors()
-
-    # Is stdout output expected?
-    assert metadata_info['filename'] + "\n" == validator.messages()
