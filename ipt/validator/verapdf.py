@@ -15,7 +15,5 @@ class VeraPDF(BaseValidator):
     }
 
     def validate(self):
-        """No need for special implementation,
-        file-scraper should have handled all.
-        """
-        pass
+        """Validate the mimetype."""
+        self.validate_mimetype()

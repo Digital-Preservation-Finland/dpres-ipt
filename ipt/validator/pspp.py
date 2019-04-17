@@ -17,5 +17,5 @@ class PSPP(BaseValidator):
     }
 
     def validate(self):
-        """Ensure that the file has valid mimetype."""
+        """Validate the mimetype."""
         self.validate_mimetype()

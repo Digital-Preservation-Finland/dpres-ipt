@@ -6,7 +6,6 @@ import os
 import pytest
 from ipt.validator.verapdf import VeraPDF
 
-
 BASEPATH = "tests/data/02_filevalidation_data/"
 
 
@@ -28,7 +27,8 @@ BASEPATH = "tests/data/02_filevalidation_data/"
          "SEVERE", 'A-3b'],
     ]
 )
-def test_validate_file(filename, is_valid, errors, version):
+def test_validate_file(filename, is_valid, errors, version,
+                       create_scraper_obj):
     """
     Test validation of PDF/A files. Asserts that valid files are
     validated and invalid files or files with wrong versions are
@@ -43,15 +43,9 @@ def test_validate_file(filename, is_valid, errors, version):
             'version': version
         }
     }
-
-    validator = VeraPDF(metadata_info)
+    scraper_obj = create_scraper_obj(metadata_info)
+    validator = VeraPDF(metadata_info, scraper_obj=scraper_obj)
     validator.validate()
 
     # Is validity expected?
     assert validator.is_valid == is_valid
-
-    # Is stderr output expected?
-    if errors == "":
-        assert validator.errors() == ""
-    else:
-        assert errors in validator.errors()
