@@ -25,5 +25,6 @@ class ImageMagick(BaseValidator):
 
     def validate(self):
         """Check for the appropriate mimetype"""
-        if self.scraper.mimetype != FORMAT_STRINGS[self.mimetype]:
-            self.errors("File format does not match with MIME type.")
+        if self.mimetype != self.scraper.mimetype:
+            self.errors("Mimetype [%s] does not match with expected [%s]" % (
+                self.scraper.mimetype, self.mimetype))
