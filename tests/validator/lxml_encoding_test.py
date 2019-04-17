@@ -24,7 +24,8 @@ from ipt.validator.lxml_encoding import XmlEncoding
         ('text/xml', '1.0', 'UTF-16', 'utf_16'),
     ]
 )
-def test_validate_xml_encoding(mimetype, version, encoding, file_encoding):
+def test_validate_xml_encoding(mimetype, version, encoding, file_encoding,
+                               create_scraper_obj):
     enc_match = {'latin_1': 'ISO-8859-15',
                  'utf_8': 'UTF-8',
                  'utf_16': 'UTF-16'}
@@ -42,8 +43,8 @@ def test_validate_xml_encoding(mimetype, version, encoding, file_encoding):
             'charset': encoding
         }
     }
-
-    validator = XmlEncoding(metadata_info)
+    scraper_obj = create_scraper_obj(metadata_info)
+    validator = XmlEncoding(metadata_info, scraper_obj=scraper_obj)
     validator.validate()
     f.close()
     os.remove(tmppath)
