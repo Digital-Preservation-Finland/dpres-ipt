@@ -6,7 +6,6 @@ import os
 import pytest
 from ipt.validator.pspp import PSPP
 
-
 BASEPATH = "tests/data/02_filevalidation_data/pspp"
 
 
@@ -20,8 +19,8 @@ BASEPATH = "tests/data/02_filevalidation_data/pspp"
         ("ISSP2000_sample_corrupted.por", "application/x-spss-por", "", False),
     ]
 )
-def test_validate_valid_file(filename, mimetype, version, validity):
-
+def test_validate_valid_file(filename, mimetype, version, validity,
+                             create_scraper_obj):
     metadata_info = {
         'filename': os.path.join(BASEPATH, filename),
         'format': {
@@ -29,7 +28,7 @@ def test_validate_valid_file(filename, mimetype, version, validity):
             'version': version
         }
     }
-
-    validator = PSPP(metadata_info)
+    scraper_obj = create_scraper_obj(metadata_info)
+    validator = PSPP(metadata_info, scraper_obj=scraper_obj)
     validator.validate()
     assert validator.is_valid == validity

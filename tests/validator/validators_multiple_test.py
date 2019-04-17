@@ -7,7 +7,6 @@ import os
 import pytest
 from ipt.validator.validators import iter_validators
 
-
 BASEPATH = "tests/data/02_filevalidation_data/office"
 
 
@@ -19,7 +18,7 @@ BASEPATH = "tests/data/02_filevalidation_data/office"
          "1.2"),
     ]
 )
-def test_validate_valid_file(filename, mimetype, version):
+def test_validate_valid_file(filename, mimetype, version, create_scraper_obj):
     metadata_info = {
         'filename': os.path.join(BASEPATH, filename),
         'format': {
@@ -27,8 +26,8 @@ def test_validate_valid_file(filename, mimetype, version):
             'version': version
         }
     }
-
-    for validator in iter_validators(metadata_info):
+    scraper_obj = create_scraper_obj(metadata_info)
+    for validator in iter_validators(metadata_info, scraper_obj=scraper_obj):
         assert validator.result()['is_valid']
 
 
@@ -45,7 +44,7 @@ def test_validate_valid_file(filename, mimetype, version):
         ("MS_Word_97-2003.doc", "application/msword", "15.0"),
     ]
 )
-def test_validate_invalid_file(filename, mimetype, version):
+def test_validate_invalid_file(filename, mimetype, version, create_scraper_obj):
     metadata_info = {
         'filename': os.path.join(BASEPATH, filename),
         'format': {
@@ -53,9 +52,9 @@ def test_validate_invalid_file(filename, mimetype, version):
             'version': version
         }
     }
-
+    scraper_obj = create_scraper_obj(metadata_info)
     validator_results = []
-    for validator in iter_validators(metadata_info):
+    for validator in iter_validators(metadata_info, scraper_obj=scraper_obj):
         validator_results.append(validator.result()['is_valid'])
 
     assert not all(validator_results)

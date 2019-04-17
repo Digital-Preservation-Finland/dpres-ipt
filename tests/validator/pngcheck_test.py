@@ -5,7 +5,7 @@ import os
 import ipt.validator.pngcheck
 
 
-def validate(filename):
+def validate(filename, create_scraper_obj):
     """Return validator with given filename"""
 
     metadata_info = {
@@ -14,27 +14,24 @@ def validate(filename):
         "format": {
             "mimetype": 'image/png',
             "version": '1.2'}}
-
-    val = ipt.validator.pngcheck.Pngcheck(metadata_info)
+    scraper_obj = create_scraper_obj(metadata_info)
+    val = ipt.validator.pngcheck.Pngcheck(metadata_info,
+                                          scraper_obj=scraper_obj)
     val.validate()
     return val
 
 
-def test_pngcheck_valid():
+def test_pngcheck_valid(create_scraper_obj):
     """Test valid PNG file"""
 
-    val = validate('valid.png')
+    val = validate('valid.png', create_scraper_obj)
 
     assert val.is_valid
-    assert 'OK' in val.messages()
-    assert val.errors() == ""
 
 
-def test_pngcheck_invalid():
+def test_pngcheck_invalid(create_scraper_obj):
     """Test corrupted PNG file"""
 
-    val = validate('invalid.png')
+    val = validate('invalid.png', create_scraper_obj)
 
     assert not val.is_valid
-    assert 'OK' not in val.messages()
-    assert 'ERROR' in val.errors()
