@@ -4,6 +4,8 @@ import os
 import lxml.etree
 from tempfile import NamedTemporaryFile
 
+import pytest
+
 from ipt.validator.csv_validator import PythonCsv
 from ipt.addml.addml import to_dict
 
@@ -69,6 +71,7 @@ def run_validator(csv_text, addml=None, file_format=None, metadata_info=None,
     return validator, scraper_obj
 
 
+@pytest.mark.usefixtures('monkeypatch_scraper_mime_csv')
 def test_valid_created_addml(create_scraper_obj):
     """Test that CSV validator can handle the ADDML given from addml.py"""
     addml_tree = lxml.etree.parse(ADDML_PATH)
@@ -76,18 +79,20 @@ def test_valid_created_addml(create_scraper_obj):
     validator, scraper_obj = run_validator("name; email", addml['addml'],
                                            scraper_obj_func=create_scraper_obj)
 
-    assert validator.is_valid and scraper_obj.well_formed
+    assert validator.is_valid
 
 
+@pytest.mark.usefixtures('monkeypatch_scraper_mime_csv')
 def test_valid_no_header(create_scraper_obj):
     """Test the validator with valid data from Wikipedia's CSV article"""
 
     validator, scraper_obj = run_validator(VALID_CSV,
                                            scraper_obj_func=create_scraper_obj)
 
-    assert validator.is_valid and scraper_obj.well_formed
+    assert validator.is_valid
 
 
+@pytest.mark.usefixtures('monkeypatch_scraper_mime_csv')
 def test_valid_with_header(create_scraper_obj):
     """Test valid CSV with headers"""
 
@@ -101,9 +106,10 @@ def test_valid_with_header(create_scraper_obj):
     validator, scraper_obj = run_validator(VALID_WITH_HEADER, addml,
                                            scraper_obj_func=create_scraper_obj)
 
-    assert validator.is_valid and scraper_obj.well_formed
+    assert validator.is_valid
 
 
+@pytest.mark.usefixtures('monkeypatch_scraper_mime_csv')
 def test_single_field_csv(create_scraper_obj):
     """Test CSV which contains only single field.
 
@@ -119,9 +125,10 @@ def test_single_field_csv(create_scraper_obj):
     validator, scraper_obj = run_validator(VALID_WITH_HEADER, addml,
                                            scraper_obj_func=create_scraper_obj)
 
-    assert validator.is_valid and scraper_obj.well_formed
+    assert validator.is_valid
 
 
+@pytest.mark.usefixtures('monkeypatch_scraper_mime_csv')
 def test_missing_header(create_scraper_obj):
     """Test in invalid csv validation"""
 
@@ -134,7 +141,7 @@ def test_missing_header(create_scraper_obj):
     validator, scraper_obj = run_validator(VALID_WITH_HEADER, addml,
                                            scraper_obj_func=create_scraper_obj)
 
-    assert not validator.is_valid and not scraper_obj.well_formed
+    assert not validator.is_valid
 
 
 def test_pdf_as_csv(create_scraper_obj):
@@ -143,18 +150,20 @@ def test_pdf_as_csv(create_scraper_obj):
     validator, scraper_obj = run_validator(open(PDF_PATH).read(),
                                            scraper_obj_func=create_scraper_obj)
 
-    assert not validator.is_valid and not scraper_obj.well_formed
+    assert not validator.is_valid
 
 
+@pytest.mark.usefixtures('monkeypatch_scraper_mime_csv')
 def test_missing_end_quote(create_scraper_obj):
     """Test missing end quote"""
 
     validator, scraper_obj = run_validator(MISSING_END_QUOTE,
                                            scraper_obj_func=create_scraper_obj)
 
-    assert not validator.is_valid and not scraper_obj.well_formed
+    assert not validator.is_valid
 
 
+@pytest.mark.usefixtures('monkeypatch_scraper_mime_csv')
 def test_invalid_field_delimiter(create_scraper_obj):
     """Test different field separator than defined in addml"""
 
@@ -167,9 +176,10 @@ def test_invalid_field_delimiter(create_scraper_obj):
     validator, scraper_obj = run_validator(VALID_WITH_HEADER, addml,
                                            scraper_obj_func=create_scraper_obj)
 
-    assert not validator.is_valid and not scraper_obj.well_formed
+    assert not validator.is_valid
 
 
+@pytest.mark.usefixtures('monkeypatch_scraper_mime_csv')
 def test_invalid_missing_addml_metadata_info(create_scraper_obj):
     """Test valid CSV without providing ADDML data in metadata_info"""
 
@@ -187,4 +197,4 @@ def test_invalid_missing_addml_metadata_info(create_scraper_obj):
                                            metadata_info=metadata_info,
                                            scraper_obj_func=create_scraper_obj)
 
-    assert not validator.is_valid and not scraper_obj.well_formed
+    assert not validator.is_valid

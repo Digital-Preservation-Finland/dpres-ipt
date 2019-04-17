@@ -2,6 +2,7 @@
 
 import sys
 import pytest
+from file_scraper.iterator import iter_detectors
 from file_scraper.scraper import Scraper
 
 from ipt.utils import create_scraper_params
@@ -32,3 +33,37 @@ def create_scraper_obj():
         return scraper_obj
 
     return _f
+
+
+@pytest.fixture(scope='function')
+def monkeypatch_scraper_mime_csv(monkeypatch):
+    """To monkeypatch Scraper-class's default behaviour.
+
+    At the time of this writing, there's a bug that makes Scraper unable
+    to detect text/csv files.
+    """
+
+    def patch_scraper_identify(mimetype='', version=''):
+        def _identify(obj):
+            obj.info = {}
+            for detector in iter_detectors():
+                tool = detector(obj.filename)
+                tool.detect()
+                obj.info[len(obj.info)] = tool.info
+                obj.mimetype = mimetype
+                obj.version = version
+
+        return _identify
+
+    monkeypatch.setattr(Scraper, '_identify',
+                        patch_scraper_identify(mimetype='text/csv'))
+    monkeypatch.setattr('file_scraper.scraper.LOSE',
+                        [None, '(:unav)', '(:unap)', 'text/plain'])
+    monkeypatch.setattr('file_scraper.magic_base.MIMETYPE_DICT', {
+        'application/xml': 'text/xml',
+        'application/mp4': None,
+        'application/vnd.ms-asf': 'video/x-ms-asf',
+        'video/x-msvideo': 'video/avi',
+        'application/x-ia-arc': 'application/x-internet-archive',
+        'text/plain': 'text/csv'
+    })

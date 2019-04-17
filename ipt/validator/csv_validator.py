@@ -25,12 +25,14 @@ class PythonCsv(BaseValidator):
             self.header_fields = metadata_info['addml']['header_fields']
 
     def validate(self):
-        """Try to read CSV file through cvs.reader and if that can be done file
-        is valid.
-        :returns: (statuscode, messages, errors)
-        """
+        """Validates if the given file is the expected CSV."""
         # TODO: This issue involves all validators that use ADDML
         # Fix this issue more generically if it becomes more widespread
         if "addml" not in self.metadata_info:
             self.errors("ADDML data was expected, but not found")
             return
+
+        if self.scraper.mimetype not in self._supported_mimetypes:
+            self.errors(
+                'Mimetype [%s] is not supported' % self.scraper.mimetype
+            )
