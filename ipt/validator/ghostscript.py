@@ -20,6 +20,6 @@ class GhostScript(BaseValidator):
                             'A-3b', 'A-3u']:
             return
 
-        if self.version not in self.scraper.version:
+        if self.version != self.scraper.version:
             self.errors("wrong file version. Expected PDF %s, found%s"
                         % (self.version, self.scraper.version))
