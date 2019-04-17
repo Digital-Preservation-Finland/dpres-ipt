@@ -2,7 +2,8 @@
 import os
 import lxml.etree
 
-from ipt.validator.basevalidator import BaseValidator, Shell
+from ipt.validator.basevalidator import BaseValidator, Shell, \
+    VideoAudioStreamValidatorMixin
 from ipt.utils import parse_mimetype, handle_div, find_max_complete, \
     compare_lists_of_dicts
 
@@ -23,7 +24,7 @@ class JHoveBase(BaseValidator):
         stream_data = self.scraper.streams[0]
         stream_data['mimetype'] = self.scraper.mimetype
         for key in self.metadata_info['format']:
-            if key in ('alt-format', 'version'):
+            if key in ('alt-format'):
                 # Alt-format and version are the data JHove can't discover
                 continue
             try:
@@ -110,8 +111,14 @@ class JHoveTextUTF8(JHoveBase):
                 return False
         return super(JHoveTextUTF8, cls).is_supported(metadata_info)
 
+    def validate(self):
+        super(JHoveTextUTF8, self).validate()
+        if self.scraper.streams[0]['charset'] != 'UTF-8':
+            self.errors('Mimetype [%s] is not expected UTF-8'
+                        % self.scraper.streams[0]['charset'])
 
-class JHoveWAV(JHoveBase):
+
+class JHoveWAV(VideoAudioStreamValidatorMixin, JHoveBase):
     """JHove validator for WAV and BWF audio data."""
 
     _supported_mimetypes = {
@@ -119,23 +126,18 @@ class JHoveWAV(JHoveBase):
     }
 
     def validate(self):
-        """Using scraper's stream as a base, adds the elements to the
-        stream_data dict. Then removes keys from dicts
-        missing in either dict before comparing the dicts.
+        """Using scraper's stream as a base, compares the metadata against it.
 
-        If the dicts match the metadata is valid."""
+        If the metadata data against the scraper matches,
+        the metadata is valid.
+        """
+        super(JHoveWAV, self).validate()
+        validation_failures = False
+        if self.validate_mimetype():
+            validation_failures = True
 
-        (metadata, stream_data) = find_max_complete(
-            [self.metadata_info], [self.scraper.streams[0]],
-            ['format', 'mimetype', 'version']
-        )
+        if 'audio' in self.metadata_info and not self.validate_stream('audio'):
+            validation_failures = True
 
-        match = compare_lists_of_dicts(metadata, stream_data)
-
-        if match is False:
-            self.errors("Audio metadata in %s are not what is "
-                        "described in metadata. Found %s, expected %s" % (
-                            self.metadata_info["filename"],
-                            stream_data, self.metadata_info))
-        if match is True:
+        if not validation_failures:
             self.messages('Validation audio metadata check OK')

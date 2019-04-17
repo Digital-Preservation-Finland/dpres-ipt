@@ -3,9 +3,9 @@ import abc
 import subprocess
 
 from file_scraper.iterator import iter_scrapers
-from six import iteritems
+from six import iteritems, itervalues
 
-from ipt.utils import run_command
+from ipt.utils import run_command, handle_div, synonymize_stream_keys
 
 
 class ValidatorError(Exception):
@@ -168,6 +168,17 @@ class BaseValidator(object):
         return all((not self._errors,
                     self.scraper.well_formed))
 
+    @property
+    def is_valid_mimetype(self):
+        """Validates the current defined mimetype and version to the scraper's
+        discovered mimetype and version.
+        """
+        metadata_version = self.version if self.version else ''
+        if any((self.mimetype != self.scraper.mimetype,
+                metadata_version != self.scraper.version)):
+            return False
+        return True
+
     def iter_related_scrapers(self):
         """Iterates through all relevant scrapers based on the provided
         metadata.
@@ -187,10 +198,65 @@ class BaseValidator(object):
             'errors': self.errors()
         }
 
+    def validate_mimetype(self):
+        """Validates the current defined mimetype and version to the scraper's
+        discovered mimetype and version.
+        :return: True if no mimetype matches,
+            else False and then logs a message to errors.
+        """
+        if not self.is_valid_mimetype:
+            metadata_version = self.version if self.version else ''
+            self.errors(("Mimetype version mismatch. "
+                         "Expected [%s: %s] in metadata, got [%s, %s]") % (
+                            self.mimetype, metadata_version,
+                            self.scraper.mimetype,
+                            self.scraper.version))
+            return False
+        return True
+
     @abc.abstractmethod
     def validate(self):
         """All validator classes must implement the validate() method"""
         pass
+
+
+class VideoAudioStreamValidatorMixin:
+    """Mixin class to validate the video and audio stream """
+
+    def validate_stream(self, stream_type):
+        if stream_type in self.metadata_info:
+            if stream_type == 'audio_streams':
+                metadata_streams = self.metadata_info[stream_type]
+                stream_type = 'audio'
+            elif stream_type == 'video_streams':
+                metadata_streams = self.metadata_info[stream_type]
+                stream_type = 'video'
+            else:
+                metadata_streams = [self.metadata_info]
+        else:
+            metadata_streams = [self.metadata_info]
+
+        scraper_streams = []
+        for stream in itervalues(self.scraper.streams):
+            _dummy_dict = {}
+            stream = synonymize_stream_keys(stream)
+            _dummy_dict['format'] = {
+                'mimetype': stream.pop('mimetype', self.scraper.mimetype),
+                'version': stream.pop('version', self.scraper.version)
+            }
+            _dummy_dict[stream_type] = stream
+            scraper_streams.append(_dummy_dict)
+
+        if _match_scraper_stream(metadata_streams, scraper_streams,
+                                 stream_type):
+            return True
+
+        self.errors("Streams in %s are not what is "
+                    "described in metadata. Found %s, expected %s" % (
+                        self.metadata_info["filename"],
+                        scraper_streams,
+                        metadata_streams))
+        return True
 
 
 def concat(lines, prefix=""):
@@ -202,3 +268,48 @@ def concat(lines, prefix=""):
 
     """
     return "\n".join(["%s%s" % (prefix, line) for line in lines])
+
+
+def _match_scraper_stream(metadata_streams, scraper_streams, s_type):
+    """Helper function to help us determine that the stream data of metadata
+    is found among scraper_streams.
+
+    :param metadata_streams: The stream that we'll compare to scraper stream.
+    :param scraper_streams: The stream to be compared at.
+    :param s_type: Which stream type are we handling.
+    :return: True if metadata stream information can be found in scraper stream.
+    """
+
+    def _match_to(metadata_collection, scraper_collection):
+        """Helper to make the if-condition readable.
+
+        :param metadata_collection: Collection to use to compare to.
+        :param scraper_collection: Collection to compare against.
+        :return: True if metadata_collection information can be found in
+            scraper_collection.
+        """
+        try:
+            return all((
+                value == handle_div(scraper_collection[key]) for key, value in
+                iteritems(metadata_collection)
+            ))
+        except KeyError:
+            return False
+
+    matched_indexes = set()  # To keep tabs which items were matched.
+    for metadata_stream in metadata_streams:
+        for i, stream in enumerate(scraper_streams):
+            if _match_to(metadata_stream[s_type],
+                         stream[s_type]) and i not in matched_indexes:
+                # All values are a match, we break out from the stream loop.
+                matched_indexes.add(i)
+                break
+        else:
+            # The whole stream has been traversed and none of them matched.
+            break
+    else:
+        # We'll reach here only if scraper stream loop didn't break
+        # therefore signifying success of matching and for final check.
+        # The number of unique matches must match with length of metadata.
+        return len(matched_indexes) == len(metadata_streams)
+    return False
