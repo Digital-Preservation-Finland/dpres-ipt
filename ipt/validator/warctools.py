@@ -24,10 +24,8 @@ class WarctoolsWARC(BaseValidator):
     }
 
     def validate(self):
-        """No need for special implementation,
-        file-scraper should have handled all.
-        """
-        pass
+        """Validate the mimetype."""
+        self.validate_mimetype()
 
 
 class WarctoolsARC(BaseValidator):
@@ -39,4 +37,8 @@ class WarctoolsARC(BaseValidator):
         """No need for special implementation,
         file-scraper should have handled all.
         """
-        pass
+        if self.mimetype != self.scraper.mimetype:
+            self.errors(("Mimetype version mismatch. "
+                         "Expected [%s] in metadata, got [%s]") % (
+                            self.mimetype,
+                            self.scraper.mimetype))
