@@ -30,6 +30,10 @@ def main():
             'scandir',
             'six',
             'wand',
+            'opf-fido',
+            'file-magic',
+            'Pillow',
+            'pymediainfo',
             ('file-scraper@git+ssh://git@gitlab.csc.fi/dpres/file-scraper.git'
              '@develop#egg=file-scraper'),
         ]
