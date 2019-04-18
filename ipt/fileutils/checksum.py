@@ -1,18 +1,14 @@
-import hashlib
+from file_scraper.utils import hexdigest
 
 
 class BigFile(object):
 
     def __init__(self, algorithm='sha1'):
         # Accept MD5 and different SHA variations
-        algorithm = algorithm.lower().replace('-', '').strip()
-        self.checksum = hashlib.new(algorithm)
+        self.algorithm = algorithm.lower().replace('-', '').strip()
 
     def hexdigest(self, filename):
-        with open(filename, 'rb') as input_file:
-            for chunk in iter(lambda: input_file.read(1024 * 1024), b''):
-                self.checksum.update(chunk)
-        return self.checksum.hexdigest()
+        return hexdigest(filename, self.algorithm)
 
     def checksums_match(self, checksum_expected, checksum_to_test):
         return ((len(checksum_expected) > 0) and
