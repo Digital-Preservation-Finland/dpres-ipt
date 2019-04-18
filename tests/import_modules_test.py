@@ -8,6 +8,7 @@ modules would not be included in the coverage report.
 
 import os
 import pytest
+from importlib import import_module
 
 
 @pytest.mark.parametrize('package', ['ipt'])
@@ -23,35 +24,23 @@ def test_import_modules(package):
     for root, _, files in os.walk(package_path):
 
         for filename in files:
-
-            if filename == '__init__.py':
-
-                module_name = os.path.relpath(
-                    os.path.join(root, filename), project_path)
-                module_name = module_name.replace('/__init__.py', '')
-                module_name = module_name.replace('/', '.')
-
-                module = __import__(module_name)
-
-                message = "Failed importing package %s" % module_name
-                assert str(type(module)) == "<type 'module'>", message
-                assert not (module is None), message
-
+            if not filename.endswith('.py'):
                 continue
-
-            if filename.endswith('.py'):
-
-                module_name = os.path.relpath(
-                    os.path.join(root, filename), project_path)
-                module_name = module_name.replace('.py', '')
-                module_name = module_name.replace('/', '.')
-
-                module = __import__(module_name)
-
-                message = "Failed loading module %s" % module_name
-                assert str(type(module)) == "<type 'module'>", message
-                assert not (module is None), message
-
-                import_count = import_count + 1
+            module_name = _provide_module_name(project_path, root, filename)
+            try:
+                import_module(module_name)
+                if filename == '__init__.py':
+                    continue
+                import_count += 1
+            except ModuleNotFoundError:
+                pytest.fail('Failed loading module %s' % module_name)
 
     assert import_count > 1
+
+
+def _provide_module_name(project_path, root, filename):
+    module_name = os.path.relpath(
+        os.path.join(root, filename), project_path)
+    module_name = module_name.replace(
+        '/__init__.py', '').replace('.py', '').replace('/', '.')
+    return module_name
