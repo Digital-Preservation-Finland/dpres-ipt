@@ -48,7 +48,8 @@ creates a manifest file manifest-md5.txt with lines:
 """
 
 import os
-from hashlib import md5
+
+from file_scraper.utils import hexdigest
 
 
 class BagitError(Exception):
@@ -77,16 +78,7 @@ def calculate_md5(file_path):
     :file_path: path of file from which the md5sum is calculated.
     :returns: a string with md5-hexdigest.
     """
-    md5sum = md5()
-    with open(file_path, 'r') as infile:
-        while True:
-            # Read data in 2048 byte chunks, since larger files might
-            # be too slow otherwise.
-            data = infile.read(2048)
-            if data == '':
-                break
-            md5sum.update(data)
-    return md5sum.hexdigest()
+    return hexdigest(file_path, algorithm='md5')
 
 
 def write_manifest(manifest, path):
@@ -129,7 +121,6 @@ def check_bagit_mandatory_files(bagit_dir):
     :returns: 0 if ok, raise BagitError otherwise."""
     dirs_list = os.listdir(bagit_dir)
     if not set(['manifest-md5.txt', 'bagit.txt']).issubset(set(dirs_list)):
-        print(dirs_list)
         raise BagitError("Directory %s is not bagit format compilant. "
                          "manifest-md5.txt and bagit.txt should exist." %
                          bagit_dir)

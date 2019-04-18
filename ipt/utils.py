@@ -2,7 +2,6 @@
 
 import os
 import subprocess
-import urllib
 from collections import defaultdict
 from copy import deepcopy
 from fractions import Fraction
@@ -10,7 +9,8 @@ from fractions import Fraction
 import six
 
 import mimeparse
-
+from six import iteritems
+from six.moves.urllib.parse import unquote_plus
 _SCRAPER_PARAM_ADDML_KEY_RELATION = (('fields', 'header_fields'),
                                      ('separator', 'separator'),
                                      ('delimiter', 'delimiter'))
@@ -43,7 +43,7 @@ def run_command(cmd, stdout=subprocess.PIPE, env=None):
     _env = os.environ.copy()
 
     if env:
-        for key, value in env.iteritems():
+        for key, value in iteritems(env):
             _env[key] = value
 
     proc = subprocess.Popen(cmd,
@@ -134,7 +134,7 @@ def serialize_dict(data):
     """
     serialized_dict = ""
     if data:
-        for key in sorted(data.iterkeys()):
+        for key in sorted(list(data)):
             serialized_dict = serialized_dict + "%s=%s  " % (key, data[key])
     return serialized_dict.strip("  ")
 
