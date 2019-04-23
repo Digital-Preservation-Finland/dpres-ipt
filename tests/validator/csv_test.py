@@ -2,12 +2,14 @@
 
 import os
 import lxml.etree
+from io import open
 from tempfile import NamedTemporaryFile
 
 import pytest
 
 from ipt.validator.csv_validator import PythonCsv
 from ipt.addml.addml import to_dict
+from tests.utils import ensure_binary
 
 PDF_PATH = os.path.join(
     'tests/data/02_filevalidation_data/pdf_1_4/sample_1_4.pdf')
@@ -52,7 +54,7 @@ def run_validator(csv_text, addml=None, file_format=None, metadata_info=None,
     with NamedTemporaryFile(delete=False) as outfile:
 
         try:
-            outfile.write(csv_text)
+            outfile.write(ensure_binary(csv_text))
             outfile.close()
 
             if metadata_info is None:
@@ -147,7 +149,7 @@ def test_missing_header(create_scraper_obj):
 def test_pdf_as_csv(create_scraper_obj):
     """Test CSV validator with PDF files"""
 
-    validator, scraper_obj = run_validator(open(PDF_PATH).read(),
+    validator, scraper_obj = run_validator(open(PDF_PATH, 'rb').read(),
                                            scraper_obj_func=create_scraper_obj)
 
     assert not validator.is_valid
