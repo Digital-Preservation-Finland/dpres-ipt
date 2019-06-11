@@ -1,5 +1,5 @@
 """
-This is an DPX V2.0 validator
+This is a DPX validator
 """
 
 from ipt.validator.basevalidator import BaseValidator, Shell
@@ -10,8 +10,10 @@ class DPXv(BaseValidator):
     DPX validator
     """
     _supported_mimetypes = {
-        "image/x-dpx": ["2.0"]
+        "image/x-dpx": ["1.0", "2.0"]
     }
+
+    _check_version = None
 
     def validate(self):
         """
@@ -24,6 +26,10 @@ class DPXv(BaseValidator):
         stderr.
         """
 
+        if self._check_version is None:
+            self._check_version = 'validated as V{}'.format(
+                self.metadata_info['format']['version'])
+
         shell = Shell(['dpxv', self.metadata_info['filename']])
 
         if shell.returncode != 0:
@@ -31,6 +37,10 @@ class DPXv(BaseValidator):
 
         self.errors(shell.stderr)
         self.messages(shell.stdout)
+
+        if self._check_version not in shell.stdout:
+            self.errors().join("\nDPX not of version V{}".format(
+                self.metadata_info['format']['version']))
 
 
 class DPXvError(Exception):
