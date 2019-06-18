@@ -9,7 +9,7 @@ import tempfile
 import pytest
 
 from ipt.validator.file import File, FileEncoding
-from tests.utils import ensure_binary, ensure_text
+from ipt.utils import ensure_binary, ensure_text
 
 BASEPATH = "tests/data/02_filevalidation_data/"
 

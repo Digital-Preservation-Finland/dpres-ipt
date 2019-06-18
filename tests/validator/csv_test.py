@@ -9,7 +9,7 @@ import pytest
 
 from ipt.validator.csv_validator import PythonCsv
 from ipt.addml.addml import to_dict
-from tests.utils import ensure_binary
+from ipt.utils import ensure_binary
 
 PDF_PATH = os.path.join(
     'tests/data/02_filevalidation_data/pdf_1_4/sample_1_4.pdf')
