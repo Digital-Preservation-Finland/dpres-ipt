@@ -1,6 +1,8 @@
 #!/usr/bin/python
 """Validate all digital objects in a given METS document"""
 
+from __future__ import print_function
+
 import os
 import sys
 import uuid
@@ -13,6 +15,7 @@ import premis
 
 from ipt.validator.utils import iter_metadata_info
 from ipt.validator.validators import metadata_validation_results
+from ipt.utils import ensure_text
 
 
 def main(arguments=None):
@@ -24,7 +27,7 @@ def main(arguments=None):
         args.linking_sip_type,
         args.linking_sip_id)
 
-    print(xml_helpers.utils.serialize(report))
+    print(ensure_text(xml_helpers.utils.serialize(report)))
 
     if contains_errors(report):
         return 117
