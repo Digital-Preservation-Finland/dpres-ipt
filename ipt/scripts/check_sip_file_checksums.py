@@ -1,6 +1,8 @@
 #!/usr/bin/python
 """Check fixity for SIP digital objects"""
 
+from __future__ import print_function
+
 import os
 import sys
 import argparse
@@ -10,6 +12,7 @@ import scandir
 
 import xml_helpers.utils as u
 from ipt.validator.utils import iter_metadata_info
+from ipt.utils import ensure_text
 from ipt.fileutils.checksum import BigFile
 
 
@@ -48,8 +51,8 @@ def check_checksums(mets_path):
 
     def _message(metadata_info, message):
         """Format error message"""
-        return "%s: %s" % (
-            message, os.path.relpath(metadata_info["filename"], sip_path))
+        return ensure_text("%s: %s" % (
+            message, os.path.relpath(metadata_info["filename"], sip_path)))
 
     mets_tree = u.readfile(mets_path)
     for metadata_info in iter_metadata_info(mets_tree, mets_path):
