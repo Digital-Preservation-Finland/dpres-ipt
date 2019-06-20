@@ -100,4 +100,4 @@ def test_pdf_invalid_pdfa_invalid():
     validator.validate()
     assert not validator.is_valid
     assert "An error occurred while reading an XREF table." in \
-        validator.errors()
+        validator.messages()
