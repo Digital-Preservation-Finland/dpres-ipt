@@ -24,8 +24,8 @@ class GhostScript(BaseValidator):
             self.metadata_info["filename"]])
 
         # Ghostscript will result 0 if it can repair errors.
-        # However, stderr is not then empty.
         # This case should be handled as validation failure.
+
         if shell.stderr:
             self.errors(shell.stderr.decode('iso-8859-1').encode('utf8'))
         elif shell.returncode != 0:
@@ -33,7 +33,14 @@ class GhostScript(BaseValidator):
                         % shell.returncode)
         else:
             self._check_version()
+
         self.messages(shell.stdout.decode('iso-8859-1').encode('utf8'))
+
+        for _message in self._messages:
+            message = _message.lower()
+            if '**** error' in message or '**** warning' in message:
+                self.errors(
+                    "Validation errors suspected. See standard output.")
 
     def _check_version(self):
         """
