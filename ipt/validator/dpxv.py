@@ -39,7 +39,7 @@ class DPXv(BaseValidator):
         self.messages(shell.stdout)
 
         if self._check_version not in shell.stdout:
-            self.errors().join("\nDPX not of version V{}".format(
+            self.errors("DPX not of version V{}".format(
                 self.metadata_info['format']['version']))
 
 
