@@ -14,8 +14,12 @@ import xml_helpers.utils
 import premis
 
 from ipt.validator.utils import iter_metadata_info
-from ipt.validator.validators import metadata_validation_results
-from ipt.utils import ensure_text
+from ipt.validator.comparator import MetadataComparator
+from ipt.utils import ensure_text, create_scraper_params
+from file_scraper.scraper import Scraper
+from six import itervalues
+
+_FILE_SCRAPER_DETECTOR_CLASSES = ('FidoDetector', 'MagicDetector')
 
 
 def main(arguments=None):
@@ -59,7 +63,9 @@ def validation(mets_path):
     :mets_parser: LXML class for mets parsing
     :yields: {
                 'metadata_info': metadata_info,
-                'result': validation_result
+                'is_valid': scraper well-formedness/metadata comparison result
+                'messages': scraper/comparator messages
+                'errors': scraper/comparator errors
             }
     """
     mets_tree = None
@@ -75,21 +81,30 @@ def validation(mets_path):
         if metadata_info["errors"]:
             yield {
                 'metadata_info': metadata_info,
-                'result': {
-                    'is_valid': False,
-                    'messages': ("Failed parsing metadata, skipping "
-                                 "validation."),
-                    'errors': metadata_info["errors"],
-                    'result': None
-                }
+                'is_valid': False,
+                'messages': ("Failed parsing metadata, skipping "
+                             "validation."),
+                'errors': metadata_info["errors"],
             }
 
         else:
-            for result in metadata_validation_results(metadata_info):
+            scraper = Scraper(metadata_info['filename'],
+                              **create_scraper_params(metadata_info))
+            scraper.scrape()
+            for info in itervalues(scraper.info):
+                if info['class'] in _FILE_SCRAPER_DETECTOR_CLASSES:
+                    continue
                 yield {
                     'metadata_info': metadata_info,
-                    'result': result
+                    'is_valid': scraper.well_formed,
+                    'messages': info['messages'],
+                    'errors': info['errors'],
                 }
+
+            # Compare metadata_info to scraper results
+            # TODO: Make conditional depending on well-formedness?
+            comparator = MetadataComparator(metadata_info, scraper)
+            yield comparator.result()
 
 
 def validation_report(results, linking_sip_type, linking_sip_id):
@@ -111,10 +126,9 @@ def validation_report(results, linking_sip_type, linking_sip_id):
 
     childs = [report_agent]
     object_list = set()
-    for given_result in results:
+    for result in results:
 
-        metadata_info = given_result['metadata_info']
-        result = given_result['result']
+        metadata_info = result['metadata_info']
 
         # Create PREMIS object only if not already in the report
         if metadata_info['object_id']['value'] not in object_list:
