@@ -29,16 +29,12 @@ class MetadataComparator(object):
         return all((not self._errors,
                     self._scraper.well_formed))
 
-    def messages(self, message=None):
+    def messages(self):
         """Return comparison diagnostic messages"""
-        if message is not None:
-            self._messages.append(message)
         return concat(self._messages)
 
-    def errors(self, error=None):
+    def errors(self):
         """Return comparison error messages"""
-        if error is not None and error != "":
-            self._errors.append(error)
         return concat(self._errors, 'ERROR: ')
 
     def result(self):
@@ -48,7 +44,6 @@ class MetadataComparator(object):
             self._check_streams()
 
         return {
-            'metadata_info': self.metadata_info,
             'is_valid': self.is_valid,
             'messages': self.messages(),
             'errors': self.errors(),
@@ -61,12 +56,13 @@ class MetadataComparator(object):
         metadata_mimetype = self.metadata_info['format']['mimetype']
         metadata_version = self.metadata_info['format']['version']
 
-        if metadata_mimetype == self._scraper.mimetype and \
-                (metadata_version == '' or
-                 metadata_version == self._scraper.version):
-            self.messages('Mimetype and version ok.')
+        if not metadata_mimetype:
+            self._errors.append('Mimetype not found in metadata.')
+        elif metadata_mimetype == self._scraper.mimetype and \
+                metadata_version in ('', self._scraper.version):
+            self._messages.append('Mimetype and version ok.')
         else:
-            self.errors(
+            self._errors.append(
                 'Mimetype and version mismatch. '
                 'Expected ["{}", "{}"], found ["{}", "{}"]'
                 .format(metadata_mimetype, metadata_version,
@@ -108,11 +104,12 @@ class MetadataComparator(object):
                                      stream_type):
             # TODO Add clearer error message specifying exactly which values
             # did not match?
-            self.errors("Streams in %s are not what is "
-                        "described in metadata. Found %s, expected %s" % (
-                            self.metadata_info["filename"],
-                            scraper_streams,
-                            metadata_streams))
+            self._errors.append(
+                'Streams in {} are not what is '
+                'described in metadata. Found {}, expected {}'.format(
+                    self.metadata_info['filename'],
+                    scraper_streams,
+                    metadata_streams))
 
 
 def concat(lines, prefix=""):
