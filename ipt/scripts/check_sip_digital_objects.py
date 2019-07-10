@@ -3,21 +3,22 @@
 
 from __future__ import print_function
 
+import argparse
+import datetime
 import os
 import sys
 import uuid
-import argparse
-import datetime
-import lxml.etree
 
-import xml_helpers.utils
+import lxml.etree
+from six import itervalues
+
 import premis
+import xml_helpers.utils
+from file_scraper.scraper import Scraper
 
 from ipt.validator.utils import iter_metadata_info
 from ipt.validator.comparator import MetadataComparator
 from ipt.utils import ensure_text, create_scraper_params
-from file_scraper.scraper import Scraper
-from six import itervalues
 
 _FILE_SCRAPER_DETECTOR_CLASSES = ('FidoDetector', 'MagicDetector')
 
@@ -57,54 +58,155 @@ def contains_errors(report):
     return False
 
 
+def make_result_dict(is_valid, messages='', errors='', prefix=''):
+    """ Create a result dict from a validation component output.
+
+    :is_valid: Boolean describing the validation result.
+    :messages: Message string obtained from a validation component.
+    :errors: Error string obtained from a validation component.
+    :prefix: Prefix string to prepend messages and errors with.
+    :returns: A result_dict created from the arguments.
+    """
+    if prefix:
+        if messages:
+            messages = prefix + messages
+        if errors:
+            errors = prefix + errors
+    return {
+        'is_valid': is_valid,
+        'messages': messages,
+        'errors': errors,
+    }
+
+
+def check_mets_errors(metadata_info):
+    """
+    Check if metadata was parsed correctly from mets.
+
+    :metadata_info: Dictionary containing metadata parsed from mets.
+    :returns: List of result_dicts.
+    """
+    if metadata_info['errors']:
+        return [make_result_dict(
+            is_valid=False,
+            messages='Failed parsing metadata, skipping validation.',
+            errors=metadata_info["errors"]
+        )]
+    return [make_result_dict(True)]
+
+
+def skip_validation(metadata_info):
+    """ File format validation is not done for native file formats. """
+    return metadata_info['use'] == 'no-file-format-validation'
+
+
+def check_well_formed(scraper):
+    """
+    Collect well-formedness information, messages and errors from a
+    file-scraper object.
+
+    :scraper: File-scraper object which must have already called scrape().
+    :returns: List of result_dicts.
+    """
+    results = []
+    for info in itervalues(scraper.info):
+        if info['class'] in _FILE_SCRAPER_DETECTOR_CLASSES:
+            continue
+        results.append(
+            make_result_dict(
+                is_valid=scraper.well_formed,
+                messages=info['messages'],
+                errors=info['errors'],
+                prefix=info['class'] + ': ')
+        )
+    return results
+
+
+def check_metadata_match(metadata_info, scraper):
+    """
+    Compare mets metadata to scraper metadata using the
+    MetadataComparator class.
+
+    :metadata_info: Dictionary containing metadata parsed from mets.
+    :scraper: File-scraper object which must have already called scrape().
+    :returns: List of result_dicts.
+    """
+    comparator = MetadataComparator(metadata_info, scraper)
+    result = comparator.result()
+    return [make_result_dict(prefix='MetadataComparator: ', **result)]
+
+
+def join_validation_results(metadata_info, results):
+    """
+    Join multiple result_dicts obtained from different validation components
+    into a single dictionary, which is used to create the validation report.
+
+    :metadata_info: Dictionary containing metadata parsed from mets.
+    :results: List of result_dicts.
+    :returns: Dictionary which contains metadata_info and the aggregated
+              validation results.
+    """
+    valids, messages, errors = [], [], []
+    for result_dict in results:
+        valids.append(result_dict['is_valid'])
+        messages.append(result_dict['messages'])
+        errors.append(result_dict['errors'])
+    # Filter empty messages and errors
+    messages = [msg for msg in messages if msg]
+    errors = [err for err in errors if err]
+    return {
+        'metadata_info': metadata_info,
+        'is_valid': all(valids),
+        'messages': '\n'.join(messages),
+        'errors': '\n'.join(errors),
+    }
+
+
 def validation(mets_path):
     """
-    Call validation for all files enumerated in mets.xml files.
-    :mets_parser: LXML class for mets parsing
+    Validate all files enumerated in mets.xml files.
+
+    :mets_path: Path to the directory which contains the mets.xml file
     :yields: {
                 'metadata_info': metadata_info,
-                'is_valid': scraper well-formedness/metadata comparison result
-                'messages': scraper/comparator messages
-                'errors': scraper/comparator errors
+                'is_valid': Boolean which is True iff all validation components
+                            report valid results.
+                'messages': String containing joined messages from all
+                            validation components.
+                'errors': String containing joined errors from all validation
+                          components.
             }
     """
+
+    def _validate(metadata_info):
+        """
+        Perform validation operations in the following order:
+        1. Check if mets was parsed succesfully; if not, skip other steps.
+        2. Check if file needs to be validated; if not, skip other steps.
+        3. Scrape metadata using file-scraper and check well-formedness.
+        4. Check that mets metadata matches scraper metadata.
+
+        :returns: Dictionary containing joined results from the above steps.
+        """
+        results = []
+        results += check_mets_errors(metadata_info)
+        if not results[0]['is_valid'] or skip_validation(metadata_info):
+            return join_validation_results(metadata_info, results)
+        scraper = Scraper(metadata_info['filename'],
+                          **create_scraper_params(metadata_info))
+        scraper.scrape()
+        results += check_well_formed(scraper)
+        results += check_metadata_match(metadata_info, scraper)
+        return join_validation_results(metadata_info, results)
+
     mets_tree = None
     if mets_path is not None:
         if os.path.isdir(mets_path):
             mets_path = os.path.join(mets_path, 'mets.xml')
         mets_tree = xml_helpers.utils.readfile(mets_path)
+
     for metadata_info in iter_metadata_info(mets_tree, mets_path):
-
-        if metadata_info["use"] == 'no-file-format-validation':
-            continue
-
-        if metadata_info["errors"]:
-            yield {
-                'metadata_info': metadata_info,
-                'is_valid': False,
-                'messages': ("Failed parsing metadata, skipping "
-                             "validation."),
-                'errors': metadata_info["errors"],
-            }
-
-        else:
-            scraper = Scraper(metadata_info['filename'],
-                              **create_scraper_params(metadata_info))
-            scraper.scrape()
-            for info in itervalues(scraper.info):
-                if info['class'] in _FILE_SCRAPER_DETECTOR_CLASSES:
-                    continue
-                yield {
-                    'metadata_info': metadata_info,
-                    'is_valid': scraper.well_formed,
-                    'messages': info['messages'],
-                    'errors': info['errors'],
-                }
-
-            # Compare metadata_info to scraper results
-            # TODO: Make conditional depending on well-formedness?
-            comparator = MetadataComparator(metadata_info, scraper)
-            yield comparator.result()
+        yield _validate(metadata_info)
 
 
 def validation_report(results, linking_sip_type, linking_sip_id):
