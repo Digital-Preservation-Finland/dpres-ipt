@@ -17,7 +17,7 @@ from tests.testcommon import shell
 from ipt.scripts.check_sip_digital_objects import (main, validation,
                                                    validation_report,
                                                    make_result_dict)
-import ipt.validator.jhove
+import ipt.scripts.check_sip_digital_objects
 
 METSDIR = os.path.abspath(
     os.path.join(testcommon.settings.TESTDATADIR, 'mets'))
