@@ -32,7 +32,7 @@ def test_import_modules(package):
                 if filename == '__init__.py':
                     continue
                 import_count += 1
-            except ModuleNotFoundError:
+            except ImportError:
                 pytest.fail('Failed loading module %s' % module_name)
 
     assert import_count > 1

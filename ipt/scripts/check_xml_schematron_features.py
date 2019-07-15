@@ -1,11 +1,14 @@
 #!/usr/bin/python
+# -*- encoding:utf-8 -*-
 # vim:ft=python
 from __future__ import print_function
 import os
 import sys
 import optparse
 
-import ipt.validator.schematron
+from file_scraper.scraper import Scraper
+
+from ipt.utils import concat
 
 
 def main(arguments=None):
@@ -31,16 +34,21 @@ def main(arguments=None):
     if os.path.isdir(filename):
         filename = os.path.join(filename, 'mets.xml')
 
-    validator = ipt.validator.schematron.SchematronValidator()
+    scraper = Scraper(filename, schematron=options.schemapath)
+    scraper.scrape()
 
-    validator.schematron_validation(filename, options.schemapath)
+    messages = []
+    errors = []
+    for info in scraper.info():
+        scraper_class = info["scraper_class"]
+        messages.append(scraper_class + ": " + info["messages"])
+        errors.append(scraper_class + ": " + info["errors"])
 
-    print(validator.messages)
+    print(concat(messages))
+    print(concat(errors), file=sys.stderr)
 
-    if len(validator.errors.strip('\n \t')) > 0:
-        print(validator.errors, file=sys.stderr)
-
-    if not validator.document_valid():
+    # TODO halutaanko tarkastaa myös tiedostotyyppi ja/tai käytetyt scraperit?
+    if not scraper.well_formed:
         return 117
 
     return 0

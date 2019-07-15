@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- encoding:utf-8 -*-
 # vim:ft=python
 
 from __future__ import print_function
@@ -6,7 +7,9 @@ import os
 import sys
 import optparse
 
-import ipt.validator.xmllint
+from file_scraper.scraper import Scraper
+
+from ipt.utils import concat
 
 
 def main(arguments=None):
@@ -33,22 +36,27 @@ def main(arguments=None):
     if len(args) != 1:
         parser.error("Must give XML filename as argument")
 
-    metadata_info = {
-        "filename": args[0],
-        "schema": options.schemapath,
-        "format": {
-            "mimetype": "text/xml",
-            "version": "1.0"
-        }
-    }
-    validate = ipt.validator.xmllint.Xmllint(metadata_info)
+    scraper = Scraper(args[0], schema=options.schemapath,
+                      catalog_path=catalog_path)
+    scraper.scrape()
 
-    validate.validate()
+    # TODO olisiko tämänkaltainen toiminnallisuus tarpeen toteuttaa yhteiseen
+    #      käyttöön esim utilsseissa? Nyt copypastakoodia täällä ja
+    #      check_xml_schematron_featuresissa, pistetään kondikseen kun haluttu
+    #      outputformaatti on päätetty ja on selvää, onko missä(än) muualla
+    #      käyttöä.
+    messages = []
+    errors = []
+    for info in scraper.info():
+        scraper_class = info["scraper_class"]
+        messages.append(scraper_class + ": " + info["messages"])
+        errors.append(scraper_class + ": " + info["errors"])
 
-    print(validate.messages(), file=sys.stdout)
-    print(validate.errors(), file=sys.stderr)
+    print(concat(messages), file=sys.stdout)
+    print(concat(errors), file=sys.stderr)
 
-    if not validate.is_valid:
+    # TODO halutaanko tarkastaa myös tiedostotyyppi ja/tai käytetyt scraperit?
+    if not scraper.well_formed:
         return 117
 
     return 0
