@@ -399,3 +399,14 @@ def ensure_text(s, encoding='utf-8', errors='strict'):
         return s
     else:
         raise TypeError("not expecting type '%s'" % type(s))
+
+
+def concat(lines, prefix=""):
+    """Join given list of strings to single string separated with newlines.
+
+    :lines: List of string to join
+    :prefix: Prefix to prepend each line with
+    :returns: Joined lines as string
+
+    """
+    return "\n".join(["%s%s" % (prefix, line) for line in lines])
