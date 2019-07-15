@@ -69,9 +69,9 @@ def make_result_dict(is_valid, messages='', errors='', prefix=''):
     """
     if prefix:
         if messages:
-            messages = prefix + messages
+            messages = prefix + '\n' + messages
         if errors:
-            errors = prefix + errors
+            errors = prefix + '\n' + errors
     return {
         'is_valid': is_valid,
         'messages': messages,

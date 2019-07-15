@@ -1,9 +1,14 @@
-"""Module to compara metadata found in mets to metadata scraped by
-file-scraper.
+"""
+Module to compare metadata found in mets to metadata scraped by file-scraper.
 """
 
+import itertools
 from six import iteritems, itervalues
 from ipt.utils import handle_div, synonymize_stream_keys, concat
+
+
+_ETAL_ALLOWED_KEYS = ('display_aspect_ratio')
+_UNAVAILABLE_VALUES = ('(:unav)', '0')
 
 
 class MetadataComparator(object):
@@ -16,7 +21,7 @@ class MetadataComparator(object):
         :metadata_info: A dictionary containing metadata info parsed from mets.
         :scraper: A scraper object which has conducted file scraping.
         """
-        self.metadata_info = metadata_info
+        self._metadata_info = metadata_info
         self._messages = []
         self._errors = []
         self._scraper = scraper
@@ -26,8 +31,7 @@ class MetadataComparator(object):
         """Comparison result is valid when there are no error messages and
         scraped data is well formed.
         """
-        return all((not self._errors,
-                    self._scraper.well_formed))
+        return all((not self._errors, self._scraper.well_formed))
 
     def messages(self):
         """Return comparison diagnostic messages"""
@@ -38,120 +42,222 @@ class MetadataComparator(object):
         return concat(self._errors, 'ERROR: ')
 
     def result(self):
-        """Return the comparison result."""
+        """Perform comparison if not already done and return the result."""
         if not any((self._messages, self._errors)):
             self._check_format()
             self._check_streams()
-
+            if self.is_valid:
+                self._messages.append('Mets metadata matches '
+                                      'scraper metadata.')
         return {
             'is_valid': self.is_valid,
             'messages': self.messages(),
             'errors': self.errors(),
         }
 
-    def _check_format(self):
-        """Check that the mimetype and version number found by
-        scraper match mets metadata.
+    def _add_error(self, info, mets_value, scraper_value):
         """
-        metadata_mimetype = self.metadata_info['format']['mimetype']
-        metadata_version = self.metadata_info['format']['version']
+        Add an error describing what failed and which values were
+        compared.
+        """
+        self._errors.append(info + ' Mets: {}, Scraper: {}'.format(
+            mets_value, scraper_value))
 
-        if not metadata_mimetype:
-            self._errors.append('Mimetype not found in metadata.')
-        elif metadata_mimetype == self._scraper.mimetype and \
-                metadata_version in ('', self._scraper.version):
-            self._messages.append('Mimetype and version ok.')
-        else:
-            self._errors.append(
-                'Mimetype and version mismatch. '
-                'Expected ["{}", "{}"], found ["{}", "{}"]'
-                .format(metadata_mimetype, metadata_version,
-                        self._scraper.mimetype, self._scraper.version))
+    def _get_stream_format(self, stream_index):
+        """
+        Helper to get the part of a scraper stream which corresponds with the
+        metadata_info['format'] dictionary.
+
+        :stream_index: Index of the scraper stream.
+        """
+        stream = self._scraper.streams[stream_index]
+        return {
+            'mimetype': stream['mimetype'],
+            'version': stream['version'],
+        }
+
+    def _check_format(self):
+        """
+        Check that mimetype and version (and charset if textfile)
+        in mets metadata matches metadata found by scraper.
+        """
+        mets_format = self._metadata_info['format']
+        scraper_format = self._get_stream_format(0)
+        is_textfile = self._scraper.is_textfile()
+
+        if is_textfile:
+            self._check_charset()
+        if not _compare_mimetype_version(
+                mets_format, scraper_format, is_textfile):
+            self._add_error('Missing or incorrect mimetype/version.',
+                            mets_format, scraper_format)
+
+    def _check_charset(self):
+        """Check that character set in mets matches what scraper found."""
+        scraper_charset = self._scraper.streams[0].get('charset', None)
+        mets_charset = self._metadata_info['format'].get('charset', None)
+        if mets_charset != scraper_charset:
+            self._add_error('Character set mismatch.',
+                            mets_charset, scraper_charset)
 
     def _check_streams(self):
-        found_stream_types = set(self.metadata_info.keys()).intersection(
-            set(['audio', 'video', 'audio_streams', 'video_streams']))
-        for stream_type in found_stream_types:
-            self._check_audio_or_video_stream(stream_type)
+        metadata_stream_types = set(self._metadata_info.keys()).intersection(
+            {'addml', 'audio', 'audio_streams', 'video', 'video_streams'})
+        for stream_type in metadata_stream_types:
+            if stream_type == 'addml':
+                self._check_addml(self._metadata_info['addml'])
+            else:
+                self._check_audio_or_video_streams(stream_type)
 
-    def _check_audio_or_video_stream(self, stream_type):
-        """Modifies scraper output streams into a scraper_streams dict, which
-        follows the same formatting as the metadata_info dict. Then
-        checks that matching value for each metadata_info entry is also found
-        in scraper_streams.
+    def _check_addml(self, metadata_stream):
+        # TODO implement addml comparison
+        pass
+
+    def _check_audio_or_video_streams(self, stream_type):
         """
-        if stream_type == 'audio_streams':
-            metadata_streams = self.metadata_info[stream_type]
-            stream_type = 'audio'
-        elif stream_type == 'video_streams':
-            metadata_streams = self.metadata_info[stream_type]
-            stream_type = 'video'
+        Prepare mets and scraper streams for comparison and try to match them.
+
+        :stream_type: One of the following strings:
+                      'audio', 'audio_streams', 'video', 'video_streams'
+        """
+        mets_streams = self._prepare_mets_av_streams(stream_type)
+        stream_type = stream_type.split('_')[0]  # remove '_streams' part
+        scraper_streams = self._prepare_scraper_av_streams(stream_type)
+
+        is_match, notes = _match_streams(mets_streams, scraper_streams,
+                                         stream_type)
+        if is_match:
+            self._messages += notes
         else:
-            metadata_streams = [self.metadata_info]
+            self._add_error(
+                '{} streams in {} are not what is described in metadata.'
+                .format(stream_type, self._metadata_info['filename']),
+                mets_streams, scraper_streams)
 
-        scraper_streams = []
-        for stream in itervalues(self._scraper.streams):
-            _dummy_dict = {}
-            stream = synonymize_stream_keys(stream)
-            _dummy_dict['format'] = {
-                'mimetype': stream.pop('mimetype', self._scraper.mimetype),
-                'version': stream.pop('version', self._scraper.version)
-            }
-            _dummy_dict[stream_type] = stream
-            scraper_streams.append(_dummy_dict)
-
-        if not _match_scraper_stream(metadata_streams, scraper_streams,
-                                     stream_type):
-            # TODO Add clearer error message specifying exactly which values
-            # did not match?
-            self._errors.append(
-                'Streams in {} are not what is '
-                'described in metadata. Found {}, expected {}'.format(
-                    self.metadata_info['filename'],
-                    scraper_streams,
-                    metadata_streams))
-
-
-def _match_scraper_stream(metadata_streams, scraper_streams, s_type):
-    """Helper function to help us determine that the stream data of metadata
-    is found among scraper_streams.
-
-    :param metadata_streams: The stream that we'll compare to scraper stream.
-    :param scraper_streams: The stream to be compared at.
-    :param s_type: Which stream type are we handling.
-    :return: True if metadata stream information can be found in scraper streams.
-    """
-
-    def _match_to(metadata_collection, scraper_collection):
-        """Helper to make the if-condition readable.
-
-        :param metadata_collection: Collection to use to compare to.
-        :param scraper_collection: Collection to compare against.
-        :return: True if metadata_collection information can be found in
-            scraper_collection.
+    def _prepare_scraper_av_streams(self, stream_type):
         """
-        try:
-            return all((
-                value == handle_div(scraper_collection[key]) for key, value in
-                iteritems(metadata_collection)
-            ))
-        except KeyError:
+        Modify scraper streams to resemble the metadata_info dictionary.
+        Keep only streams of given type, handle divisions in values
+        and convert key names to match corresponding metadata_info keys.
+
+        :scraper_streams: Streams scraped by a file-scraper object.
+        :stream_type: Either 'audio' or 'video'.
+        :returns: List of metadata dictionaries prepared for comparison.
+        """
+        if stream_type not in ('audio', 'video'):
+            raise ValueError('Invalid stream type {}'.format(stream_type))
+        prepared_streams = []
+        for stream in itervalues(self._scraper.streams):
+            if stream['stream_type'] != stream_type:
+                continue
+            _dummy_dict = {}
+            _dummy_dict['format'] = self._get_stream_format(stream['index'])
+            stream = {k: handle_div(v) for k, v in iteritems(stream)}
+            stream = synonymize_stream_keys(stream)
+            _dummy_dict[stream_type] = stream
+            prepared_streams.append(_dummy_dict)
+        return prepared_streams
+
+    def _prepare_mets_av_streams(self, stream_type):
+        """
+        Get stream dicts of type stream_type from metadata_info into a list.
+
+        :stream_type: One of the following strings:
+                      'audio', 'audio_streams', 'video', 'video_streams'.
+        :returns: List of metadata dictionaries.
+        """
+        if stream_type in ('audio_streams', 'video_streams'):
+            return self._metadata_info[stream_type]
+        if stream_type in ('audio', 'video'):
+            return [self._metadata_info]
+        raise ValueError('Invalid stream type {}'.format(stream_type))
+
+
+def _compare_mimetype_version(mets_format, scraper_format, is_textfile=False):
+    """
+    Helper to check if mimetype and version in mets match scraper.
+
+    :mets_format: Dict with keys 'mimetype' and 'version (from mets).
+    :scraper_format: Dict with keys 'mimetype' and 'version' (from scraper).
+    :is_textfile: True if checking a text file.
+    :returns: True iff mets mimetype and version match what scraper found.
+    """
+    ok_mimetypes = [scraper_format['mimetype']]
+    ok_versions = [scraper_format['version']]
+    # Subsets of text/plain (e.g., text/html) can be submitted as plaintext
+    if is_textfile:
+        ok_mimetypes.append('text/plain')
+    # If scraper does not find a version, empty string in mets is ok
+    if scraper_format['version'] in ('(:unav)', None):
+        ok_versions.append('')
+    return all((mets_format['mimetype'] in ok_mimetypes,
+                mets_format['version'] in ok_versions))
+
+
+def _match_streams(mets_streams, scraper_streams, stream_type):
+    """
+    Check that mets contains as many streams as scraper found, and that every
+    stream in mets matches some scraper stream.
+
+    :mets_streams: List of prepared audio or video streams parsed from mets.
+    :scraper_streams: List of prepared audio or video streams from scraper.
+    :stream_type: Either 'audio' or 'video'.
+    :returns: (is_match, notes); is_match = True iff all streams were paired
+              successfully. Notes is a list of info about values listed as
+              (:unav) or 0 in mets but for which scraper found actual values.
+    """
+    if stream_type not in ('audio', 'video'):
+        raise ValueError('Invalid stream type {}'.format(stream_type))
+
+    def _compare_stream_dicts(mets_stream, scraper_stream):
+        """
+        Helper to check if all key-value pairs in mets_stream can be found in
+        scraper_stream, excluding some special cases.
+
+        mets_stream: A prepared mets stream dictionary.
+        scraper_stream: A prepared scraper stream dictionary.
+        :returns: True iff mets_stream matches scraper_stream.
+        """
+        if not _compare_mimetype_version(mets_stream['format'],
+                                         scraper_stream['format']):
             return False
 
-    matched_indexes = set()  # To keep tabs which items were matched.
-    for metadata_stream in metadata_streams:
-        for i, stream in enumerate(scraper_streams):
-            if _match_to(metadata_stream[s_type],
-                         stream[s_type]) and i not in matched_indexes:
-                # All values are a match, we break out from the stream loop.
-                matched_indexes.add(i)
-                break
-        else:
-            # The whole stream has been traversed and none of them matched.
-            break
-    else:
-        # We'll reach here only if scraper stream loop didn't break
-        # therefore signifying success of matching and for final check.
-        # The number of unique matches must match with length of metadata.
-        return len(matched_indexes) == len(metadata_streams)
-    return False
+        for key, mets_value in iteritems(mets_stream[stream_type]):
+            try:
+                scraper_value = scraper_stream[stream_type][key]
+                if mets_value == scraper_value:
+                    continue
+                # Check special cases where value mismatch is allowed
+                if mets_value in _UNAVAILABLE_VALUES:
+                    notes.append('Found value for {} -- {}'.format(
+                        {key: mets_value}, {key: scraper_value}))
+                    continue
+                if scraper_value in _UNAVAILABLE_VALUES:
+                    continue
+                if mets_value == '(:etal)' and key in _ETAL_ALLOWED_KEYS:
+                    continue
+                return False
+            except KeyError:
+                # Mets may contain keys that scraper does not find, this is ok
+                pass
+        return True
+
+    # Number of streams must match
+    if len(mets_streams) != len(scraper_streams):
+        return (False, [])
+
+    # Try to pair each mets stream with one scraper stream.
+    # NOTE This is a brute-force algorithm which tries every possible
+    # pairing combination (O(n!) time complexity). Typically the number of
+    # streams is small, so this should not be a problem.
+    # TODO Special handling for cases when there are too many streams,
+    # or implement a completely different smarter algorithm?
+    for mets_perm in itertools.permutations(mets_streams):
+        notes = []
+        if all([_compare_stream_dicts(mets_stream, scraper_stream)
+                for mets_stream, scraper_stream in
+                zip(mets_perm, scraper_streams)]):
+            return (True, notes)
+    # All combinations tried, could not match the streams. Notes are only
+    # useful if the streams were matched successfully, so return empty list.
+    return (False, [])
