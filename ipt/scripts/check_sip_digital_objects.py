@@ -79,9 +79,10 @@ def make_result_dict(is_valid, messages='', errors='', prefix=''):
     }
 
 
-def check_mets_errors(metadata_info):
+def check_metadata_info(metadata_info):
     """
-    Check if metadata was parsed correctly from mets.
+    Check if metadata was parsed correctly from mets, and add possible notes
+    to messages.
 
     :metadata_info: Dictionary containing metadata parsed from mets.
     :returns: List of result_dicts.
@@ -92,7 +93,14 @@ def check_mets_errors(metadata_info):
             messages='Failed parsing metadata, skipping validation.',
             errors=metadata_info["errors"]
         )]
-    return [make_result_dict(True)]
+    messages = ''
+    try:
+        alt_format = metadata_info['format']['alt-format']
+        messages = 'Found alternative format "{}", but validating as "{}".' \
+            .format(alt_format, metadata_info['format']['mimetype'])
+    except KeyError:
+        pass
+    return [make_result_dict(True, messages=messages)]
 
 
 def skip_validation(metadata_info):
@@ -181,7 +189,8 @@ def validation(mets_path):
     def _validate(metadata_info):
         """
         Perform validation operations in the following order:
-        1. Check if mets was parsed succesfully; if not, skip other steps.
+        1. Check metadata_info for errors and notes; if there are errors,
+           skip other steps.
         2. Check if file needs to be validated; if not, skip other steps.
         3. Scrape metadata using file-scraper and check well-formedness.
         4. Check that mets metadata matches scraper metadata.
@@ -189,7 +198,7 @@ def validation(mets_path):
         :returns: Dictionary containing joined results from the above steps.
         """
         results = []
-        results += check_mets_errors(metadata_info)
+        results += check_metadata_info(metadata_info)
         if not results[0]['is_valid'] or skip_validation(metadata_info):
             return join_validation_results(metadata_info, results)
         scraper = Scraper(metadata_info['filename'],

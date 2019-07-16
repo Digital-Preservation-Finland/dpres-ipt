@@ -324,10 +324,16 @@ def _filter_dicts(list1, list2, included_keys, parent_key, forcekeys):
 def create_scraper_params(metadata_info):
     """Creates a suitable dictionary for keyword arguments for Scraper.
 
-    :param metadata_info: Discovered metadata information in dictionary.
-    :return: Dictionary of the parameters that can be passed to Scraper.
+    :metadata_info: Discovered metadata information in dictionary.
+    :returns: Dictionary of the parameters that can be passed to Scraper.
     """
     params = {}
+
+    if 'alt-format' in metadata_info['format']:
+        # If given alt-format (e.g., text/html), ensure that validation is
+        # done using the primary mimetype (e.g., text/plain)
+        params['mimetype'] = metadata_info['format']['mimetype']
+
     for scr_param_key, addml_key in _SCRAPER_PARAM_ADDML_KEY_RELATION:
         try:
             params[scr_param_key] = metadata_info['addml'][addml_key]
