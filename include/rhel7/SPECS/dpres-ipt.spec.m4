@@ -28,7 +28,7 @@ Requires: warc-tools >= 4.8.3 ffmpeg pngcheck
 Requires: dpres-xml-schemas xml-helpers mets premis
 Requires: python-wand libreoffice
 Requires: pspp
-Requires: file-scraper python-opf-fido python-magic python-pillow pymediainfo
+Requires: file-scraper-full python-opf-fido python-magic python-pillow pymediainfo
 # Our own packaging of a newer file command than what CentOS provides
 Requires: file-5.30
 # For xmllint XHTML validation
