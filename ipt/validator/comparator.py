@@ -12,8 +12,21 @@ _UNAVAILABLE_VALUES = ('(:unav)', '0')
 
 
 class MetadataComparator(object):
-    """This class performs the metadata comparison between mets and scraper
-    output."""
+    """
+    This class checks that mets metadata matches scraper metadata.
+    First call to the result() method calls the _perform_checks() method,
+    which goes through all relevant sections of the metadata_info dictionary.
+    The checks for individual metadata_info sections are performed in methods
+    starting with '_check', which may call other _check methods or helper
+    functions.
+
+    1. _check_format (always): compare mimetype and version
+           _check_charset (text files only): compare character set
+    2. _check_addml (if 'addml' key exists in metadata_info)
+    3. _check_audio_or_video_streams (called for each of the following keys
+           present in metadata_info:
+           'audio', 'audio_streams', 'video', 'video_streams')
+    """
 
     def __init__(self, metadata_info, scraper):
         """Setup the metadata comparator object
@@ -22,16 +35,17 @@ class MetadataComparator(object):
         :scraper: A scraper object which has conducted file scraping.
         """
         self._metadata_info = metadata_info
+        self._scraper = scraper
         self._messages = []
         self._errors = []
-        self._scraper = scraper
 
     @property
     def is_valid(self):
-        """Comparison result is valid when there are no error messages and
-        scraped data is well formed.
         """
-        return all((not self._errors, self._scraper.well_formed))
+        Comparison result is valid when checks don't result in any error
+        messages.
+        """
+        return not self._errors
 
     def messages(self):
         """Return comparison diagnostic messages"""
@@ -44,8 +58,7 @@ class MetadataComparator(object):
     def result(self):
         """Perform comparison if not already done and return the result."""
         if not any((self._messages, self._errors)):
-            self._check_format()
-            self._check_streams()
+            self._perform_checks()
             if self.is_valid:
                 self._messages.append('Mets metadata matches '
                                       'scraper metadata.')
@@ -76,6 +89,16 @@ class MetadataComparator(object):
             'version': stream['version'],
         }
 
+    def _perform_checks(self):
+        self._check_format()
+        metadata_stream_types = set(self._metadata_info.keys()).intersection(
+            {'addml', 'audio', 'audio_streams', 'video', 'video_streams'})
+        for stream_type in metadata_stream_types:
+            if stream_type == 'addml':
+                self._check_addml(self._metadata_info['addml'])
+            else:
+                self._check_audio_or_video_streams(stream_type)
+
     def _check_format(self):
         """
         Check that mimetype and version (and charset if textfile)
@@ -99,15 +122,6 @@ class MetadataComparator(object):
         if mets_charset != scraper_charset:
             self._add_error('Character set mismatch.',
                             mets_charset, scraper_charset)
-
-    def _check_streams(self):
-        metadata_stream_types = set(self._metadata_info.keys()).intersection(
-            {'addml', 'audio', 'audio_streams', 'video', 'video_streams'})
-        for stream_type in metadata_stream_types:
-            if stream_type == 'addml':
-                self._check_addml(self._metadata_info['addml'])
-            else:
-                self._check_audio_or_video_streams(stream_type)
 
     def _check_addml(self, metadata_stream):
         # TODO implement addml comparison
@@ -177,7 +191,7 @@ def _compare_mimetype_version(mets_format, scraper_format, is_textfile=False):
     """
     Helper to check if mimetype and version in mets match scraper.
 
-    :mets_format: Dict with keys 'mimetype' and 'version (from mets).
+    :mets_format: Dict with keys 'mimetype' and 'version' (from mets).
     :scraper_format: Dict with keys 'mimetype' and 'version' (from scraper).
     :is_textfile: True if checking a text file.
     :returns: True iff mets mimetype and version match what scraper found.
