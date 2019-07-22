@@ -8,6 +8,7 @@ from ipt.utils import handle_div, synonymize_stream_keys, concat
 
 
 _ETAL_ALLOWED_KEYS = ('display_aspect_ratio')
+_INTEGER_VALUE_KEYS = ('data_rate')
 _UNAVAILABLE_VALUES = ('(:unav)', '0')
 
 
@@ -160,17 +161,22 @@ class MetadataComparator(object):
         """
         if stream_type not in ('audio', 'video'):
             raise ValueError('Invalid stream type {}'.format(stream_type))
-        prepared_streams = []
+        prepared_dicts = []
         for stream in itervalues(self._scraper.streams):
             if stream['stream_type'] != stream_type:
                 continue
             _dummy_dict = {}
             _dummy_dict['format'] = self._get_stream_format(stream['index'])
-            stream = {k: handle_div(v) for k, v in iteritems(stream)}
-            stream = synonymize_stream_keys(stream)
-            _dummy_dict[stream_type] = stream
-            prepared_streams.append(_dummy_dict)
-        return prepared_streams
+            _stream = {}
+            for key, value in iteritems(stream):
+                decimals = 2  # Round values to two decimals by default
+                if key in _INTEGER_VALUE_KEYS:
+                    decimals = 0
+                _stream[key] = handle_div(value, decimals)
+            _stream = synonymize_stream_keys(_stream)
+            _dummy_dict[stream_type] = _stream
+            prepared_dicts.append(_dummy_dict)
+        return prepared_dicts
 
     def _prepare_mets_av_streams(self, stream_type):
         """
@@ -202,7 +208,7 @@ def _compare_mimetype_version(mets_format, scraper_format, is_textfile=False):
     if is_textfile:
         ok_mimetypes.append('text/plain')
     # If scraper does not find a version, empty string in mets is ok
-    if scraper_format['version'] in ('(:unav)', None):
+    if scraper_format['version'] in ('(:unav)', '(:unap)', None):
         ok_versions.append('')
     return all((mets_format['mimetype'] in ok_mimetypes,
                 mets_format['version'] in ok_versions))
@@ -243,7 +249,7 @@ def _match_streams(mets_streams, scraper_streams, stream_type):
                     continue
                 # Check special cases where value mismatch is allowed
                 if mets_value in _UNAVAILABLE_VALUES:
-                    notes.append('Found value for {} -- {}'.format(
+                    notes.append('Found value for {} -- {}.'.format(
                         {key: mets_value}, {key: scraper_value}))
                     continue
                 if scraper_value in _UNAVAILABLE_VALUES:

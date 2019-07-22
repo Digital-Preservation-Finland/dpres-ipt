@@ -207,17 +207,17 @@ def parse_mimetype(mimetype):
     return result
 
 
-def handle_div(div):
+def handle_div(div, decimals=2):
     """
     Change a string containing a division or a decimal number to a
-    string containing a decimal number with max 2 digits.
+    string containing a decimal number with max <decimals> decimals.
     Returns original string if ValueError of ZeroDivisionError raised.
     :div: e.g. "16/9" or "1.7777778"
     :returns: e.g. "1.78"
     """
     try:
         div = float(Fraction(div))
-        return ("%.2f" % round(div, 2)).rstrip('0').rstrip('.')
+        return ("%.2f" % round(div, decimals)).rstrip('0').rstrip('.')
     except (ValueError, ZeroDivisionError):
         return div
 
