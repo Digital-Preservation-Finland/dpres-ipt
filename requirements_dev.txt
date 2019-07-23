@@ -5,6 +5,7 @@ dateutils
 scandir
 pytest
 wand
+six
 python-mimeparse
 pytest-timeout
 git+https://gitlab.csc.fi/dpres/xml-helpers.git@develop#egg=xml_helpers

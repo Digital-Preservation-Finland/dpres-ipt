@@ -6,6 +6,9 @@ import urllib
 from collections import defaultdict
 from copy import deepcopy
 from fractions import Fraction
+
+import six
+
 import mimeparse
 
 
@@ -135,6 +138,7 @@ def uri_to_path(uri):
     :returns: Relative path as string
 
     """
+    uri = uri.encode("utf-8") if six.PY2 else uri
     path = urllib.unquote_plus(uri).replace('file://', '')
     return path.lstrip('./')
 

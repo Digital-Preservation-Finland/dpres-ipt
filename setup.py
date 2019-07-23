@@ -25,7 +25,7 @@ def main():
         packages=find_packages(exclude=['tests', 'tests.*']),
         version=get_version(),
         entry_points={'console_scripts': scripts_list()},
-        install_requires=['python-mimeparse', 'scandir', 'wand']
+        install_requires=['python-mimeparse', 'scandir', 'wand', 'six']
     )
 
 
