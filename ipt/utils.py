@@ -34,7 +34,7 @@ from fractions import Fraction
 import six
 
 import mimeparse
-from six import iteritems, text_type, binary_type
+from six import iteritems, itervalues, text_type, binary_type
 from six.moves.urllib.parse import unquote_plus
 _SCRAPER_PARAM_ADDML_KEY_RELATION = (('fields', 'header_fields'),
                                      ('separator', 'separator'),
@@ -45,6 +45,8 @@ _FFMPEG_FILE_SCRAPER_KEY_SYNONYMS = (('frame_rate', 'avg_frame_rate'),
                                      ('dar', 'display_aspect_ratio'),
                                      ('num_channels', 'channels'),
                                      ('sampling_frequency', 'sample_rate'))
+
+_SCRAPER_DETECTOR_CLASSES = ('FidoDetector', 'MagicDetector')
 
 
 class UnknownException(Exception):
@@ -416,3 +418,16 @@ def concat(lines, prefix=""):
 
     """
     return "\n".join(["%s%s" % (prefix, line) for line in lines])
+
+
+def get_scraper_info(scraper, filter_detectors=False):
+    messages, errors = [], []
+    for info in itervalues(scraper.info):
+        scraper_class = info['class']
+        if filter_detectors and scraper_class in _SCRAPER_DETECTOR_CLASSES:
+            continue
+        # Keep empty messages to see used classes, but filter empty errors
+        messages.append(scraper_class + ': ' + info['messages'])
+        if info['errors']:
+            errors.append(scraper_class + ': ' + info['errors'])
+    return messages, errors

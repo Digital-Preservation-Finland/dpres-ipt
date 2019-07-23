@@ -4,7 +4,7 @@ Module to compare metadata found in mets to metadata scraped by file-scraper.
 
 import itertools
 from six import iteritems, itervalues
-from ipt.utils import handle_div, synonymize_stream_keys, concat
+from ipt.utils import handle_div, synonymize_stream_keys
 
 
 _ETAL_ALLOWED_KEYS = ('display_aspect_ratio')
@@ -50,11 +50,11 @@ class MetadataComparator(object):
 
     def messages(self):
         """Return comparison diagnostic messages"""
-        return concat(self._messages)
+        return self._messages
 
     def errors(self):
         """Return comparison error messages"""
-        return concat(self._errors, 'ERROR: ')
+        return ['ERROR: ' + err for err in self._errors]
 
     def result(self):
         """Perform comparison if not already done and return the result."""

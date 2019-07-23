@@ -8,7 +8,7 @@ import optparse
 
 from file_scraper.scraper import Scraper
 
-from ipt.utils import concat
+from ipt.utils import concat, get_scraper_info
 
 
 def main(arguments=None):
@@ -37,12 +37,7 @@ def main(arguments=None):
     scraper = Scraper(filename, schematron=options.schemapath)
     scraper.scrape()
 
-    messages = []
-    errors = []
-    for info in scraper.info():
-        scraper_class = info["scraper_class"]
-        messages.append(scraper_class + ": " + info["messages"])
-        errors.append(scraper_class + ": " + info["errors"])
+    messages, errors = get_scraper_info(scraper)
 
     print(concat(messages))
     print(concat(errors), file=sys.stderr)

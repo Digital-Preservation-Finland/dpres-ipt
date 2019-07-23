@@ -46,15 +46,13 @@ TESTCASES = [
     #      'stdout': '',
     #      'stderr': ''}},
 
-    # The text file inside is actually not plain text for scraper: html
-    # files are reported as such.
-    # TODO this is a behaviour that might need to be addressed in ipt?
-    # {'testcase': 'Test valid sip package #7: csc-test-metadata-text-plain',
-    #  'filename': 'csc-test-metadata-text-plain',
-    #  'expected_result': {
-    #      'returncode': 0,
-    #      'stdout': ['File is a text file'],
-    #      'stderr': ''}},
+    {'testcase': 'Test valid sip package #7: csc-test-metadata-text-plain',
+     'filename': 'csc-test-metadata-text-plain',
+     'expected_result': {
+         'returncode': 0,
+         'stdout': ['Found alternative format "text/html", but validating '
+                    'as "text/plain".'],
+         'stderr': ''}},
 
     # Scraper seems to support the file
     # {'testcase': 'Unsupported file version',
@@ -233,30 +231,23 @@ def patch_validate(monkeypatch):
 
     def _check_well_formed(scraper):
         """Monkeypatch well-formedness check (there are no real files)."""
-        results = []
+        result = {}
 
         if scraper.filename == 'pdf':
-            results.append(
-                make_result_dict(
+            result = make_result_dict(
                     is_valid=True,
-                    messages='Well-Formed and valid',
-                    errors='',
-                    prefix='JHovePdfScraper' + ': '))
-            results.append(
-                make_result_dict(
-                    is_valid=True,
-                    messages='The file was analyzed successfully.',
-                    errors='',
-                    prefix='MagicScraper' + ': '))
+                    messages=['JHovePdfScraper: Well-Formed and valid',
+                              ('MagicScraper: The file was analyzed '
+                               'successfully.')],
+                    errors=[])
         elif scraper.filename == 'cdr':
-            results.append(
-                make_result_dict(
+            result = make_result_dict(
                     is_valid=None,
-                    messages=('Proper scraper was not found. The file was not '
-                              'analyzed.'),
-                    errors='',
-                    prefix='ScraperNotFound' + ': '))
-        return results
+                    messages=['Proper scraper was not found. The file was not '
+                              'analyzed.'],
+                    errors=[],
+                    prefix='ScraperNotFound' + ': ')
+        return result
 
     def _check_metadata_match(metadata_info, results):
         """Monkeypatch metadata matching: there are no real files to scrape."""
@@ -272,7 +263,7 @@ def patch_validate(monkeypatch):
                                  "version mismatch. Expected "
                                  "['application/cdr', '9.0'], found "
                                  "['None', '''None']")}
-        return [make_result_dict(result)]
+        return result
 
     def _iter_metadata_info(mets_tree, mets_path):
         """Monkeypatch mets reading."""
