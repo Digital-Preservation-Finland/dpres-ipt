@@ -1,0 +1,264 @@
+import pytest
+from copy import deepcopy
+from six import iteritems
+from file_scraper.scraper import Scraper
+from ipt.validator.comparator import MetadataComparator
+from ipt.utils import concat
+
+METADATA_INFO = {
+    'valid_text': {
+        'filename': 'textfile',
+        'format': {'charset': 'UTF-8',
+                   'mimetype': 'text/plain',
+                   'version': ''}},
+    'valid_image': {
+        'filename': 'imagefile',
+        'format': {'mimetype': 'image/jpeg',
+                   'version': '1.02'}},
+    'valid_audio': {
+        'filename': 'audiofile',
+        'format': {'mimetype': 'audio/x-wav',
+                   'version': ''},
+        'audio': {'bit_rate': '706',
+                  'bits_per_sample': '8',
+                  'channels': '2',
+                  'sample_rate': '44.1'}},
+    'valid_video': {
+        'filename': 'videocontainer',
+        'format': {'mimetype': 'video/mp4', 'version': ''},
+        'audio_streams': [{'format': {'mimetype': 'audio/mp4',
+                                      'version': ''},
+                           'audio': {'bit_rate': '135',
+                                     'channels': '2',
+                                     'sample_rate': '44.1'}},
+                          {'format': {'mimetype': 'audio/mp4',
+                                      'version': ''},
+                           'audio': {'bit_rate': '135',
+                                     'channels': '4',
+                                     'sample_rate': '48'}}],
+        'video_streams': [{'format': {'mimetype': 'video/mp4',
+                                      'version': ''},
+                           'video': {'avg_frame_rate': '30',
+                                     'bit_rate': '0.05',
+                                     'display_aspect_ratio': '1.78',
+                                     'height': '180',
+                                     'width': '320'}}]},
+}
+
+
+SCRAPER_ATTRIBUTES = {
+    'valid_text': {
+         'filename': 'textfile',
+         'mimetype': 'text/plain',
+         'version': '(:unav)',
+         'well_formed': True,
+         'streams': {
+             0: {'charset': 'UTF-8',
+                 'index': 0,
+                 'mimetype': 'text/plain',
+                 'stream_type': 'text',
+                 'version': '(:unav)'}}},
+    'valid_image': {
+        'filename': 'imagefile',
+        'mimetype': 'image/jpeg',
+        'version': '1.02',
+        'well_formed': True,
+        'streams': {
+             0: {'bps_unit': 'integer',
+                 'bps_value': '8',
+                 'colorspace': 'srgb',
+                 'compression': 'jpeg',
+                 'height': '300',
+                 'index': 0,
+                 'mimetype': 'image/jpeg',
+                 'samples_per_pixel': '3',
+                 'stream_type': 'image',
+                 'version': '1.02',
+                 'width': '400'}}},
+    'valid_audio': {
+        'filename': 'audiofile',
+        'mimetype': 'audio/x-wav',
+        'version': '',
+        'well_formed': True,
+        'streams': {
+             0: {'audio_data_encoding': 'PCM',
+                 'bits_per_sample': '8',
+                 'codec_creator_app': 'Lavf56.40.101',
+                 'codec_creator_app_version': '56.40.101',
+                 'codec_name': 'PCM',
+                 'codec_quality': 'lossless',
+                 'data_rate': '705.6',
+                 'data_rate_mode': 'Fixed',
+                 'duration': 'PT0.86S',
+                 'index': 0,
+                 'mimetype': 'audio/x-wav',
+                 'num_channels': '2',
+                 'sampling_frequency': '44.1',
+                 'stream_type': 'audio',
+                 'version': ''}}},
+    'valid_video': {
+        'filename': 'videocontainer',
+        'mimetype': 'video/mp4',
+        'version': None,
+        'well_formed': True,
+        'streams': {
+            0: {'codec_creator_app': 'Lavf56.40.101',
+                'codec_creator_app_version': '56.40.101',
+                'codec_name': 'MPEG-4',
+                'index': 0,
+                'mimetype': 'video/mp4',
+                'stream_type': 'videocontainer',
+                'version': '(:unav)'},
+            1: {'bits_per_sample': '8',
+                'codec_creator_app': 'Lavf56.40.101',
+                'codec_creator_app_version': '56.40.101',
+                'codec_name': 'AVC',
+                'codec_quality': 'lossy',
+                'color': 'Color',
+                'dar': '1.778',
+                'data_rate': '0.048704',
+                'data_rate_mode': 'Variable',
+                'duration': 'PT1S',
+                'frame_rate': '30',
+                'height': '180',
+                'index': 1,
+                'mimetype': 'video/mp4',
+                'par': '1',
+                'sampling': '4:2:0',
+                'signal_format': '(:unap)',
+                'sound': 'Yes',
+                'stream_type': 'video',
+                'version': '(:unav)',
+                'width': '320'},
+            2: {'audio_data_encoding': 'AAC',
+                'bits_per_sample': '(:unav)',
+                'codec_creator_app': 'Lavf56.40.101',
+                'codec_creator_app_version': '56.40.101',
+                'codec_name': 'AAC',
+                'codec_quality': 'lossy',
+                'data_rate': '135.233',
+                'data_rate_mode': 'Fixed',
+                'duration': 'PT0.86S',
+                'index': 2,
+                'mimetype': 'audio/mp4',
+                'num_channels': '4',
+                'sampling_frequency': '48',
+                'stream_type': 'audio',
+                'version': '(:unav)'},
+            3: {'audio_data_encoding': 'AAC',
+                'bits_per_sample': '(:unav)',
+                'codec_creator_app': 'Lavf56.40.101',
+                'codec_creator_app_version': '56.40.101',
+                'codec_name': 'AAC',
+                'codec_quality': 'lossy',
+                'data_rate': '135.233',
+                'data_rate_mode': 'Fixed',
+                'duration': 'PT0.86S',
+                'index': 3,
+                'mimetype': 'audio/mp4',
+                'num_channels': '2',
+                'sampling_frequency': '44.1',
+                'stream_type': 'audio',
+                'version': '(:unav)'}}},
+}
+
+# The default result message if comparison does not find any errors.
+DEFAULT_VALID_MESSAGE = 'Mets metadata matches scraper metadata.'
+
+VALID_TEST_CASES = [
+    {'reason': 'Valid plaintext must pass.',
+     'base': 'valid_text'},
+    {'reason': 'Valid non-plaintext must pass.',
+     'base': 'valid_image'},
+    {'reason': 'Valid single-stream file must pass.',
+     'base': 'valid_audio'},
+    {'reason': 'Valid video container with multiple streams must pass.',
+     'base': 'valid_video'},
+    {'reason': 'Check that (:etal) value in allowed key is accepted.',
+     'base': 'valid_video',
+     'md_patch': [
+         ['video_streams', 0, 'video', 'display_aspect_ratio', '(:etal)']]},
+    {'reason': 'If scraper finds value for mets (:unav), it must be reported.',
+     'base': 'valid_audio',
+     'md_patch': [['audio', 'channels', '(:unav)']],
+     'expected_message': "Found value for {'channels': '(:unav)'} "
+                         "-- {'channels': '2'}."},
+]
+
+
+INVALID_TEST_CASES = [
+    {'reason': 'Mimetype is always required in mets.',
+     'base': 'valid_text',
+     'md_patch': [['format', {'mimetype': None, 'version': None}]],
+     'expected_error': 'Missing or incorrect mimetype/version.'},
+    {'reason': 'Version is required except when scraper does not find it.',
+     'base': 'valid_image',
+     'md_patch': [['format', 'version', '']],
+     'expected_error': 'Missing or incorrect mimetype/version.'},
+    {'reason': 'Character set is always required for text files.',
+     'base': 'valid_text',
+     'md_patch': [['format', {'mimetype': 'text/plain', 'version': ''}]],
+     'expected_error': 'Character set mismatch.'},
+]
+
+
+def patch_dict(original, patches):
+    patched_dict = deepcopy(original)
+    for patch in patches:
+        value = patch.pop()
+        current = patched_dict
+        for key in patch[:-1]:
+            current = current[key]
+        current[patch[-1]] = value
+    return patched_dict
+
+
+class _TestScraper(Scraper):
+    def __init__(self, attr_dict):
+        for key, value in iteritems(attr_dict):
+            setattr(self, key, value)
+
+    def is_textfile(self):
+        return self.filename == 'textfile'
+
+
+@pytest.mark.parametrize('test_params', VALID_TEST_CASES,
+                         ids=[case['reason'] for case in VALID_TEST_CASES])
+def test_valid_result(test_params):
+    base = test_params['base']
+    scraper = _TestScraper(SCRAPER_ATTRIBUTES[base])
+    metadata_info = METADATA_INFO[base]
+    try:
+        metadata_info = patch_dict(metadata_info, test_params['md_patch'])
+    except KeyError:
+        pass
+
+    comparator = MetadataComparator(metadata_info, scraper)
+    result = comparator.result()
+
+    print(result)
+
+    expected_message = test_params.get('expected_message',
+                                       DEFAULT_VALID_MESSAGE)
+    assert not result['errors']
+    assert expected_message in concat(result['messages'])
+    assert result['is_valid']
+
+
+@pytest.mark.parametrize('test_params', INVALID_TEST_CASES,
+                         ids=[case['reason'] for case in INVALID_TEST_CASES])
+def test_invalid_result(test_params):
+    base = test_params['base']
+    scraper = _TestScraper(SCRAPER_ATTRIBUTES[base])
+    metadata_info = METADATA_INFO[base]
+    try:
+        metadata_info = patch_dict(metadata_info, test_params['md_patch'])
+    except KeyError:
+        pass
+
+    comparator = MetadataComparator(metadata_info, scraper)
+    result = comparator.result()
+
+    expected_error = test_params['expected_error']
+    assert expected_error in concat(result['errors'])
+    assert not result['is_valid']
