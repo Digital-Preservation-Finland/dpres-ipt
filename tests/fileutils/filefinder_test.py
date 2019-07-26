@@ -11,7 +11,7 @@ import ipt.fileutils.filefinder
 # Other imports
 import os
 
-SIPDIR = os.path.abspath(os.path.dirname(__file__) + '../../data/test-sips')
+SIPDIR = os.path.abspath(os.path.dirname(__file__) + '../../data/sips')
 
 
 class TestGetFilesInTree:

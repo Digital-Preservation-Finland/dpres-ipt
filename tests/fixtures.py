@@ -135,7 +135,7 @@ def temp_sip(testpath):
 
     def _temp_sip(sip_name):
         """Copy function used inside tests used inside tests"""
-        sip_path = os.path.join('tests/data/test-sips', sip_name)
+        sip_path = os.path.join('tests/data/sips', sip_name)
         temp_sip_path = os.path.join(testpath, sip_name)
         shutil.copytree(sip_path, temp_sip_path)
         return temp_sip_path
