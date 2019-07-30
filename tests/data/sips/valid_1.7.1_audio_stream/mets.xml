@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mets:mets xmlns:mets="http://www.loc.gov/METS/" xmlns:audiomd="http://www.loc.gov/audioMD/" xmlns:fi="http://digitalpreservation.fi/schemas/mets/fi-extensions" xmlns:premis="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" PROFILE="http://digitalpreservation.fi/mets-profiles/cultural-heritage" OBJID="9ce46d99-7354-4693-9355-0add610c9f3e" xsi:schemaLocation="http://www.loc.gov/METS/ http://digitalpreservation.fi/schemas/mets/mets.xsd" fi:CATALOG="1.7.1" fi:SPECIFICATION="1.7.1" fi:CONTRACTID="urn:uuid:e48a7051-2247-4d4d-ae90-44c8ee94daca"><mets:metsHdr CREATEDATE="2019-07-29T12:33:19.679084" RECORDSTATUS="submission"><mets:agent ROLE="CREATOR" TYPE="ORGANIZATION"><mets:name>CSC</mets:name></mets:agent></mets:metsHdr><mets:dmdSec ID="_1bb558fc-2347-4a32-a888-cf20b8a84018" CREATED="2019-07-29T12:33:18.823449">
+    <mets:mdWrap MDTYPE="DC" MDTYPEVERSION="1.1">
+      <mets:xmlData><dc:title xmlns:dc="http://purl.org/dc/elements/1.1/">Audio SIP</dc:title>
+	<dc:description xmlns:dc="http://purl.org/dc/elements/1.1/">Test SIP containing an audio file.</dc:description>
+	<dc:publisher xmlns:dc="http://purl.org/dc/elements/1.1/">CSC</dc:publisher>
+	<dc:identifier xmlns:dc="http://purl.org/dc/elements/1.1/">test_sip_valid_1.7.1_audio_stream</dc:identifier>
+</mets:xmlData>
+    </mets:mdWrap>
+  </mets:dmdSec>
+<mets:amdSec>
+    <mets:techMD ID="_2e6039b1852b5caa57f0569180930054" CREATED="2019-07-29T12:32:39.920771">
+      <mets:mdWrap MDTYPE="PREMIS:OBJECT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:object xsi:type="premis:file">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>de348ca0-ff4d-4502-bb9e-2dc8c066a736</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:objectCharacteristics>
+              <premis:compositionLevel>0</premis:compositionLevel>
+              <premis:fixity>
+                <premis:messageDigestAlgorithm>MD5</premis:messageDigestAlgorithm>
+                <premis:messageDigest>24c1f29b1587c564608f6879713bfbba</premis:messageDigest>
+              </premis:fixity>
+              <premis:format>
+                <premis:formatDesignation>
+                  <premis:formatName>audio/x-wav</premis:formatName>
+                  <premis:formatVersion>2</premis:formatVersion>
+                </premis:formatDesignation>
+              </premis:format>
+              <premis:creatingApplication>
+                <premis:dateCreatedByApplication>2019-07-26T10:18:52.196613</premis:dateCreatedByApplication>
+              </premis:creatingApplication>
+            </premis:objectCharacteristics>
+          </premis:object>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+  <mets:techMD ID="_eae4d239422e21f3a8cfa57bb2afcb9e" CREATED="2019-07-29T12:32:41.391524">
+      <mets:mdWrap MDTYPE="OTHER" MDTYPEVERSION="2.0" OTHERMDTYPE="AudioMD">
+        <mets:xmlData>
+          <audiomd:AUDIOMD xsi:schemaLocation="http://www.loc.gov/audioMD/ https://www.loc.gov/standards/amdvmd/audioMD.xsd" ANALOGDIGITALFLAG="FileDigital">
+            <audiomd:fileData>
+              <audiomd:audioDataEncoding>PCM</audiomd:audioDataEncoding>
+              <audiomd:bitsPerSample>8</audiomd:bitsPerSample>
+              <audiomd:compression>
+                <audiomd:codecCreatorApp>Lavf56.40.101</audiomd:codecCreatorApp>
+                <audiomd:codecCreatorAppVersion>56.40.101</audiomd:codecCreatorAppVersion>
+                <audiomd:codecName>PCM</audiomd:codecName>
+                <audiomd:codecQuality>lossless</audiomd:codecQuality>
+              </audiomd:compression>
+              <audiomd:dataRate>706</audiomd:dataRate>
+              <audiomd:dataRateMode>Fixed</audiomd:dataRateMode>
+              <audiomd:samplingFrequency>44.1</audiomd:samplingFrequency>
+            </audiomd:fileData>
+            <audiomd:audioInfo>
+              <audiomd:duration>PT0.86S</audiomd:duration>
+              <audiomd:numChannels>2</audiomd:numChannels>
+            </audiomd:audioInfo>
+          </audiomd:AUDIOMD>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+  <mets:digiprovMD ID="_1f217fa77680ff961dcb876257f97886" CREATED="2019-07-29T12:32:57.348128">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>UUID</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>5852fd8e-a9e1-4329-af61-b0312dc153ca</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>Pre-Ingest tool</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  <mets:digiprovMD ID="_9b547f38d36afb98400f2ddf4f19df5c" CREATED="2019-07-29T12:32:57.348128">
+      <mets:mdWrap MDTYPE="PREMIS:EVENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:event>
+            <premis:eventIdentifier>
+              <premis:eventIdentifierType>UUID</premis:eventIdentifierType>
+              <premis:eventIdentifierValue>10bdfd9b-2082-4bb3-9a1b-8081acec0131</premis:eventIdentifierValue>
+            </premis:eventIdentifier>
+            <premis:eventType>creation</premis:eventType>
+            <premis:eventDateTime>2019-07-29T12:32:57+0000</premis:eventDateTime>
+            <premis:eventDetail>SIP creation</premis:eventDetail>
+            <premis:eventOutcomeInformation>
+              <premis:eventOutcome>success</premis:eventOutcome>
+              <premis:eventOutcomeDetail>
+                <premis:eventOutcomeDetailNote>Test SIP created successfully</premis:eventOutcomeDetailNote>
+              </premis:eventOutcomeDetail>
+            </premis:eventOutcomeInformation>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>UUID</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>5852fd8e-a9e1-4329-af61-b0312dc153ca</premis:linkingAgentIdentifierValue>
+            </premis:linkingAgentIdentifier>
+          </premis:event>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  </mets:amdSec>
+<mets:fileSec>
+    <mets:fileGrp>
+      <mets:file ID="_a6c28ac2-c99f-485b-9b9a-df455a1da9c2" ADMID="_2e6039b1852b5caa57f0569180930054 _eae4d239422e21f3a8cfa57bb2afcb9e">
+        <mets:FLocat LOCTYPE="URL" xlink:href="file://data/valid_2_bwf.wav" xlink:type="simple"/>
+      </mets:file>
+    </mets:fileGrp>
+  </mets:fileSec>
+<mets:structMap>
+    <mets:div TYPE="directory" DMDID="_1bb558fc-2347-4a32-a888-cf20b8a84018" ADMID="_9b547f38d36afb98400f2ddf4f19df5c _1f217fa77680ff961dcb876257f97886">
+      <mets:div TYPE="data">
+        <mets:fptr FILEID="_a6c28ac2-c99f-485b-9b9a-df455a1da9c2"/>
+      </mets:div>
+    </mets:div>
+  </mets:structMap>
+</mets:mets>

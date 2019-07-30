@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mets:mets xmlns:mets="http://www.loc.gov/METS/" xmlns:mix="http://www.loc.gov/mix/v20" xmlns:fi="http://digitalpreservation.fi/schemas/mets/fi-extensions" xmlns:premis="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" PROFILE="http://digitalpreservation.fi/mets-profiles/cultural-heritage" OBJID="fe4705ab-ef2d-4db4-b7cd-6344618f898d" xsi:schemaLocation="http://www.loc.gov/METS/ http://digitalpreservation.fi/schemas/mets/mets.xsd" fi:CATALOG="1.7.1" fi:SPECIFICATION="1.7.1" fi:CONTRACTID="urn:uuid:e48a7051-2247-4d4d-ae90-44c8ee94daca"><mets:metsHdr CREATEDATE="2019-07-29T13:08:39.344477" RECORDSTATUS="submission"><mets:agent ROLE="CREATOR" TYPE="ORGANIZATION"><mets:name>CSC</mets:name></mets:agent></mets:metsHdr><mets:dmdSec ID="_967eea13-e01d-45bb-a2e9-770a8b98d70f" CREATED="2019-07-29T13:08:38.488724">
+    <mets:mdWrap MDTYPE="DC" MDTYPEVERSION="1.1">
+      <mets:xmlData><dc:title xmlns:dc="http://purl.org/dc/elements/1.1/">Unsupported mimetype SIP</dc:title>
+	<dc:description xmlns:dc="http://purl.org/dc/elements/1.1/">Test SIP with unsupported mimetype in mets.</dc:description>
+	<dc:publisher xmlns:dc="http://purl.org/dc/elements/1.1/">CSC</dc:publisher>
+	<dc:identifier xmlns:dc="http://purl.org/dc/elements/1.1/">test_sip_invalid_1.7.1_unsupported_mimetype</dc:identifier>
+</mets:xmlData>
+    </mets:mdWrap>
+  </mets:dmdSec>
+<mets:amdSec>
+    <mets:techMD ID="_4f5a5b36ff6481a7956795a0a3b5e387" CREATED="2019-07-29T13:07:24.314216">
+      <mets:mdWrap MDTYPE="PREMIS:OBJECT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:object xsi:type="premis:file">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>42683aef-a79f-4610-8698-e208fb468295</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:objectCharacteristics>
+              <premis:compositionLevel>0</premis:compositionLevel>
+              <premis:fixity>
+                <premis:messageDigestAlgorithm>MD5</premis:messageDigestAlgorithm>
+                <premis:messageDigest>11d81a68eb9a36c08246c9e1f48e3d8e</premis:messageDigest>
+              </premis:fixity>
+              <premis:format>
+                <premis:formatDesignation>
+		  <premis:formatName>application/kissa</premis:formatName>
+                </premis:formatDesignation>
+              </premis:format>
+              <premis:creatingApplication>
+                <premis:dateCreatedByApplication>2019-07-26T10:29:17.177029</premis:dateCreatedByApplication>
+              </premis:creatingApplication>
+            </premis:objectCharacteristics>
+          </premis:object>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+  <mets:techMD ID="_18a5288d89edcb7263f3ae9922360b77" CREATED="2019-07-29T13:07:25.815517">
+      <mets:mdWrap MDTYPE="NISOIMG" MDTYPEVERSION="2.0">
+        <mets:xmlData>
+          <mix:mix xsi:schemaLocation="http://www.loc.gov/mix/v20 http://www.loc.gov/mix/mix.xsd">
+            <mix:BasicDigitalObjectInformation>
+              <mix:Compression>
+                <mix:compressionScheme>jpeg</mix:compressionScheme>
+              </mix:Compression>
+            </mix:BasicDigitalObjectInformation>
+            <mix:BasicImageInformation>
+              <mix:BasicImageCharacteristics>
+                <mix:imageWidth>10</mix:imageWidth>
+                <mix:imageHeight>6</mix:imageHeight>
+                <mix:PhotometricInterpretation>
+                  <mix:colorSpace>srgb</mix:colorSpace>
+                </mix:PhotometricInterpretation>
+              </mix:BasicImageCharacteristics>
+            </mix:BasicImageInformation>
+            <mix:ImageAssessmentMetadata>
+              <mix:ImageColorEncoding>
+                <mix:BitsPerSample>
+                  <mix:bitsPerSampleValue>8</mix:bitsPerSampleValue>
+                  <mix:bitsPerSampleUnit>integer</mix:bitsPerSampleUnit>
+                </mix:BitsPerSample>
+                <mix:samplesPerPixel>3</mix:samplesPerPixel>
+              </mix:ImageColorEncoding>
+            </mix:ImageAssessmentMetadata>
+          </mix:mix>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+  <mets:digiprovMD ID="_1f217fa77680ff961dcb876257f97886" CREATED="2019-07-29T13:07:50.893744">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>UUID</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>bfc2285e-d7b8-465f-8c11-6bd7139638bd</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>Pre-Ingest tool</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  <mets:digiprovMD ID="_511e776030f1b7ae8334b6c3c8b4ae3e" CREATED="2019-07-29T13:07:50.893744">
+      <mets:mdWrap MDTYPE="PREMIS:EVENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:event>
+            <premis:eventIdentifier>
+              <premis:eventIdentifierType>UUID</premis:eventIdentifierType>
+              <premis:eventIdentifierValue>ea257d83-aa0d-4b91-ae92-85dd928331fc</premis:eventIdentifierValue>
+            </premis:eventIdentifier>
+            <premis:eventType>creation</premis:eventType>
+            <premis:eventDateTime>2019-07-29T13:07:50+0000</premis:eventDateTime>
+            <premis:eventDetail>SIP creation</premis:eventDetail>
+            <premis:eventOutcomeInformation>
+              <premis:eventOutcome>success</premis:eventOutcome>
+              <premis:eventOutcomeDetail>
+                <premis:eventOutcomeDetailNote>Test SIP created successfully</premis:eventOutcomeDetailNote>
+              </premis:eventOutcomeDetail>
+            </premis:eventOutcomeInformation>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>UUID</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>bfc2285e-d7b8-465f-8c11-6bd7139638bd</premis:linkingAgentIdentifierValue>
+            </premis:linkingAgentIdentifier>
+          </premis:event>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  </mets:amdSec>
+<mets:fileSec>
+    <mets:fileGrp>
+      <mets:file ID="_cd2770c7-0c55-4ef3-bade-1ee9312e56c9" ADMID="_18a5288d89edcb7263f3ae9922360b77 _4f5a5b36ff6481a7956795a0a3b5e387">
+        <mets:FLocat LOCTYPE="URL" xlink:href="file://data/valid_1.01.jpg" xlink:type="simple"/>
+      </mets:file>
+    </mets:fileGrp>
+  </mets:fileSec>
+<mets:structMap>
+    <mets:div TYPE="directory" DMDID="_967eea13-e01d-45bb-a2e9-770a8b98d70f" ADMID="_511e776030f1b7ae8334b6c3c8b4ae3e _1f217fa77680ff961dcb876257f97886">
+      <mets:div TYPE="data">
+        <mets:fptr FILEID="_cd2770c7-0c55-4ef3-bade-1ee9312e56c9"/>
+      </mets:div>
+    </mets:div>
+  </mets:structMap>
+</mets:mets>

@@ -236,8 +236,6 @@ def test_valid_result(test_params):
     comparator = MetadataComparator(metadata_info, scraper)
     result = comparator.result()
 
-    print(result)
-
     expected_message = test_params.get('expected_message',
                                        DEFAULT_VALID_MESSAGE)
     assert not result['errors']

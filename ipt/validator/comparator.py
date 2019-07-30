@@ -59,10 +59,15 @@ class MetadataComparator(object):
     def result(self):
         """Perform comparison if not already done and return the result."""
         if not any((self._messages, self._errors)):
-            self._perform_checks()
-            if self.is_valid:
-                self._messages.append('Mets metadata matches '
-                                      'scraper metadata.')
+            if not self._scraper.well_formed:
+                self._errors.append('{} is not well-formed. Skipping metadata '
+                                    'comparison.'
+                                    .format(self._scraper.filename))
+            else:
+                self._perform_checks()
+                if self.is_valid:
+                    self._messages.append('Mets metadata matches '
+                                          'scraper metadata.')
         return {
             'is_valid': self.is_valid,
             'messages': self.messages(),
@@ -208,8 +213,8 @@ def _compare_mimetype_version(mets_format, scraper_format, is_textfile=False):
     if is_textfile:
         ok_mimetypes.append('text/plain')
     # If scraper does not find a version, empty string in mets is ok
-    if scraper_format['version'] in ('(:unav)', '(:unap)', None):
-        ok_versions.append('')
+    if scraper_format['version'] in ('(:unav)', '(:unap)', '', None):
+        ok_versions.extend(['(:unap)', ''])
     return all((mets_format['mimetype'] in ok_mimetypes,
                 mets_format['version'] in ok_versions))
 

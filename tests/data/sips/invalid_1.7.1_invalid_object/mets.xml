@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mets:mets xmlns:mets="http://www.loc.gov/METS/" xmlns:fi="http://digitalpreservation.fi/schemas/mets/fi-extensions" xmlns:premis="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" PROFILE="http://digitalpreservation.fi/mets-profiles/cultural-heritage" OBJID="2e4f44ad-9f44-4dcd-8c30-73348b3a672b" xsi:schemaLocation="http://www.loc.gov/METS/ http://digitalpreservation.fi/schemas/mets/mets.xsd" fi:CATALOG="1.7.1" fi:SPECIFICATION="1.7.1" fi:CONTRACTID="urn:uuid:e48a7051-2247-4d4d-ae90-44c8ee94daca"><mets:metsHdr CREATEDATE="2019-07-30T06:37:24.375026" RECORDSTATUS="submission"><mets:agent ROLE="CREATOR" TYPE="ORGANIZATION"><mets:name>CSC</mets:name></mets:agent></mets:metsHdr><mets:dmdSec ID="_dfcf4ddb-cbee-4d66-91b2-3948afe245bd" CREATED="2019-07-30T06:37:23.550020">
+    <mets:mdWrap MDTYPE="DC" MDTYPEVERSION="1.1">
+      <mets:xmlData><dc:title xmlns:dc="http://purl.org/dc/elements/1.1/">Invalid digital object SIP</dc:title>
+	<dc:description xmlns:dc="http://purl.org/dc/elements/1.1/">Test SIP containing an invalid digital object.</dc:description>
+	<dc:publisher xmlns:dc="http://purl.org/dc/elements/1.1/">CSC</dc:publisher>
+	<dc:identifier xmlns:dc="http://purl.org/dc/elements/1.1/">test_sip_invalid_1.7.1_invalid_object</dc:identifier>
+</mets:xmlData>
+    </mets:mdWrap>
+  </mets:dmdSec>
+<mets:amdSec>
+    <mets:techMD ID="_b91fc2d0b893a73e682c4e685004da0d" CREATED="2019-07-30T06:36:26.421716">
+      <mets:mdWrap MDTYPE="PREMIS:OBJECT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:object xsi:type="premis:file">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>c95bfd7f-21b9-4eb2-b082-a825f61665e8</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:objectCharacteristics>
+              <premis:compositionLevel>0</premis:compositionLevel>
+              <premis:fixity>
+                <premis:messageDigestAlgorithm>MD5</premis:messageDigestAlgorithm>
+                <premis:messageDigest>aa02fc52974975e22c95a0b4faaf2d7a</premis:messageDigest>
+              </premis:fixity>
+              <premis:format>
+                <premis:formatDesignation>
+                  <premis:formatName>application/warc</premis:formatName>
+                  <premis:formatVersion>0.18</premis:formatVersion>
+                </premis:formatDesignation>
+              </premis:format>
+              <premis:creatingApplication>
+                <premis:dateCreatedByApplication>2019-07-30T06:35:30.632093</premis:dateCreatedByApplication>
+              </premis:creatingApplication>
+            </premis:objectCharacteristics>
+          </premis:object>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+  <mets:digiprovMD ID="_1f217fa77680ff961dcb876257f97886" CREATED="2019-07-30T06:37:00.016872">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>UUID</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>c7c5fa77-3067-4763-b9d3-3ec7d52a9072</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>Pre-Ingest tool</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  <mets:digiprovMD ID="_56d4a2bc3166082b290b2683f88b35bd" CREATED="2019-07-30T06:37:00.016872">
+      <mets:mdWrap MDTYPE="PREMIS:EVENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:event>
+            <premis:eventIdentifier>
+              <premis:eventIdentifierType>UUID</premis:eventIdentifierType>
+              <premis:eventIdentifierValue>a23d2a7f-b177-4290-beb9-2e2555ad2a61</premis:eventIdentifierValue>
+            </premis:eventIdentifier>
+            <premis:eventType>creation</premis:eventType>
+            <premis:eventDateTime>2019-07-30T06:36:59+0000</premis:eventDateTime>
+            <premis:eventDetail>SIP creation</premis:eventDetail>
+            <premis:eventOutcomeInformation>
+              <premis:eventOutcome>success</premis:eventOutcome>
+              <premis:eventOutcomeDetail>
+                <premis:eventOutcomeDetailNote>Test SIP created successfully</premis:eventOutcomeDetailNote>
+              </premis:eventOutcomeDetail>
+            </premis:eventOutcomeInformation>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>UUID</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>c7c5fa77-3067-4763-b9d3-3ec7d52a9072</premis:linkingAgentIdentifierValue>
+            </premis:linkingAgentIdentifier>
+          </premis:event>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  </mets:amdSec>
+<mets:fileSec>
+    <mets:fileGrp>
+      <mets:file ID="_d1476d74-90c6-4503-98bd-292f180d645f" ADMID="_b91fc2d0b893a73e682c4e685004da0d">
+        <mets:FLocat LOCTYPE="URL" xlink:href="file://data/invalid_0.18_too_short_content_length.warc" xlink:type="simple"/>
+      </mets:file>
+    </mets:fileGrp>
+  </mets:fileSec>
+<mets:structMap>
+    <mets:div TYPE="directory" DMDID="_dfcf4ddb-cbee-4d66-91b2-3948afe245bd" ADMID="_56d4a2bc3166082b290b2683f88b35bd _1f217fa77680ff961dcb876257f97886">
+      <mets:div TYPE="data">
+        <mets:fptr FILEID="_d1476d74-90c6-4503-98bd-292f180d645f"/>
+      </mets:div>
+    </mets:div>
+  </mets:structMap>
+</mets:mets>

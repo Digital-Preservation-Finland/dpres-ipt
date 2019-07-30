@@ -1,0 +1,207 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mets:mets xmlns:mets="http://www.loc.gov/METS/" xmlns:videomd="http://www.loc.gov/videoMD/" xmlns:audiomd="http://www.loc.gov/audioMD/" xmlns:fi="http://digitalpreservation.fi/schemas/mets/fi-extensions" xmlns:premis="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" PROFILE="http://digitalpreservation.fi/mets-profiles/cultural-heritage" OBJID="39549250-3966-4e15-a7c5-c70a512bd82f" xsi:schemaLocation="http://www.loc.gov/METS/ http://digitalpreservation.fi/schemas/mets/mets.xsd" fi:CATALOG="1.7.1" fi:SPECIFICATION="1.7.1" fi:CONTRACTID="urn:uuid:e48a7051-2247-4d4d-ae90-44c8ee94daca"><mets:metsHdr CREATEDATE="2019-07-29T12:47:23.540214" RECORDSTATUS="submission"><mets:agent ROLE="CREATOR" TYPE="ORGANIZATION"><mets:name>CSC</mets:name></mets:agent></mets:metsHdr><mets:dmdSec ID="_3a6a4cc6-e28f-4895-902e-eab61b3535e3" CREATED="2019-07-29T12:47:22.692534">
+    <mets:mdWrap MDTYPE="DC" MDTYPEVERSION="1.1">
+      <mets:xmlData><dc:title xmlns:dc="http://purl.org/dc/elements/1.1/">Video SIP</dc:title>
+	<dc:description xmlns:dc="http://purl.org/dc/elements/1.1/">Test SIP containing a video container file, as well as audioMD and videoMD metadata.</dc:description>
+	<dc:publisher xmlns:dc="http://purl.org/dc/elements/1.1/">CSC</dc:publisher>
+	<dc:identifier xmlns:dc="http://purl.org/dc/elements/1.1/">test_sip_valid_1.7.1_video_container</dc:identifier>
+</mets:xmlData>
+    </mets:mdWrap>
+  </mets:dmdSec>
+<mets:amdSec>
+    <mets:techMD ID="_ae78b4562a4706d762a30fdb5a97fbb8" CREATED="2019-07-29T12:46:23.855400">
+      <mets:mdWrap MDTYPE="PREMIS:OBJECT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:object xsi:type="premis:file">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>29e8210a-6cbc-4744-80ca-30085d6c1c4d</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:objectCharacteristics>
+              <premis:compositionLevel>0</premis:compositionLevel>
+              <premis:fixity>
+                <premis:messageDigestAlgorithm>MD5</premis:messageDigestAlgorithm>
+                <premis:messageDigest>fa77efe9eed0312bc26867bcce9d42a7</premis:messageDigest>
+              </premis:fixity>
+              <premis:format>
+                <premis:formatDesignation>
+                  <premis:formatName>video/mp4</premis:formatName>
+                </premis:formatDesignation>
+              </premis:format>
+              <premis:creatingApplication>
+                <premis:dateCreatedByApplication>2019-07-26T12:10:45.114986</premis:dateCreatedByApplication>
+              </premis:creatingApplication>
+            </premis:objectCharacteristics>
+            <premis:relationship>
+              <premis:relationshipType>structural</premis:relationshipType>
+              <premis:relationshipSubType>includes</premis:relationshipSubType>
+              <premis:relatedObjectIdentification>
+                <premis:relatedObjectIdentifierType>UUID</premis:relatedObjectIdentifierType>
+                <premis:relatedObjectIdentifierValue>e17cbb0c-e8ef-480f-b0ed-cbc0729ed54b</premis:relatedObjectIdentifierValue>
+              </premis:relatedObjectIdentification>
+            </premis:relationship>
+            <premis:relationship>
+              <premis:relationshipType>structural</premis:relationshipType>
+              <premis:relationshipSubType>includes</premis:relationshipSubType>
+              <premis:relatedObjectIdentification>
+                <premis:relatedObjectIdentifierType>UUID</premis:relatedObjectIdentifierType>
+                <premis:relatedObjectIdentifierValue>bc77b218-b3d2-41f2-bc22-47285ce20d4d</premis:relatedObjectIdentifierValue>
+              </premis:relatedObjectIdentification>
+            </premis:relationship>
+          </premis:object>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+  <mets:techMD ID="_25d5950abcb36f4531dc78c30a2d054d" CREATED="2019-07-29T12:46:23.855400">
+      <mets:mdWrap MDTYPE="PREMIS:OBJECT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:object xsi:type="premis:bitstream">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>e17cbb0c-e8ef-480f-b0ed-cbc0729ed54b</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:objectCharacteristics>
+              <premis:compositionLevel>0</premis:compositionLevel>
+              <premis:format>
+                <premis:formatDesignation>
+                  <premis:formatName>video/mp4</premis:formatName>
+                </premis:formatDesignation>
+              </premis:format>
+            </premis:objectCharacteristics>
+          </premis:object>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+  <mets:techMD ID="_bc143d2f4069e4bfe8bc7ecab08d1672" CREATED="2019-07-29T12:46:23.855400">
+      <mets:mdWrap MDTYPE="PREMIS:OBJECT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:object xsi:type="premis:bitstream">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>bc77b218-b3d2-41f2-bc22-47285ce20d4d</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:objectCharacteristics>
+              <premis:compositionLevel>0</premis:compositionLevel>
+              <premis:format>
+                <premis:formatDesignation>
+                  <premis:formatName>audio/mp4</premis:formatName>
+                </premis:formatDesignation>
+              </premis:format>
+            </premis:objectCharacteristics>
+          </premis:object>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+  <mets:techMD ID="_8cb74ea6f9dc7593895fc35e7e437570" CREATED="2019-07-29T12:46:24.976784">
+      <mets:mdWrap MDTYPE="OTHER" MDTYPEVERSION="2.0" OTHERMDTYPE="AudioMD">
+        <mets:xmlData>
+          <audiomd:AUDIOMD xsi:schemaLocation="http://www.loc.gov/audioMD/ https://www.loc.gov/standards/amdvmd/audioMD.xsd" ANALOGDIGITALFLAG="FileDigital">
+            <audiomd:fileData>
+              <audiomd:audioDataEncoding>AAC</audiomd:audioDataEncoding>
+              <audiomd:bitsPerSample>0</audiomd:bitsPerSample>
+              <audiomd:compression>
+                <audiomd:codecCreatorApp>Lavf56.40.101</audiomd:codecCreatorApp>
+                <audiomd:codecCreatorAppVersion>56.40.101</audiomd:codecCreatorAppVersion>
+                <audiomd:codecName>AAC</audiomd:codecName>
+                <audiomd:codecQuality>lossy</audiomd:codecQuality>
+              </audiomd:compression>
+              <audiomd:dataRate>135</audiomd:dataRate>
+              <audiomd:dataRateMode>Fixed</audiomd:dataRateMode>
+              <audiomd:samplingFrequency>44.1</audiomd:samplingFrequency>
+            </audiomd:fileData>
+            <audiomd:audioInfo>
+              <audiomd:duration>PT0.86S</audiomd:duration>
+              <audiomd:numChannels>2</audiomd:numChannels>
+            </audiomd:audioInfo>
+          </audiomd:AUDIOMD>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+  <mets:techMD ID="_0b9100d3c4f9184536e4e6744af57c97" CREATED="2019-07-29T12:46:25.309663">
+      <mets:mdWrap MDTYPE="OTHER" MDTYPEVERSION="2.0" OTHERMDTYPE="VideoMD">
+        <mets:xmlData>
+          <videomd:VIDEOMD xsi:schemaLocation="http://www.loc.gov/VideoMD/ https://www.loc.gov/standards/vmdvmd/VideoMD.xsd" ANALOGDIGITALFLAG="FileDigital">
+            <videomd:fileData>
+              <videomd:duration>PT1S</videomd:duration>
+              <videomd:dataRate>0.048704</videomd:dataRate>
+              <videomd:bitsPerSample>8</videomd:bitsPerSample>
+              <videomd:color>Color</videomd:color>
+              <videomd:compression>
+                <videomd:codecCreatorApp>Lavf56.40.101</videomd:codecCreatorApp>
+                <videomd:codecCreatorAppVersion>56.40.101</videomd:codecCreatorAppVersion>
+                <videomd:codecName>AVC</videomd:codecName>
+                <videomd:codecQuality>lossy</videomd:codecQuality>
+              </videomd:compression>
+              <videomd:dataRateMode>Variable</videomd:dataRateMode>
+              <videomd:frame>
+                <videomd:pixelsHorizontal>320</videomd:pixelsHorizontal>
+                <videomd:pixelsVertical>180</videomd:pixelsVertical>
+                <videomd:PAR>1</videomd:PAR>
+                <videomd:DAR>1.778</videomd:DAR>
+              </videomd:frame>
+              <videomd:frameRate>30</videomd:frameRate>
+              <videomd:sampling>4:2:0</videomd:sampling>
+              <videomd:signalFormat>(:unap)</videomd:signalFormat>
+              <videomd:sound>Yes</videomd:sound>
+            </videomd:fileData>
+          </videomd:VIDEOMD>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+  <mets:digiprovMD ID="_1f217fa77680ff961dcb876257f97886" CREATED="2019-07-29T12:46:36.016203">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>UUID</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>1191add8-f5c5-4be4-806d-496fde889962</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>Pre-Ingest tool</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  <mets:digiprovMD ID="_f62c3ba8c9c7ca411040ee7d2c864fbe" CREATED="2019-07-29T12:46:36.016203">
+      <mets:mdWrap MDTYPE="PREMIS:EVENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:event>
+            <premis:eventIdentifier>
+              <premis:eventIdentifierType>UUID</premis:eventIdentifierType>
+              <premis:eventIdentifierValue>8b5ea167-be1d-48e4-995b-1b60bad98a19</premis:eventIdentifierValue>
+            </premis:eventIdentifier>
+            <premis:eventType>creation</premis:eventType>
+            <premis:eventDateTime>2019-07-29T12:46:35+0000</premis:eventDateTime>
+            <premis:eventDetail>SIP creation</premis:eventDetail>
+            <premis:eventOutcomeInformation>
+              <premis:eventOutcome>success</premis:eventOutcome>
+              <premis:eventOutcomeDetail>
+                <premis:eventOutcomeDetailNote>Test SIP created successfully</premis:eventOutcomeDetailNote>
+              </premis:eventOutcomeDetail>
+            </premis:eventOutcomeInformation>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>UUID</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>1191add8-f5c5-4be4-806d-496fde889962</premis:linkingAgentIdentifierValue>
+            </premis:linkingAgentIdentifier>
+          </premis:event>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  </mets:amdSec>
+<mets:fileSec>
+    <mets:fileGrp>
+      <mets:file ID="_e90a58fa-513d-4402-96f5-037951455960" ADMID="_ae78b4562a4706d762a30fdb5a97fbb8">
+        <mets:FLocat LOCTYPE="URL" xlink:href="file://data/valid__h264_aac.mp4" xlink:type="simple"/>
+        <mets:stream ADMID="_25d5950abcb36f4531dc78c30a2d054d _0b9100d3c4f9184536e4e6744af57c97"/>
+        <mets:stream ADMID="_bc143d2f4069e4bfe8bc7ecab08d1672 _8cb74ea6f9dc7593895fc35e7e437570"/>
+      </mets:file>
+    </mets:fileGrp>
+  </mets:fileSec>
+<mets:structMap>
+    <mets:div TYPE="directory" DMDID="_3a6a4cc6-e28f-4895-902e-eab61b3535e3" ADMID="_f62c3ba8c9c7ca411040ee7d2c864fbe _1f217fa77680ff961dcb876257f97886">
+      <mets:div TYPE="data">
+        <mets:fptr FILEID="_e90a58fa-513d-4402-96f5-037951455960"/>
+      </mets:div>
+    </mets:div>
+  </mets:structMap>
+</mets:mets>

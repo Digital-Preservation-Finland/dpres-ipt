@@ -30,12 +30,6 @@ TESTCASES = [
          'returncode': 0,
          'stdout': '',
          'stderr': ''}},
-    {'testcase': 'Test sip with whitespace sip package #3',
-     'filename': 'CSC whitespace',
-     'expected_result': {
-         'returncode': 0,
-         'stdout': '',
-         'stderr': ''}},
 
     # The version given in METS for the pdf does not match what scraper
     # thinks it is
@@ -46,13 +40,6 @@ TESTCASES = [
     #      'stdout': '',
     #      'stderr': ''}},
 
-    {'testcase': 'Test valid sip package #7: csc-test-metadata-text-plain',
-     'filename': 'csc-test-metadata-text-plain',
-     'expected_result': {
-         'returncode': 0,
-         'stdout': ['Found alternative format "text/html", but validating '
-                    'as "text/plain".'],
-         'stderr': ''}},
 
     # Scraper seems to support the file
     # {'testcase': 'Unsupported file version',
@@ -63,24 +50,24 @@ TESTCASES = [
     #      'stdout': ['No validator for mimetype: '
     #                 'application/warc version: 2.0'],
     #      'stderr': ''}},
-    {'testcase': 'Unsupported file mimetype, without version',
-     'filename': 'CSC_test_unsupported_mimetype_no_version',
-     'patch': {'mimetype': 'application/kissa',
-               'version': ''},
-     'expected_result': {
-         'returncode': 117,
-         'stdout': ['Proper scraper was not found. The file was not '
-                    'analyzed.'],
-         'stderr': ''}},
-    {'testcase': 'Unsupported file mimetype',
-     'filename': 'CSC_test_unsupported_mimetype',
-     'patch': {'mimetype': 'application/kissa',
-               'version': '1.0'},
-     'expected_result': {
-         'returncode': 117,
-         'stdout': ['Proper scraper was not found. The file was not '
-                    'analyzed.'],
-         'stderr': ''}},
+    # {'testcase': 'Unsupported file mimetype, without version',
+    #  'filename': 'CSC_test_unsupported_mimetype_no_version',
+    #  'patch': {'mimetype': 'application/kissa',
+    #            'version': ''},
+    #  'expected_result': {
+    #      'returncode': 117,
+    #      'stdout': ['Proper scraper was not found. The file was not '
+    #                 'analyzed.'],
+    #      'stderr': ''}},
+    # {'testcase': 'Unsupported file mimetype',
+    #  'filename': 'CSC_test_unsupported_mimetype',
+    #  'patch': {'mimetype': 'application/kissa',
+    #            'version': '1.0'},
+    #  'expected_result': {
+    #      'returncode': 117,
+    #      'stdout': ['Proper scraper was not found. The file was not '
+    #                 'analyzed.'],
+    #      'stderr': ''}},
     {'testcase': 'Invalid mets, missing ADMID.',
      'filename': 'CSC_test_missing_admid',
      'patch': {'mimetype': None,
@@ -99,35 +86,84 @@ TESTCASES = [
          'stdout': ['Proper scraper was not found. The file was not '
                     'analyzed.'],
          'stderr': ''}},
-    {'testcase': 'Invalid warc',
-     'filename': 'csc-test-invalid-warc',
+    {'testcase': 'Invalid digital object.',
+     'filename': 'invalid_1.7.1_invalid_object',
+     'expected_result': {
+         'returncode': 117,
+         'stdout': ['ERROR: warc errors at'],
+         'stderr': ''}},
+    {'testcase': 'Missing digital object.',
+     'filename': 'invalid_1.7.1_missing_object',
+     'expected_result': {
+         'returncode': 117,
+         'stdout': ['ERROR: File {}/sips/invalid_1.7.1_missing_object/'
+                    'data/valid_1.2.png does not exist.'
+                    .format(testcommon.settings.TESTDATADIR)],
+         'stderr': ''}},
+    {'testcase': 'Unsupported mimetype, with version.',
+     'filename': 'invalid_1.7.1_unsupported_mimetype',
+     'patch': {'mimetype': 'application/kissa',
+               'version': '1.01'},
      'expected_result': {
          'returncode': 117,
          'stdout': ['Proper scraper was not found. The file was not '
                     'analyzed.'],
          'stderr': ''}},
-    {'testcase': 'Invalid arc',
-     'filename': 'csc-test-invalid-arc-invalid-start-byte',
-     'expected_result': {
-         'returncode': 117,
-         'stdout': ['Failed: returncode 1',
-                    'Exception: missing headers'],
-         'stderr': ''}},
-    {'testcase': 'Invalid arc',
-     'filename': 'csc-test-invalid-arc-xml-incompatible-string',
-     'expected_result': {
-         'returncode': 117,
-         'stdout': ['Failed: returncode 1',
-                    'WARNING: Unable to parse HTTP-header: ',
-                    'Exception: expected 14 bytes but only read 0'],
-         'stderr': ''}},
-    {'testcase': 'Invalid warc renamed to .gz',
-     'filename': 'csc-test-invalid-warc-not-gz',
+    {'testcase': 'Unsupported mimetype, without version.',
+     'filename': 'invalid_1.7.1_unsupported_mimetype_no_version',
+     'patch': {'mimetype': 'application/kissa',
+               'version': ''},
      'expected_result': {
          'returncode': 117,
          'stdout': ['Proper scraper was not found. The file was not '
                     'analyzed.'],
-         'stderr': ''}}]
+         'stderr': ''}},
+    {'testcase': 'Unsupported version with supported mimetype.',
+     'filename': 'invalid_1.7.1_unsupported_version',
+     'patch': {'mimetype': 'image/jpeg',
+               'version': '3.1415'},
+     'expected_result': {
+         'returncode': 117,
+         'stdout': ['Missing or incorrect mimetype/version.'],
+         'stderr': ''}},
+    {'testcase': 'Report alt-format when validating as primary mimetype.',
+     'filename': 'valid_1.7.0_plaintext_alt_format',
+     'expected_result': {
+         'returncode': 0,
+         'stdout': ['Found alternative format "text/html", but validating '
+                    'as "text/plain".'],
+         'stderr': ''}},
+    {'testcase': 'Digital object with audiomd metadata.',
+     'filename': 'valid_1.7.1_audio_stream',
+     'expected_result': {
+         'returncode': 0,
+         'stdout': '',
+         'stderr': ''}},
+    {'testcase': 'Digital object with mix metadata.',
+     'filename': 'valid_1.7.1_image',
+     'expected_result': {
+         'returncode': 0,
+         'stdout': '',
+         'stderr': ''}},
+    {'testcase': 'SIP with multiple digital objects.',
+     'filename': 'valid_1.7.1_multiple_objects',
+     'expected_result': {
+         'returncode': 0,
+         'stdout': '',
+         'stderr': ''}},
+    {'testcase': 'Videocontainer with audiomd/videomd metadata.',
+     'filename': 'valid_1.7.1_video_container',
+     'expected_result': {
+         'returncode': 0,
+         'stdout': '',
+         'stderr': ''}},
+    {'testcase': 'Whitespace in sip and digital object names.',
+     'filename': 'valid_1.7.1_white space',
+     'expected_result': {
+         'returncode': 0,
+         'stdout': '',
+         'stderr': ''}},
+     ]
 
 """
 This list contains the following cases:
@@ -187,7 +223,7 @@ def test_check_sip_digital_objects(case, monkeypatch):
         pass
 
     filename = os.path.join(
-        testcommon.settings.TESTDATADIR, 'test-sips', case['filename'])
+        testcommon.settings.TESTDATADIR, 'sips', case['filename'])
 
     arguments = [filename, 'preservation-sip-id', str(uuid.uuid4())]
 
