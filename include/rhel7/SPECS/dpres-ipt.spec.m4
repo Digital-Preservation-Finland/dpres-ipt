@@ -20,20 +20,12 @@ Source0:        %{file_prefix}-v%{file_version}%{?file_release_tag}-%{file_build
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 
-Requires: python python2-mimeparse python-dateutil python-six xml-common ghostscript
-Requires: libxslt unzip jhove python-setuptools python-lxml veraPDF dpx-validator iso-schematron-xslt1
+Requires: python python2-mimeparse python-dateutil python-six xml-common
+Requires: libxslt unzip python-setuptools python-lxml
 # ClamAV installation requires these to work
 Requires: clamav libtool-ltdl
-Requires: warc-tools >= 4.8.3 ffmpeg pngcheck
 Requires: dpres-xml-schemas xml-helpers mets premis
-Requires: python-wand libreoffice
-Requires: pspp
-Requires: file-scraper-full python-opf-fido python-magic python-pillow pymediainfo
-# Our own packaging of a newer file command than what CentOS provides
-Requires: file-5.30
-# For xmllint XHTML validation
-Requires: xhtml1-dtds
-Requires: vnu
+Requires: file-scraper-full
 BuildRequires: pytest
 # We could also add a Provides but that's unnecessary, we should fix the
 # dependencies that get broken by this Obsoletes. The release number here is
