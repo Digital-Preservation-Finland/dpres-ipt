@@ -27,6 +27,7 @@ SOFTWARE.
 
 import os
 import subprocess
+import urllib
 from collections import defaultdict
 from copy import deepcopy
 from fractions import Fraction
@@ -35,7 +36,6 @@ import six
 
 import mimeparse
 from six import iteritems, itervalues, text_type, binary_type
-from six.moves.urllib.parse import unquote_plus
 _SCRAPER_PARAM_ADDML_KEY_RELATION = (('fields', 'header_fields'),
                                      ('separator', 'separator'),
                                      ('delimiter', 'delimiter'))
