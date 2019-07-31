@@ -44,7 +44,8 @@ def to_dict(videomd_xml):
     if videomd_xml is None:
         return None
     video = {"video": {}}
-    video["video"]["bit_rate"] = handle_div(parse_element("dataRate", videomd_xml))
+    video["video"]["bit_rate"] = handle_div(
+        parse_element("dataRate", videomd_xml))
     video["video"]["avg_frame_rate"] = handle_div(
         parse_element("frameRate", videomd_xml))
     video["video"]["width"] = parse_element("pixelsHorizontal", videomd_xml)

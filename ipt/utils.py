@@ -1,8 +1,8 @@
 """
 Utility functions.
 
-Couple of functions (ensure_text and ensure_binary) have been adapted from a MIT
-licensed open source solution:
+Couple of functions (ensure_text and ensure_binary) have been adapted from a
+MIT licensed open source solution:
 
 Copyright (c) 2018 Benjamin Peterson
 

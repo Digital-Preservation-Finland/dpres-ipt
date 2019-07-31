@@ -7,7 +7,6 @@ import os
 import sys
 import optparse
 
-from six import itervalues
 from file_scraper.scraper import Scraper
 
 from ipt.utils import concat, get_scraper_info
@@ -50,7 +49,6 @@ def main(arguments=None):
     print(concat(messages), file=sys.stdout)
     print(concat(errors), file=sys.stderr)
 
-    # TODO halutaanko tarkastaa myös tiedostotyyppi ja/tai käytetyt scraperit?
     if errors or not scraper.well_formed:
         return 117
 
