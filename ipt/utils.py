@@ -46,7 +46,9 @@ _FFMPEG_FILE_SCRAPER_KEY_SYNONYMS = (('frame_rate', 'avg_frame_rate'),
                                      ('num_channels', 'channels'),
                                      ('sampling_frequency', 'sample_rate'))
 
-_SCRAPER_DETECTOR_CLASSES = ('FidoDetector', 'MagicDetector')
+_SCRAPER_DETECTOR_CLASSES = ('FidoDetector',
+                             'MagicDetector',
+                             'PredefinedDetector')
 
 
 class UnknownException(Exception):
@@ -331,11 +333,6 @@ def create_scraper_params(metadata_info):
     """
     params = {}
 
-    if 'alt-format' in metadata_info['format']:
-        # If given alt-format (e.g., text/html), ensure that validation is
-        # done using the primary mimetype (e.g., text/plain)
-        params['mimetype'] = metadata_info['format']['mimetype']
-
     for scr_param_key, addml_key in _SCRAPER_PARAM_ADDML_KEY_RELATION:
         try:
             params[scr_param_key] = metadata_info['addml'][addml_key]
@@ -426,7 +423,8 @@ def get_scraper_info(scraper, filter_detectors=False):
         scraper_class = info['class']
         if filter_detectors and scraper_class in _SCRAPER_DETECTOR_CLASSES:
             continue
-        # Keep empty messages to see used classes, but filter empty errors
+        # Keep empty messages to see which scrapers were used,
+        # but filter empty errors
         messages.append(scraper_class + ': ' + info['messages'])
         if info['errors']:
             errors.append(scraper_class + ': ' + info['errors'])

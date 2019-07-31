@@ -74,10 +74,9 @@ def make_result_dict(is_valid, messages=[], errors=[], prefix=''):
     }
 
 
-def check_metadata_info(metadata_info):
+def check_mets_errors(metadata_info):
     """
-    Check if metadata was parsed correctly from mets, and add possible notes
-    to messages.
+    Check if metadata was parsed correctly from mets.
 
     :metadata_info: Dictionary containing metadata parsed from mets.
     :returns: result_dict dictionary.
@@ -86,17 +85,9 @@ def check_metadata_info(metadata_info):
         return make_result_dict(
             is_valid=False,
             messages=['Failed parsing metadata, skipping validation.'],
-            errors=[metadata_info["errors"]]
+            errors=[metadata_info['errors']]
         )
-    messages = []
-    try:
-        alt_format = metadata_info['format']['alt-format']
-        messages.append('Found alternative format "{}", '
-                        'but validating as "{}".'.format(
-                            alt_format, metadata_info['format']['mimetype']))
-    except KeyError:
-        pass
-    return make_result_dict(True, messages)
+    return make_result_dict(is_valid=True)
 
 
 def skip_validation(metadata_info):
@@ -104,18 +95,51 @@ def skip_validation(metadata_info):
     return metadata_info['use'] == 'no-file-format-validation'
 
 
-def check_well_formed(scraper):
+def check_well_formed(metadata_info):
     """
-    Create result_dict from scraper results.
+    Check if file is well formed. If alt-format is given in metadata_info,
+    force validation as primary mimetype. Otherwise, first try to validate
+    without telling scraper the mimetype, and if scraper identifies the
+    file as something else than the primary mimetype, retry using the
+    primary mimetype.
 
-    :scraper: File-scraper object which must have already called scrape().
-    :returns: result_dict dictionary.
+    :metadata_info: Dictionary containing metadata parsed from mets.
+    :returns: Tuple with 2 dicts: (result_dict, scraper.streams)
     """
-    messages, errors = get_scraper_info(scraper, filter_detectors=True)
-    return make_result_dict(scraper.well_formed, messages, errors)
+    messages = []
+    primary_mimetype = metadata_info['format']['mimetype']
+    force_primary_mimetype = False
+
+    if 'alt-format' in metadata_info['format']:
+        messages.append('Found alternative format "{}" in mets, '
+                        'but validating as "{}".'.format(
+                            metadata_info['format']['alt-format'],
+                            primary_mimetype))
+        force_primary_mimetype = True
+    else:
+        scraper = Scraper(metadata_info['filename'],
+                          **create_scraper_params(metadata_info))
+        scraper.scrape()
+        if scraper.mimetype != primary_mimetype:
+            validity_text = 'valid' if scraper.well_formed else 'invalid'
+            messages.append('Recognized file as {} "{}", but validating as '
+                            '"{}".'.format(validity_text, scraper.mimetype,
+                                           primary_mimetype))
+            force_primary_mimetype = True
+
+    if force_primary_mimetype:
+        scraper = Scraper(metadata_info['filename'],
+                          mimetype=primary_mimetype,
+                          **create_scraper_params(metadata_info))
+        scraper.scrape()
+
+    scraper_messages, errors = get_scraper_info(scraper)
+    messages.extend(scraper_messages)
+    return (make_result_dict(scraper.well_formed, messages, errors),
+            scraper.streams)
 
 
-def check_metadata_match(metadata_info, scraper):
+def check_metadata_match(metadata_info, scraper_streams):
     """
     Compare mets metadata to scraper metadata using the
     MetadataComparator class.
@@ -124,7 +148,7 @@ def check_metadata_match(metadata_info, scraper):
     :scraper: File-scraper object which must have already called scrape().
     :returns: result_dict dictionary.
     """
-    comparator = MetadataComparator(metadata_info, scraper)
+    comparator = MetadataComparator(metadata_info, scraper_streams)
     result = comparator.result()
     return make_result_dict(prefix='MetadataComparator: ', **result)
 
@@ -177,20 +201,21 @@ def validation(mets_path):
         1. Check metadata_info for errors and notes; if there are errors,
            skip other steps.
         2. Check if file needs to be validated; if not, skip other steps.
-        3. Scrape metadata using file-scraper and check well-formedness.
+        3. Check if file is well formed using scraper; if not, skip comparison.
         4. Check that mets metadata matches scraper metadata.
 
         :returns: Dictionary containing joined results from the above steps.
         """
         results = []
-        results.append(check_metadata_info(metadata_info))
-        if not results[0]['is_valid'] or skip_validation(metadata_info):
+
+        mets_result = check_mets_errors(metadata_info)
+        results.append(mets_result)
+        if not mets_result['is_valid'] or skip_validation(metadata_info):
             return join_validation_results(metadata_info, results)
-        scraper = Scraper(metadata_info['filename'],
-                          **create_scraper_params(metadata_info))
-        scraper.scrape()
-        results.append(check_well_formed(scraper))
-        results.append(check_metadata_match(metadata_info, scraper))
+        scraper_result, streams = check_well_formed(metadata_info)
+        results.append(scraper_result)
+        if scraper_result['is_valid']:
+            results.append(check_metadata_match(metadata_info, streams))
         return join_validation_results(metadata_info, results)
 
     mets_tree = None

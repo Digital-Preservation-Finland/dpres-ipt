@@ -4,6 +4,7 @@ Module to compare metadata found in mets to metadata scraped by file-scraper.
 
 import itertools
 from six import iteritems, itervalues
+from file_scraper.scraper import Scraper
 from ipt.utils import handle_div, synonymize_stream_keys
 
 
@@ -29,14 +30,14 @@ class MetadataComparator(object):
            'audio', 'audio_streams', 'video', 'video_streams')
     """
 
-    def __init__(self, metadata_info, scraper):
+    def __init__(self, metadata_info, scraper_streams):
         """Setup the metadata comparator object
 
         :metadata_info: A dictionary containing metadata info parsed from mets.
         :scraper: A scraper object which has conducted file scraping.
         """
         self._metadata_info = metadata_info
-        self._scraper = scraper
+        self._scraper_streams = scraper_streams
         self._messages = []
         self._errors = []
 
@@ -59,15 +60,10 @@ class MetadataComparator(object):
     def result(self):
         """Perform comparison if not already done and return the result."""
         if not any((self._messages, self._errors)):
-            if not self._scraper.well_formed:
-                self._errors.append('{} is not well-formed. Skipping metadata '
-                                    'comparison.'
-                                    .format(self._scraper.filename))
-            else:
-                self._perform_checks()
-                if self.is_valid:
-                    self._messages.append('Mets metadata matches '
-                                          'scraper metadata.')
+            self._perform_checks()
+            if self.is_valid:
+                self._messages.append('Mets metadata matches '
+                                      'scraper metadata.')
         return {
             'is_valid': self.is_valid,
             'messages': self.messages(),
@@ -89,7 +85,7 @@ class MetadataComparator(object):
 
         :stream_index: Index of the scraper stream.
         """
-        stream = self._scraper.streams[stream_index]
+        stream = self._scraper_streams[stream_index]
         return {
             'mimetype': stream['mimetype'],
             'version': stream['version'],
@@ -112,7 +108,7 @@ class MetadataComparator(object):
         """
         mets_format = self._metadata_info['format']
         scraper_format = self._get_stream_format(0)
-        is_textfile = self._scraper.is_textfile()
+        is_textfile = Scraper(self._metadata_info['filename']).is_textfile()
 
         if is_textfile:
             self._check_charset()
@@ -123,7 +119,7 @@ class MetadataComparator(object):
 
     def _check_charset(self):
         """Check that character set in mets matches what scraper found."""
-        scraper_charset = self._scraper.streams[0].get('charset', None)
+        scraper_charset = self._scraper_streams[0].get('charset', None)
         mets_charset = self._metadata_info['format'].get('charset', None)
         if mets_charset != scraper_charset:
             self._add_error('Character set mismatch.',
@@ -167,7 +163,7 @@ class MetadataComparator(object):
         if stream_type not in ('audio', 'video'):
             raise ValueError('Invalid stream type {}'.format(stream_type))
         prepared_dicts = []
-        for stream in itervalues(self._scraper.streams):
+        for stream in itervalues(self._scraper_streams):
             if stream['stream_type'] != stream_type:
                 continue
             _dummy_dict = {}

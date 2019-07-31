@@ -45,11 +45,11 @@ def run_main(sip_path):
 def test_checksum_ok(temp_sip):
     """Test valid METS with uncorrupted digital objects"""
 
-    (returncode, stdout, stderr) = run_main(temp_sip('CSC_test006'))
+    (returncode, stdout, stderr) = run_main(temp_sip('valid_1.7.1_image'))
     assert stderr == ''
     for line in stdout.splitlines():
         assert 'Checksum OK' in line
-    assert 'Checksum OK: KDK_paatosseminaarin_ohjelma_10_12_2013' in stdout
+    assert 'Checksum OK: data/valid_1.2.png' in stdout
     assert 'tmp' not in stdout
     assert returncode == 0
 
@@ -70,14 +70,14 @@ def test_checksum_object_types(temp_sip):
 def test_checksum_corrupted(temp_sip):
     """Test valid METS with corrupted digital objects"""
 
-    sip_path = temp_sip('CSC_test006')
+    sip_path = temp_sip('valid_1.7.1_image')
     corrupted_file = os.path.join(
-        sip_path, 'KDK_paatosseminaarin_ohjelma_10_12_2013.pdf')
+        sip_path, 'data/valid_1.2.png')
     with open(corrupted_file, 'w') as outfile:
         outfile.write('a')
     (returncode, stdout, stderr) = run_main(sip_path)
     assert stderr == ''
-    assert 'Invalid Checksum: KDK_paatosseminaarin_ohjelma_10_12_201' in stdout
+    assert 'Invalid Checksum: data/valid_1.2.png' in stdout
     assert 'tmp' not in stdout
     assert returncode == 117
 
@@ -85,25 +85,11 @@ def test_checksum_corrupted(temp_sip):
 def test_checksum_missing_file(temp_sip):
     """Test valid METS with missing digital objects"""
 
-    sip_path = temp_sip('CSC_test006')
-
-    remove_files(sip_path, ['KDK_paatosseminaarin_ohjelma_10_12_2013.pdf'])
+    sip_path = temp_sip('invalid_1.7.1_missing_object')
 
     (returncode, stdout, stderr) = run_main(sip_path)
     assert stderr == ''
-    assert 'File does not exist: KDK_paatosseminaarin_ohjelma_10_12_' in stdout
-    assert 'tmp' not in stdout
-    assert returncode == 117
-
-
-def test_checksum_missing_algorithm(temp_sip):
-    """Test valid METS with missing digital objects"""
-
-    sip_path = temp_sip('CSC_test_missing_admid')
-
-    (returncode, stdout, stderr) = run_main(sip_path)
-    assert stderr == ''
-    assert 'Could not find checksum algorithm: kuvat/PICT0102.JPG' in stdout
+    assert 'File does not exist: data/valid_1.2.png' in stdout
     assert 'tmp' not in stdout
     assert returncode == 117
 
@@ -111,16 +97,12 @@ def test_checksum_missing_algorithm(temp_sip):
 def test_checksum_extra_file(temp_sip):
     """Test valid METS with extra digital objects"""
 
-    sip_path = temp_sip('CSC_test006')
-
-    create_files(sip_path, [
-        'file_not_in_mets.file',
-        'another dir/another extra.file'])
+    sip_path = temp_sip('invalid_1.7.1_extra_object')
 
     (returncode, stdout, stderr) = run_main(sip_path)
 
     assert stderr == ''
-    assert 'Nonlisted file: file_not_in_mets.file' in stdout
-    assert 'Nonlisted file: another dir' in stdout
+    assert 'Nonlisted file: data/valid_1.6.pdf' in stdout
+    assert 'Nonlisted file: extra_file.txt' in stdout
     assert 'tmp' not in stdout
     assert returncode == 117

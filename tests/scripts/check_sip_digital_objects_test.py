@@ -23,74 +23,17 @@ METSDIR = os.path.abspath(
     os.path.join(testcommon.settings.TESTDATADIR, 'mets'))
 
 TESTCASES = [
-# TODO enable / replace tests when integration is done
-    {'testcase': 'Test valid sip package #2',
-     'filename': 'CSC_test002',
-     'expected_result': {
-         'returncode': 0,
-         'stdout': '',
-         'stderr': ''}},
-
-    # The version given in METS for the pdf does not match what scraper
-    # thinks it is
-    # {'testcase': 'Test valid sip package #6: csc-test-valid-kdkmets-1.3',
-    #  'filename': 'CSC_test006',
-    #  'expected_result': {
-    #      'returncode': 0,
-    #      'stdout': '',
-    #      'stderr': ''}},
-
-
-    # Scraper seems to support the file
-    # {'testcase': 'Unsupported file version',
-    #  'filename': 'CSC_test_unsupported_version',
-    #  'patch': {'version': '2.0'},
-    #  'expected_result': {
-    #      'returncode': 117,
-    #      'stdout': ['No validator for mimetype: '
-    #                 'application/warc version: 2.0'],
-    #      'stderr': ''}},
-    # {'testcase': 'Unsupported file mimetype, without version',
-    #  'filename': 'CSC_test_unsupported_mimetype_no_version',
-    #  'patch': {'mimetype': 'application/kissa',
-    #            'version': ''},
-    #  'expected_result': {
-    #      'returncode': 117,
-    #      'stdout': ['Proper scraper was not found. The file was not '
-    #                 'analyzed.'],
-    #      'stderr': ''}},
-    # {'testcase': 'Unsupported file mimetype',
-    #  'filename': 'CSC_test_unsupported_mimetype',
-    #  'patch': {'mimetype': 'application/kissa',
-    #            'version': '1.0'},
-    #  'expected_result': {
-    #      'returncode': 117,
-    #      'stdout': ['Proper scraper was not found. The file was not '
-    #                 'analyzed.'],
-    #      'stderr': ''}},
-    {'testcase': 'Invalid mets, missing ADMID.',
-     'filename': 'CSC_test_missing_admid',
-     'patch': {'mimetype': None,
-               'version': None},
-     'expected_result': {
-         'returncode': 117,
-         'stdout': ['Proper scraper was not found. The file was not '
-                    'analyzed.'],
-         'stderr': ''}},
-    {'testcase': 'Invalid mets, missing amdSec',
-     'filename': 'CSC_test_missing_amdSec',
-     'patch': {'mimetype': None,
-               'version': None},
-     'expected_result': {
-         'returncode': 117,
-         'stdout': ['Proper scraper was not found. The file was not '
-                    'analyzed.'],
-         'stderr': ''}},
     {'testcase': 'Invalid digital object.',
      'filename': 'invalid_1.7.1_invalid_object',
      'expected_result': {
          'returncode': 117,
          'stdout': ['ERROR: warc errors at'],
+         'stderr': ''}},
+    {'testcase': 'Invalid xml file submitted as text/xml.',
+     'filename': 'invalid_1.7.1_invalid_xml_as_xml',
+     'expected_result': {
+         'returncode': 117,
+         'stdout': ['Failed: document is not well-formed.'],
          'stderr': ''}},
     {'testcase': 'Missing digital object.',
      'filename': 'invalid_1.7.1_missing_object',
@@ -130,8 +73,8 @@ TESTCASES = [
      'filename': 'valid_1.7.0_plaintext_alt_format',
      'expected_result': {
          'returncode': 0,
-         'stdout': ['Found alternative format "text/html", but validating '
-                    'as "text/plain".'],
+         'stdout': ['Found alternative format "text/html" in mets, but '
+                    'validating as "text/plain".'],
          'stderr': ''}},
     {'testcase': 'Digital object with audiomd metadata.',
      'filename': 'valid_1.7.1_audio_stream',
@@ -145,8 +88,21 @@ TESTCASES = [
          'returncode': 0,
          'stdout': '',
          'stderr': ''}},
+    {'testcase': 'Invalid xml submitted as valid text/plain.',
+     'filename': 'valid_1.7.1_invalid_xml_as_plaintext',
+     'expected_result': {
+         'returncode': 0,
+         'stdout': ['Recognized file as invalid "text/xml", but validating '
+                    'as "text/plain".'],
+         'stderr': ''}},
     {'testcase': 'SIP with multiple digital objects.',
      'filename': 'valid_1.7.1_multiple_objects',
+     'expected_result': {
+         'returncode': 0,
+         'stdout': '',
+         'stderr': ''}},
+    {'testcase': 'Valid plaintext.',
+     'filename': 'valid_1.7.1_plaintext',
      'expected_result': {
          'returncode': 0,
          'stdout': '',
@@ -265,25 +221,25 @@ def patch_validate(monkeypatch):
     and three cdr fles (native, not validated).
     """
 
-    def _check_well_formed(scraper):
+    def _check_well_formed(metadata_info):
         """Monkeypatch well-formedness check (there are no real files)."""
         result = {}
 
-        if scraper.filename == 'pdf':
+        if metadata_info['filename'] == 'pdf':
             result = make_result_dict(
                     is_valid=True,
                     messages=['JHovePdfScraper: Well-Formed and valid',
                               ('MagicScraper: The file was analyzed '
                                'successfully.')],
                     errors=[])
-        elif scraper.filename == 'cdr':
+        elif metadata_info['filename'] == 'cdr':
             result = make_result_dict(
                     is_valid=None,
                     messages=['Proper scraper was not found. The file was not '
                               'analyzed.'],
                     errors=[],
                     prefix='ScraperNotFound' + ': ')
-        return result
+        return (result, {})
 
     def _check_metadata_match(metadata_info, results):
         """Monkeypatch metadata matching: there are no real files to scrape."""
