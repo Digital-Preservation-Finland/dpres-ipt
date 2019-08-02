@@ -228,13 +228,7 @@ def validation(mets_path):
         yield _validate(metadata_info)
 
 
-def validation_report(results, linking_sip_type, linking_sip_id):
-    """ Format validation results to Premis report"""
-
-    if results is None:
-        raise TypeError
-
-    # Create PREMIS agent, only one agent is needed
+def create_report_agent():
     # TODO: Agent could be the used validator instead of script file
     agent_name = "check_sip_digital_objects.py-v0.0"
     agent_id_value = 'preservation-agent-' + agent_name + '-' + \
@@ -244,67 +238,84 @@ def validation_report(results, linking_sip_type, linking_sip_id):
         identifier_value=agent_id_value, prefix='agent')
     report_agent = premis.agent(agent_id=agent_id, agent_name=agent_name,
                                 agent_type='software')
+    return report_agent
 
+
+def create_report_object(metadata_info, linking_sip_type, linking_sip_id):
+    dep_id = premis.identifier(
+        metadata_info['object_id']['type'],
+        metadata_info['object_id']['value'])
+    environ = premis.environment(dep_id)
+
+    related_id = premis.identifier(
+        identifier_type=linking_sip_type,
+        identifier_value=linking_sip_id,
+        prefix='object')
+    related = premis.relationship(
+        relationship_type='structural',
+        relationship_subtype='is included in',
+        related_object=related_id)
+
+    object_id = premis.identifier('preservation-object-id',
+                                  str(uuid.uuid4()))
+
+    report_object = premis.object(
+        object_id=object_id, original_name=metadata_info['filename'],
+        child_elements=[environ, related],
+        representation=True)
+
+    return report_object
+
+
+def create_report_event(result, report_object, report_agent):
+    event_id = premis.identifier(
+        identifier_type="preservation-event-id",
+        identifier_value=str(uuid.uuid4()), prefix='event')
+    outresult = 'success' if result["is_valid"] is True else 'failure'
+    detail_extension = None
+    try:
+        detail_extension = lxml.etree.fromstring(result["messages"])
+        detail_note = result["errors"] if result["errors"] else None
+
+    except lxml.etree.XMLSyntaxError:
+        if result["errors"]:
+            detail_note = (result["messages"] + '\n' + result["errors"])
+        else:
+            detail_note = result["messages"]
+
+    outcome = premis.outcome(outcome=outresult, detail_note=detail_note,
+                             detail_extension=detail_extension)
+
+    report_event = premis.event(
+        event_id=event_id, event_type="validation",
+        event_date_time=datetime.datetime.now().isoformat(),
+        event_detail="Digital object validation",
+        child_elements=[outcome],
+        linking_objects=[report_object], linking_agents=[report_agent])
+
+    return report_event
+
+
+def validation_report(results, linking_sip_type, linking_sip_id):
+    """ Format validation results to Premis report"""
+
+    if results is None:
+        raise TypeError
+
+    # Create PREMIS agent, only one agent is needed
+    report_agent = create_report_agent()
     childs = [report_agent]
     object_list = set()
     for result in results:
-
         metadata_info = result['metadata_info']
-
         # Create PREMIS object only if not already in the report
         if metadata_info['object_id']['value'] not in object_list:
             object_list.add(metadata_info['object_id']['value'])
-
-            dep_id = premis.identifier(
-                metadata_info['object_id']['type'],
-                metadata_info['object_id']['value'])
-            environ = premis.environment(dep_id)
-
-            related_id = premis.identifier(
-                identifier_type=linking_sip_type,
-                identifier_value=linking_sip_id,
-                prefix='object')
-            related = premis.relationship(
-                relationship_type='structural',
-                relationship_subtype='is included in',
-                related_object=related_id)
-
-            object_id = premis.identifier('preservation-object-id',
-                                          str(uuid.uuid4()))
-
-            report_object = premis.object(
-                object_id=object_id, original_name=metadata_info['filename'],
-                child_elements=[environ, related],
-                representation=True)
-
+            report_object = create_report_object(metadata_info,
+                                                 linking_sip_type,
+                                                 linking_sip_id)
             childs.append(report_object)
-
-        # Create PREMIS event
-        event_id = premis.identifier(
-            identifier_type="preservation-event-id",
-            identifier_value=str(uuid.uuid4()), prefix='event')
-        outresult = 'success' if result["is_valid"] is True else 'failure'
-        detail_extension = None
-        try:
-            detail_extension = lxml.etree.fromstring(result["messages"])
-            detail_note = result["errors"] if result["errors"] else None
-
-        except lxml.etree.XMLSyntaxError:
-            if result["errors"]:
-                detail_note = (result["messages"] + '\n' + result["errors"])
-            else:
-                detail_note = result["messages"]
-
-        outcome = premis.outcome(outcome=outresult, detail_note=detail_note,
-                                 detail_extension=detail_extension)
-
-        report_event = premis.event(
-            event_id=event_id, event_type="validation",
-            event_date_time=datetime.datetime.now().isoformat(),
-            event_detail="Digital object validation",
-            child_elements=[outcome],
-            linking_objects=[report_object], linking_agents=[report_agent])
-
+        report_event = create_report_event(result, report_object, report_agent)
         childs.append(report_event)
 
     return premis.premis(child_elements=childs)
