@@ -38,11 +38,13 @@ def main(arguments=None):
     scraper.scrape()
 
     messages, errors = get_scraper_info(scraper)
+    if not scraper.mimetype == 'text/xml':
+        errors.append('ERROR: {} does not appear to be XML (found '
+                      'mimetype {}).'.format(filename, scraper.mimetype))
 
     print(concat(messages))
     print(concat(errors), file=sys.stderr)
 
-    # TODO halutaanko tarkastaa myös tiedostotyyppi ja/tai käytetyt scraperit?
     if not scraper.well_formed:
         return 117
 
