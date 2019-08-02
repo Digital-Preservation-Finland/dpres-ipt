@@ -1,6 +1,23 @@
+"""
+MetadataComparator tests. This module checks that the comparison results
+are as expected, using mocked metadata_info and scraper streams dicts.
+Only valid scraper streams are used, since the comparison will be skipped
+for non-well-formed objects in the check-sip-digital-objects script.
+
+The tests check the dictionary returned by the result() method to ensure that:
+    - When metadata_info contains all required values and they match the
+      scraper streams, the comparison result should be valid.
+    - If scraper finds a value for a key which is listed as unavailable in mets
+      ('0' or '(:unav)'), the found value must be included in a message.
+    - If mets has the value '(:etal)' in some of the keys for which this is
+      allowed, the scraper value should be ignored (and result still be valid).
+    - If mets and scraper values do not match for some key and it is not one of
+      the special cases listed above, the result should be invalid.
+"""
+
+
 import pytest
 from copy import deepcopy
-from six import iteritems
 from file_scraper.scraper import Scraper
 from ipt.validator.comparator import MetadataComparator
 from ipt.utils import concat
@@ -165,7 +182,6 @@ VALID_TEST_CASES = [
                          "-- {'channels': '2'}."},
 ]
 
-
 INVALID_TEST_CASES = [
     {'reason': 'Mimetype is always required in mets.',
      'base': 'valid_text',
@@ -183,17 +199,47 @@ INVALID_TEST_CASES = [
      'base': 'valid_text',
      'md_patch': [['format', 'charset', 'UTF-16']],
      'expected_error': 'Character set mismatch.'},
+    {'reason': 'Check that mismatching stream value is caught.',
+     'base': 'valid_video',
+     'md_patch': [['audio_streams', 0, 'audio', 'bit_rate', 200]],
+     'expected_error': ('audio streams in {} are not what is described '
+                        'in metadata'.format(
+                            METADATA_INFO['valid_video']['filename']))},
 ]
 
 
 def patch_dict(original, patches):
+    """Create a copy of a dictionary and replace values according to patches.
+
+    :original: The dictionary to be copied and modified.
+    :patches: A list of patches. Each patch is a list of keys to follow,
+              and the last value is the new value.
+
+    For example:
+    original = {'format': {'mimetype': 'audio/x-wav',
+                           'version': ''},
+                'audio': {'bit_rate': '706',
+                          'bits_per_sample': '8',
+                          'channels': '2',
+                          'sample_rate': '44.1'}}
+    patches = [['format', 'mimetype', 'text/plain'],
+               ['audio', 'channels', 1337]]
+    patch_dict(original, patches) retuns:
+               {'format': {'mimetype': 'text/plain',
+                           'version': ''},
+                'audio': {'bit_rate': '706',
+                         'bits_per_sample': '8',
+                         'channels': '1337',
+                         'sample_rate': '44.1'}}
+    :returns: The patched dictionary.
+    """
     patched_dict = deepcopy(original)
     for patch in patches:
-        value = patch.pop()
+        value = patch[-1]
         current = patched_dict
-        for key in patch[:-1]:
+        for key in patch[:-2]:
             current = current[key]
-        current[patch[-1]] = value
+        current[patch[-2]] = value
     return patched_dict
 
 
