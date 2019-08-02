@@ -17,8 +17,8 @@ from file_scraper.scraper import Scraper
 
 from ipt.validator.utils import iter_metadata_info
 from ipt.validator.comparator import MetadataComparator
-from ipt.utils import (concat, create_scraper_params,
-                       ensure_text, get_scraper_info)
+from ipt.utils import concat, create_scraper_params, get_scraper_info
+from ipt.six_utils import ensure_text
 
 _FILE_SCRAPER_DETECTOR_CLASSES = ('FidoDetector', 'MagicDetector')
 

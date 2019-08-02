@@ -12,7 +12,7 @@ import scandir
 
 import xml_helpers.utils as u
 from ipt.validator.utils import iter_metadata_info
-from ipt.utils import ensure_text
+from ipt.six_utils import ensure_text
 from ipt.fileutils.checksum import BigFile
 
 
