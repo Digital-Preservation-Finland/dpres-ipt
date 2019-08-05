@@ -3,7 +3,7 @@
 import os
 import pytest
 
-from tests.testcommon.test_utils import create_test_bagit
+from tests.testcommon.utils import create_test_bagit
 from ipt.aiptools.bagit_new import BagitError
 from ipt.scripts.bagit_util import main
 

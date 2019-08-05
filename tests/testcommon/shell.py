@@ -1,24 +1,7 @@
 """Shell command line utilities for tests"""
 
 import sys
-import subprocess
 from io import StringIO
-
-
-def run_command(command):
-    """Run command using source code binaries and libraries
-
-        Note: This should be deprecated. Better to use run_main() function
-        below.
-
-    """
-
-    proc = subprocess.Popen([command], shell=True, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
-
-    (stdout, stderr) = proc.communicate()
-
-    return (proc.returncode, stdout, stderr)
 
 
 def run_main(the_main_function, arguments):
