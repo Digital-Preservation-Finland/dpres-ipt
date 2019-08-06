@@ -9,7 +9,7 @@ import optparse
 from six import itervalues
 from file_scraper.scraper import Scraper
 
-from ipt.utils import concat, get_scraper_info
+from ipt.utils import concat
 
 
 def main(arguments=None):

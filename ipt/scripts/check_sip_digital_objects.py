@@ -20,8 +20,6 @@ from ipt.validator.comparator import MetadataComparator
 from ipt.utils import concat, create_scraper_params, get_scraper_info
 from ipt.six_utils import ensure_text
 
-_FILE_SCRAPER_DETECTOR_CLASSES = ('FidoDetector', 'MagicDetector')
-
 
 def main(arguments=None):
     """ The main method for check-sip-digital-objects script"""
