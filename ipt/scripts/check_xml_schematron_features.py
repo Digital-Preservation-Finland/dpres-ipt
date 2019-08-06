@@ -6,6 +6,7 @@ import os
 import sys
 import optparse
 
+from six import itervalues
 from file_scraper.scraper import Scraper
 
 from ipt.utils import concat, get_scraper_info
@@ -37,15 +38,24 @@ def main(arguments=None):
     scraper = Scraper(filename, schematron=options.schemapath)
     scraper.scrape()
 
-    messages, errors = get_scraper_info(scraper)
-    if not scraper.mimetype == 'text/xml':
-        errors.append('ERROR: {} does not appear to be XML (found '
-                      'mimetype {}).'.format(filename, scraper.mimetype))
+    schematron_info = next((info for info in itervalues(scraper.info)
+                            if info['class'] == 'SchematronScraper'), None)
+    messages, errors = [], []
+    if not schematron_info:
+        errors.append('ERROR: {} does not appear to be an xml file.'
+                      .format(filename))
+    else:
+        messages.append(schematron_info['messages'])
+        errors.append(schematron_info['errors'])
 
-    print(concat(messages))
-    print(concat(errors), file=sys.stderr)
+    message_string = concat(messages)
+    error_string = concat(errors)
+    if message_string:
+        print(message_string)
+    if error_string:
+        print(error_string, file=sys.stderr)
 
-    if not scraper.well_formed:
+    if errors or not scraper.well_formed:
         return 117
 
     return 0

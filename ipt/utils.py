@@ -337,7 +337,7 @@ def synonymize_stream_keys(stream):
     return stream
 
 
-def concat(lines, prefix=""):
+def concat(lines, prefix=''):
     """Join given list of strings to single string separated with newlines.
 
     :lines: List of string to join
@@ -345,7 +345,7 @@ def concat(lines, prefix=""):
     :returns: Joined lines as string
 
     """
-    return "\n".join(["%s%s" % (prefix, line) for line in lines])
+    return '\n'.join(['%s%s' % (prefix, line) for line in lines]).strip()
 
 
 def get_scraper_info(scraper, filter_detectors=False):
