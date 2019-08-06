@@ -23,10 +23,6 @@ _FFMPEG_FILE_SCRAPER_KEY_SYNONYMS = (('frame_rate', 'avg_frame_rate'),
                                      ('num_channels', 'channels'),
                                      ('sampling_frequency', 'sample_rate'))
 
-_SCRAPER_DETECTOR_CLASSES = ('FidoDetector',
-                             'MagicDetector',
-                             'PredefinedDetector')
-
 
 class UnknownException(Exception):
     """Unknown error."""
@@ -348,12 +344,10 @@ def concat(lines, prefix=''):
     return '\n'.join(['%s%s' % (prefix, line) for line in lines]).strip()
 
 
-def get_scraper_info(scraper, filter_detectors=False):
+def get_scraper_info(scraper):
     messages, errors = [], []
     for info in itervalues(scraper.info):
         scraper_class = info['class']
-        if filter_detectors and scraper_class in _SCRAPER_DETECTOR_CLASSES:
-            continue
         # Keep empty messages to see which scrapers were used,
         # but filter empty errors
         messages.append(scraper_class + ': ' + info['messages'])
