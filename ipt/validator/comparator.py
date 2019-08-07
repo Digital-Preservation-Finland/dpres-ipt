@@ -9,8 +9,8 @@ from ipt.utils import handle_div, synonymize_stream_keys
 
 
 _ETAL_ALLOWED_KEYS = ('display_aspect_ratio',)
-_INTEGER_VALUE_KEYS = ('data_rate',)
-_UNAVAILABLE_VALUES = ('(:unav)', '0')
+_AUDIOMD_INTEGER_VALUE_KEYS = ('data_rate',)
+_METS_UNAVAILABLE_VALUES = ('(:unav)', '0')
 
 
 class MetadataComparator(object):
@@ -171,7 +171,8 @@ class MetadataComparator(object):
             _stream = {}
             for key, value in iteritems(stream):
                 decimals = 2  # Round values to two decimals by default
-                if key in _INTEGER_VALUE_KEYS:
+                if stream_type == 'audio' and \
+                        key in _AUDIOMD_INTEGER_VALUE_KEYS:
                     decimals = 0
                 _stream[key] = handle_div(value, decimals)
             _stream = synonymize_stream_keys(_stream)
@@ -249,11 +250,11 @@ def _match_streams(mets_streams, scraper_streams, stream_type):
                 if mets_value == scraper_value:
                     continue
                 # Check special cases where value mismatch is allowed
-                if mets_value in _UNAVAILABLE_VALUES:
+                if mets_value in _METS_UNAVAILABLE_VALUES:
                     notes.append('Found value for {} -- {}.'.format(
                         {key: mets_value}, {key: scraper_value}))
                     continue
-                if scraper_value in _UNAVAILABLE_VALUES:
+                if scraper_value == '(:unav)':
                     continue
                 if mets_value == '(:etal)' and key in _ETAL_ALLOWED_KEYS:
                     continue
