@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Validate all digital objects in a given METS document"""
 
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import argparse
 import datetime
@@ -95,41 +95,35 @@ def skip_validation(metadata_info):
 
 def check_well_formed(metadata_info):
     """
-    Check if file is well formed. If alt-format is given in metadata_info,
-    force validation as primary mimetype. Otherwise, first try to validate
-    without telling scraper the mimetype, and if scraper identifies the
-    file as something else than the primary mimetype, retry using the
-    primary mimetype.
+    Check if file is well formed. If mets specifies an alternative format or
+    scraper identifies the file as something else than what is given in mets,
+    add a message specifying the alternative mimetype. Perform validation
+    using the (primary) mets mimetype.
 
     :metadata_info: Dictionary containing metadata parsed from mets.
     :returns: Tuple with 2 dicts: (result_dict, scraper.streams)
     """
     messages = []
     primary_mimetype = metadata_info['format']['mimetype']
-    force_primary_mimetype = False
 
     if 'alt-format' in metadata_info['format']:
-        messages.append('Found alternative format "{}" in mets, '
+        messages.append('Found alternative mimetype "{}" in mets, '
                         'but validating as "{}".'.format(
                             metadata_info['format']['alt-format'],
                             primary_mimetype))
-        force_primary_mimetype = True
     else:
-        scraper = Scraper(metadata_info['filename'],
-                          **create_scraper_params(metadata_info))
-        scraper.scrape()
+        scraper = Scraper(metadata_info['filename'])
+        scraper.detect_filetype()
         if scraper.mimetype != primary_mimetype:
-            validity_text = 'valid' if scraper.well_formed else 'invalid'
-            messages.append('Recognized file as {} "{}", but validating as '
-                            '"{}".'.format(validity_text, scraper.mimetype,
-                                           primary_mimetype))
-            force_primary_mimetype = True
+            messages.append('Detected mimetype "{}", version "{}", but '
+                            'validating as "{}".'.format(
+                                scraper.mimetype, scraper.version,
+                                primary_mimetype))
 
-    if force_primary_mimetype:
-        scraper = Scraper(metadata_info['filename'],
-                          mimetype=primary_mimetype,
-                          **create_scraper_params(metadata_info))
-        scraper.scrape()
+    scraper = Scraper(metadata_info['filename'],
+                      mimetype=primary_mimetype,
+                      **create_scraper_params(metadata_info))
+    scraper.scrape()
 
     scraper_messages, errors = get_scraper_info(scraper)
     messages.extend(scraper_messages)

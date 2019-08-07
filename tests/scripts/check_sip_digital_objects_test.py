@@ -73,7 +73,7 @@ TESTCASES = [
      'filename': 'valid_1.7.0_plaintext_alt_format',
      'expected_result': {
          'returncode': 0,
-         'stdout': ['Found alternative format "text/html" in mets, but '
+         'stdout': ['Found alternative mimetype "text/html" in mets, but '
                     'validating as "text/plain".'],
          'stderr': ''}},
     {'testcase': 'Digital object with audiomd metadata.',
@@ -92,8 +92,8 @@ TESTCASES = [
      'filename': 'valid_1.7.1_invalid_xml_as_plaintext',
      'expected_result': {
          'returncode': 0,
-         'stdout': ['Recognized file as invalid "text/xml", but validating '
-                    'as "text/plain".'],
+         'stdout': ['Detected mimetype "text/xml", version "1.0", but '
+                    'validating as "text/plain".'],
          'stderr': ''}},
     {'testcase': 'SIP with multiple digital objects.',
      'filename': 'valid_1.7.1_multiple_objects',
@@ -227,18 +227,18 @@ def patch_validate(monkeypatch):
 
         if metadata_info['filename'] == 'pdf':
             result = make_result_dict(
-                    is_valid=True,
-                    messages=['JHovePdfScraper: Well-Formed and valid',
-                              ('MagicScraper: The file was analyzed '
-                               'successfully.')],
-                    errors=[])
+                is_valid=True,
+                messages=['JHovePdfScraper: Well-Formed and valid',
+                          ('MagicScraper: The file was analyzed '
+                           'successfully.')],
+                errors=[])
         elif metadata_info['filename'] == 'cdr':
             result = make_result_dict(
-                    is_valid=None,
-                    messages=['Proper scraper was not found. The file was not '
-                              'analyzed.'],
-                    errors=[],
-                    prefix='ScraperNotFound' + ': ')
+                is_valid=None,
+                messages=['Proper scraper was not found. The file was not '
+                          'analyzed.'],
+                errors=[],
+                prefix='ScraperNotFound: ')
         return (result, {})
 
     def _check_metadata_match(metadata_info, results):
