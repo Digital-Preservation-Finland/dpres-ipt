@@ -8,8 +8,8 @@ from file_scraper.scraper import Scraper
 from ipt.utils import handle_div, synonymize_stream_keys
 
 
-_ETAL_ALLOWED_KEYS = ('display_aspect_ratio')
-_INTEGER_VALUE_KEYS = ('data_rate')
+_ETAL_ALLOWED_KEYS = ('display_aspect_ratio',)
+_INTEGER_VALUE_KEYS = ('data_rate',)
 _UNAVAILABLE_VALUES = ('(:unav)', '0')
 
 
