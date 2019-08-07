@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from six import text_type, binary_type
+import six
 
 
 def ensure_binary(s, encoding='utf-8', errors='strict'):
@@ -40,9 +40,9 @@ def ensure_binary(s, encoding='utf-8', errors='strict'):
 
         https://github.com/benjaminp/six/blob/master/six.py#L853
     """
-    if isinstance(s, text_type):
+    if isinstance(s, six.text_type):
         return s.encode(encoding, errors)
-    elif isinstance(s, binary_type):
+    elif isinstance(s, six.binary_type):
         return s
     else:
         raise TypeError("not expecting type '%s'" % type(s))
@@ -63,9 +63,9 @@ def ensure_text(s, encoding='utf-8', errors='strict'):
 
         https://github.com/benjaminp/six/blob/master/six.py#892
     """
-    if isinstance(s, binary_type):
+    if isinstance(s, six.binary_type):
         return s.decode(encoding, errors)
-    elif isinstance(s, text_type):
+    elif isinstance(s, six.text_type):
         return s
     else:
         raise TypeError("not expecting type '%s'" % type(s))

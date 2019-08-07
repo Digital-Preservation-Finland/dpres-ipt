@@ -12,7 +12,6 @@ from fractions import Fraction
 import six
 
 import mimeparse
-from six import iteritems, itervalues
 _SCRAPER_PARAM_ADDML_KEY_RELATION = (('fields', 'header_fields'),
                                      ('separator', 'separator'),
                                      ('delimiter', 'delimiter'))
@@ -45,7 +44,7 @@ def run_command(cmd, stdout=subprocess.PIPE, env=None):
     _env = os.environ.copy()
 
     if env:
-        for key, value in iteritems(env):
+        for key, value in six.iteritems(env):
             _env[key] = value
 
     proc = subprocess.Popen(cmd,
@@ -346,7 +345,7 @@ def concat(lines, prefix=''):
 
 def get_scraper_info(scraper):
     messages, errors = [], []
-    for info in itervalues(scraper.info):
+    for info in six.itervalues(scraper.info):
         scraper_class = info['class']
         # Keep empty messages to see which scrapers were used,
         # but filter empty errors

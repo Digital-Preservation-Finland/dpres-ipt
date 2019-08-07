@@ -6,7 +6,7 @@ import os
 import sys
 import optparse
 
-from six import itervalues
+import six
 from file_scraper.scraper import Scraper
 
 from ipt.utils import concat
@@ -38,7 +38,7 @@ def main(arguments=None):
     scraper = Scraper(filename, schematron=options.schemapath)
     scraper.scrape()
 
-    schematron_info = next((info for info in itervalues(scraper.info)
+    schematron_info = next((info for info in six.itervalues(scraper.info)
                             if info['class'] == 'SchematronScraper'), None)
     messages, errors = [], []
     if not schematron_info:

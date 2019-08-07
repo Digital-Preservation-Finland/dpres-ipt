@@ -3,7 +3,7 @@ Module to compare metadata found in mets to metadata scraped by file-scraper.
 """
 
 import itertools
-from six import iteritems, itervalues
+import six
 from file_scraper.scraper import Scraper
 from ipt.utils import handle_div, synonymize_stream_keys
 
@@ -163,13 +163,13 @@ class MetadataComparator(object):
         if stream_type not in ('audio', 'video'):
             raise ValueError('Invalid stream type {}'.format(stream_type))
         prepared_dicts = []
-        for stream in itervalues(self._scraper_streams):
+        for stream in six.itervalues(self._scraper_streams):
             if stream['stream_type'] != stream_type:
                 continue
             _dummy_dict = {}
             _dummy_dict['format'] = self._get_stream_format(stream['index'])
             _stream = {}
-            for key, value in iteritems(stream):
+            for key, value in six.iteritems(stream):
                 decimals = 2  # Round values to two decimals by default
                 if stream_type == 'audio' and \
                         key in _AUDIOMD_INTEGER_VALUE_KEYS:
@@ -244,7 +244,7 @@ def _match_streams(mets_streams, scraper_streams, stream_type):
                                          scraper_stream['format']):
             return False
 
-        for key, mets_value in iteritems(mets_stream[stream_type]):
+        for key, mets_value in six.iteritems(mets_stream[stream_type]):
             try:
                 scraper_value = scraper_stream[stream_type][key]
                 if mets_value == scraper_value:
