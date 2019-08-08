@@ -97,31 +97,34 @@ def check_well_formed(metadata_info):
     """
     Check if file is well formed. If mets specifies an alternative format or
     scraper identifies the file as something else than what is given in mets,
-    add a message specifying the alternative mimetype. Perform validation
-    using the (primary) mets mimetype.
+    add a message specifying the alternative mimetype and version. Perform
+    validation using mets mimetype and version.
 
     :metadata_info: Dictionary containing metadata parsed from mets.
     :returns: Tuple with 2 dicts: (result_dict, scraper.streams)
     """
     messages = []
-    primary_mimetype = metadata_info['format']['mimetype']
+    md_mimetype = metadata_info['format']['mimetype']
+    md_version = metadata_info['format']['version']
 
     if 'alt-format' in metadata_info['format']:
         messages.append('Found alternative mimetype "{}" in mets, '
                         'but validating as "{}".'.format(
                             metadata_info['format']['alt-format'],
-                            primary_mimetype))
+                            md_mimetype))
     else:
         scraper = Scraper(metadata_info['filename'])
         scraper.detect_filetype()
-        if scraper.mimetype != primary_mimetype:
+        if scraper.mimetype != md_mimetype or scraper.version != md_version:
             messages.append('Detected mimetype "{}", version "{}", but '
-                            'validating as "{}".'.format(
+                            'validating as mimetype "{}", version "{}".'
+                            .format(
                                 scraper.mimetype, scraper.version,
-                                primary_mimetype))
+                                md_mimetype, md_version))
 
     scraper = Scraper(metadata_info['filename'],
-                      mimetype=primary_mimetype,
+                      mimetype=md_mimetype,
+                      version=md_version,
                       **create_scraper_params(metadata_info))
     scraper.scrape()
 
