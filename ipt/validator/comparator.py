@@ -2,6 +2,7 @@
 Module to compare metadata found in mets to metadata scraped by file-scraper.
 """
 
+from __future__ import unicode_literals
 import itertools
 import six
 from file_scraper.scraper import Scraper
@@ -92,14 +93,17 @@ class MetadataComparator(object):
         }
 
     def _perform_checks(self):
+        """
+        Check that the 'format' dictionary values in metadata_info match
+        the values of the first scraper stream. If metadata_info contains
+        audio/video streams, check that they can be matched with scraper
+        streams.
+        """
         self._check_format()
         metadata_stream_types = set(self._metadata_info.keys()).intersection(
-            {'addml', 'audio', 'audio_streams', 'video', 'video_streams'})
+            {'audio', 'audio_streams', 'video', 'video_streams'})
         for stream_type in metadata_stream_types:
-            if stream_type == 'addml':
-                self._check_addml(self._metadata_info['addml'])
-            else:
-                self._check_audio_or_video_streams(stream_type)
+            self._check_audio_or_video_streams(stream_type)
 
     def _check_format(self):
         """
@@ -124,10 +128,6 @@ class MetadataComparator(object):
         if mets_charset != scraper_charset:
             self._add_error('Character set mismatch.',
                             mets_charset, scraper_charset)
-
-    def _check_addml(self, metadata_stream):
-        # TODO implement addml comparison
-        pass
 
     def _check_audio_or_video_streams(self, stream_type):
         """
