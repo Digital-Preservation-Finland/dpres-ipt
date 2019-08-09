@@ -25,8 +25,7 @@ class MetadataComparator(object):
 
     1. _check_format (always): compare mimetype and version
            _check_charset (text files only): compare character set
-    2. _check_addml (if 'addml' key exists in metadata_info)
-    3. _check_audio_or_video_streams (called for each of the following keys
+    2. _check_audio_or_video_streams (called for each of the following keys
            present in metadata_info:
            'audio', 'audio_streams', 'video', 'video_streams')
     """
@@ -71,6 +70,9 @@ class MetadataComparator(object):
             'errors': self.errors(),
         }
 
+    def _is_textfile(self):
+        return Scraper(self._metadata_info['filename']).is_textfile()
+
     def _add_error(self, info, mets_value, scraper_value):
         """
         Add an error describing what failed and which values were
@@ -112,7 +114,7 @@ class MetadataComparator(object):
         """
         mets_format = self._metadata_info['format']
         scraper_format = self._get_stream_format(0)
-        is_textfile = Scraper(self._metadata_info['filename']).is_textfile()
+        is_textfile = self._is_textfile()
 
         if is_textfile:
             self._check_charset()
@@ -122,12 +124,17 @@ class MetadataComparator(object):
                             mets_format, scraper_format)
 
     def _check_charset(self):
-        """Check that character set in mets matches what scraper found."""
+        """
+        Check that character set in mets matches what scraper found. If
+        they do not match, add message (not an error, because scraper may
+        guess wrong).
+        """
         scraper_charset = self._scraper_streams[0].get('charset', None)
         mets_charset = self._metadata_info['format'].get('charset', None)
         if mets_charset != scraper_charset:
-            self._add_error('Character set mismatch.',
-                            mets_charset, scraper_charset)
+            self._messages.append(
+                'METS and Scraper character sets do not match. METS: {} '
+                'Scraper: {}'.format(mets_charset, scraper_charset))
 
     def _check_audio_or_video_streams(self, stream_type):
         """

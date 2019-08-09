@@ -16,8 +16,8 @@ The tests check the dictionary returned by the result() method to ensure that:
 """
 
 
-import pytest
 from copy import deepcopy
+import pytest
 from file_scraper.scraper import Scraper
 from ipt.validator.comparator import MetadataComparator
 from ipt.utils import concat
@@ -65,39 +65,39 @@ METADATA_INFO = {
 
 SCRAPER_STREAMS = {
     'valid_text': {
-         0: {'charset': 'UTF-8',
-             'index': 0,
-             'mimetype': 'text/plain',
-             'stream_type': 'text',
-             'version': '(:unav)'}},
+        0: {'charset': 'UTF-8',
+            'index': 0,
+            'mimetype': 'text/plain',
+            'stream_type': 'text',
+            'version': '(:unav)'}},
     'valid_image': {
-         0: {'bps_unit': 'integer',
-             'bps_value': '8',
-             'colorspace': 'srgb',
-             'compression': 'jpeg',
-             'height': '300',
-             'index': 0,
-             'mimetype': 'image/jpeg',
-             'samples_per_pixel': '3',
-             'stream_type': 'image',
-             'version': '1.02',
-             'width': '400'}},
+        0: {'bps_unit': 'integer',
+            'bps_value': '8',
+            'colorspace': 'srgb',
+            'compression': 'jpeg',
+            'height': '300',
+            'index': 0,
+            'mimetype': 'image/jpeg',
+            'samples_per_pixel': '3',
+            'stream_type': 'image',
+            'version': '1.02',
+            'width': '400'}},
     'valid_audio': {
-         0: {'audio_data_encoding': 'PCM',
-             'bits_per_sample': '8',
-             'codec_creator_app': 'Lavf56.40.101',
-             'codec_creator_app_version': '56.40.101',
-             'codec_name': 'PCM',
-             'codec_quality': 'lossless',
-             'data_rate': '705.6',
-             'data_rate_mode': 'Fixed',
-             'duration': 'PT0.86S',
-             'index': 0,
-             'mimetype': 'audio/x-wav',
-             'num_channels': '2',
-             'sampling_frequency': '44.1',
-             'stream_type': 'audio',
-             'version': ''}},
+        0: {'audio_data_encoding': 'PCM',
+            'bits_per_sample': '8',
+            'codec_creator_app': 'Lavf56.40.101',
+            'codec_creator_app_version': '56.40.101',
+            'codec_name': 'PCM',
+            'codec_quality': 'lossless',
+            'data_rate': '705.6',
+            'data_rate_mode': 'Fixed',
+            'duration': 'PT0.86S',
+            'index': 0,
+            'mimetype': 'audio/x-wav',
+            'num_channels': '2',
+            'sampling_frequency': '44.1',
+            'stream_type': 'audio',
+            'version': ''}},
     'valid_video': {
         0: {'codec_creator_app': 'Lavf56.40.101',
             'codec_creator_app_version': '56.40.101',
@@ -180,6 +180,10 @@ VALID_TEST_CASES = [
      'md_patch': [['audio', 'channels', '(:unav)']],
      'expected_message': "Found value for {'channels': '(:unav)'} "
                          "-- {'channels': '2'}."},
+    {'reason': 'Check that mismatching character sets are reported.',
+     'base': 'valid_text',
+     'md_patch': [['format', 'charset', 'UTF-16']],
+     'expected_message': 'METS and Scraper character sets do not match.'},
 ]
 
 INVALID_TEST_CASES = [
@@ -191,14 +195,6 @@ INVALID_TEST_CASES = [
      'base': 'valid_image',
      'md_patch': [['format', 'version', '']],
      'expected_error': 'Missing or incorrect mimetype/version.'},
-    {'reason': 'Character set is always required for text files.',
-     'base': 'valid_text',
-     'md_patch': [['format', {'mimetype': 'text/plain', 'version': ''}]],
-     'expected_error': 'Character set mismatch.'},
-    {'reason': 'Check that mismatching character sets are caught.',
-     'base': 'valid_text',
-     'md_patch': [['format', 'charset', 'UTF-16']],
-     'expected_error': 'Character set mismatch.'},
     {'reason': 'Check that mismatching stream value is caught.',
      'base': 'valid_video',
      'md_patch': [['audio_streams', 0, 'audio', 'bit_rate', 200]],

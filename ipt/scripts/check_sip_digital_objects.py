@@ -98,14 +98,13 @@ def check_well_formed(metadata_info):
     Check if file is well formed. If mets specifies an alternative format or
     scraper identifies the file as something else than what is given in mets,
     add a message specifying the alternative mimetype and version. Perform
-    validation using mets mimetype and version.
+    validation using mets mimetype.
 
     :metadata_info: Dictionary containing metadata parsed from mets.
     :returns: Tuple with 2 dicts: (result_dict, scraper.streams)
     """
     messages = []
     md_mimetype = metadata_info['format']['mimetype']
-    md_version = metadata_info['format']['version']
 
     if 'alt-format' in metadata_info['format']:
         messages.append('Found alternative mimetype "{}" in mets, '
@@ -115,16 +114,15 @@ def check_well_formed(metadata_info):
     else:
         scraper = Scraper(metadata_info['filename'])
         scraper.detect_filetype()
-        if scraper.mimetype != md_mimetype or scraper.version != md_version:
+        if scraper.mimetype != md_mimetype:
             messages.append('Detected mimetype "{}", version "{}", but '
-                            'validating as mimetype "{}", version "{}".'
+                            'validating as "{}".'
                             .format(
                                 scraper.mimetype, scraper.version,
-                                md_mimetype, md_version))
+                                md_mimetype))
 
     scraper = Scraper(metadata_info['filename'],
                       mimetype=md_mimetype,
-                      version=md_version,
                       **create_scraper_params(metadata_info))
     scraper.scrape()
 

@@ -67,8 +67,7 @@ TESTCASES = [
                'version': '3.1415'},
      'expected_result': {
          'returncode': 117,
-         'stdout': ['ERROR: MIME type image/jpeg with version 3.1415 is not '
-                    'supported.'],
+         'stdout': ['Missing or incorrect mimetype/version.'],
          'stderr': ''}},
     {'testcase': 'Report alt-format when validating as primary mimetype.',
      'filename': 'valid_1.7.0_plaintext_alt_format',
@@ -94,7 +93,7 @@ TESTCASES = [
      'expected_result': {
          'returncode': 0,
          'stdout': ['Detected mimetype "text/xml", version "1.0", but '
-                    'validating as mimetype "text/plain", version "(:unap)".'],
+                    'validating as "text/plain".'],
          'stderr': ''}},
     {'testcase': 'SIP with multiple digital objects.',
      'filename': 'valid_1.7.1_multiple_objects',
