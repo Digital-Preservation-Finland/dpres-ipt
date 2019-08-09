@@ -38,11 +38,14 @@ def main(arguments=None):
 
     filename = args[0]
     scraper = Scraper(filename, schema=options.schemapath,
-                      catalog_path=catalog_path)
-    scraper.scrape()
+                      catalog_path=options.catalogpath)
+    scraper.detect_filetype()
 
-    messages, errors = get_scraper_info(scraper)
-    if not scraper.mimetype == 'text/xml':
+    messages, errors = [], []
+    if scraper.mimetype == 'text/xml':
+        scraper.scrape()
+        messages, errors = get_scraper_info(scraper)
+    else:
         errors.append('ERROR: {} does not appear to be XML (found '
                       'mimetype {}).'.format(filename, scraper.mimetype))
 
