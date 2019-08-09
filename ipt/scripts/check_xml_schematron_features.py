@@ -36,17 +36,21 @@ def main(arguments=None):
         filename = os.path.join(filename, 'mets.xml')
 
     scraper = Scraper(filename, schematron=options.schemapath)
-    scraper.scrape()
+    scraper.detect_filetype()
 
-    schematron_info = next((info for info in six.itervalues(scraper.info)
-                            if info['class'] == 'SchematronScraper'), None)
     messages, errors = [], []
-    if not schematron_info:
-        errors.append('ERROR: {} does not appear to be an xml file.'
-                      .format(filename))
+    if scraper.mimetype == 'text/xml':
+        scraper.scrape()
+        schematron_info = next((info for info in six.itervalues(scraper.info)
+                                if info['class'] == 'SchematronScraper'), None)
+        if schematron_info:
+            messages.append(schematron_info['messages'])
+            errors.append(schematron_info['errors'])
+        else:
+            errors.append('ERROR: Could not find SchematronScraper info.')
     else:
-        messages.append(schematron_info['messages'])
-        errors.append(schematron_info['errors'])
+        errors.append('ERROR: {} does not appear to be XML (found '
+                      'mimetype {}).'.format(filename, scraper.mimetype))
 
     message_string = concat(messages)
     error_string = concat(errors)
@@ -55,7 +59,7 @@ def main(arguments=None):
     if error_string:
         print(error_string, file=sys.stderr)
 
-    if errors or not scraper.well_formed:
+    if error_string or not scraper.well_formed:
         return 117
 
     return 0
