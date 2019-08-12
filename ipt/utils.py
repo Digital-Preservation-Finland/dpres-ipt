@@ -305,6 +305,15 @@ def create_scraper_params(metadata_info):
     """
     params = {}
 
+    # Scraper detects pdf A-1b as pdf 1.4, but validation must be done as A-1b
+    # TODO remove the following when scraper detects pdf A-1b correctly
+    md_mimetype = metadata_info['format']['mimetype']
+    md_version = metadata_info['format']['version']
+    _force_version = {'application/pdf': ['A-1b']}
+    if md_mimetype in _force_version:
+        if md_version in _force_version[md_mimetype]:
+            params['version'] = md_version
+
     for scr_param_key, addml_key in _SCRAPER_PARAM_ADDML_KEY_RELATION:
         try:
             params[scr_param_key] = metadata_info['addml'][addml_key]
