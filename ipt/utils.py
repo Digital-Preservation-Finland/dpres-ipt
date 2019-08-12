@@ -2,8 +2,6 @@
 Utility functions.
 """
 
-import os
-import subprocess
 import urllib
 from collections import defaultdict
 from copy import deepcopy
@@ -31,35 +29,6 @@ class UnknownException(Exception):
 class ValidationException(Exception):
     """Validator error."""
     pass
-
-
-def run_command(cmd, stdout=subprocess.PIPE, env=None):
-    """Execute command. Validator specific error handling is supported
-    by forwarding exceptions.
-    :param cmd: commandline command.
-    :param env: Override process environment variables
-    :param stdout: a file handle can be given, for directing stdout to file.
-    :returns: Tuple (statuscode, stdout, stderr)
-    """
-    _env = os.environ.copy()
-
-    if env:
-        for key, value in six.iteritems(env):
-            _env[key] = value
-
-    proc = subprocess.Popen(cmd,
-                            stdout=stdout,
-                            stderr=subprocess.PIPE,
-                            shell=False,
-                            env=_env)
-
-    (stdout_result, stderr_result) = proc.communicate()
-    if not stdout_result:
-        stdout_result = ""
-    if not stderr_result:
-        stderr_result = ""
-    statuscode = proc.returncode
-    return statuscode, stdout_result, stderr_result
 
 
 def merge_dicts(*dicts):
