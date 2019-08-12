@@ -52,8 +52,8 @@ def main(arguments=None):
         errors.append('ERROR: {} does not appear to be XML (found '
                       'mimetype {}).'.format(filename, scraper.mimetype))
 
-    message_string = concat(messages)
-    error_string = concat(errors)
+    message_string = concat(messages).strip()
+    error_string = concat(errors).strip()
     if message_string:
         print(message_string)
     if error_string:

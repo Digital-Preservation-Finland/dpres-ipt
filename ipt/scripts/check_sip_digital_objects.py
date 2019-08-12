@@ -54,7 +54,7 @@ def contains_errors(report):
     return False
 
 
-def make_result_dict(is_valid, messages=[], errors=[], prefix=''):
+def make_result_dict(is_valid, messages=None, errors=None, prefix=''):
     """ Create a result dict from a validation component output.
 
     :is_valid: Boolean describing the validation result.
@@ -65,8 +65,8 @@ def make_result_dict(is_valid, messages=[], errors=[], prefix=''):
     """
     return {
         'is_valid': is_valid,
-        'messages': concat(messages, prefix),
-        'errors': concat(errors, prefix),
+        'messages': concat(messages, prefix) if messages else '',
+        'errors': concat(errors, prefix) if errors else '',
     }
 
 

@@ -349,7 +349,7 @@ def concat(lines, prefix=''):
     :returns: Joined lines as string
 
     """
-    return '\n'.join(['%s%s' % (prefix, line) for line in lines]).strip()
+    return '\n'.join(['%s%s' % (prefix, line) for line in lines])
 
 
 def get_scraper_info(scraper):
