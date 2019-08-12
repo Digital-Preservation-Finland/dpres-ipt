@@ -9,8 +9,6 @@ import os
 import sys
 import uuid
 
-import lxml.etree
-
 import premis
 import xml_helpers.utils
 from file_scraper.scraper import Scraper
@@ -265,19 +263,14 @@ def create_report_event(result, report_object, report_agent):
         identifier_type="preservation-event-id",
         identifier_value=str(uuid.uuid4()), prefix='event')
     outresult = 'success' if result["is_valid"] is True else 'failure'
-    detail_extension = None
-    try:
-        detail_extension = lxml.etree.fromstring(result["messages"])
-        detail_note = result["errors"] if result["errors"] else None
 
-    except lxml.etree.XMLSyntaxError:
-        if result["errors"]:
-            detail_note = (result["messages"] + '\n' + result["errors"])
-        else:
-            detail_note = result["messages"]
+    if result["errors"]:
+        detail_note = (result["messages"] + '\n' + result["errors"])
+    else:
+        detail_note = result["messages"]
 
     outcome = premis.outcome(outcome=outresult, detail_note=detail_note,
-                             detail_extension=detail_extension)
+                             detail_extension=None)
 
     report_event = premis.event(
         event_id=event_id, event_type="validation",
