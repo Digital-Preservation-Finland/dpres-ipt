@@ -80,7 +80,7 @@ def check_mets_errors(metadata_info):
     if metadata_info['errors']:
         return make_result_dict(
             is_valid=False,
-            messages=['Failed parsing metadata, skipping validation.'],
+            messages=['Failed parsing METS, skipping validation.'],
             errors=[metadata_info['errors']]
         )
     return make_result_dict(is_valid=True)
@@ -105,7 +105,7 @@ def check_well_formed(metadata_info):
     md_mimetype = metadata_info['format']['mimetype']
 
     if 'alt-format' in metadata_info['format']:
-        messages.append('Found alternative mimetype "{}" in mets, '
+        messages.append('Found alternative mimetype "{}" in METS, '
                         'but validating as "{}".'.format(
                             metadata_info['format']['alt-format'],
                             md_mimetype))

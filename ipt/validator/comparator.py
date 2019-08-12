@@ -62,7 +62,7 @@ class MetadataComparator(object):
         if not any((self._messages, self._errors)):
             self._perform_checks()
             if self.is_valid:
-                self._messages.append('Mets metadata matches '
+                self._messages.append('METS metadata matches '
                                       'scraper metadata.')
         return {
             'is_valid': self.is_valid,
@@ -78,7 +78,7 @@ class MetadataComparator(object):
         Add an error describing what failed and which values were
         compared.
         """
-        self._errors.append(info + ' Mets: {}, Scraper: {}'.format(
+        self._errors.append(info + ' METS: {}, Scraper: {}'.format(
             mets_value, scraper_value))
 
     def _get_stream_format(self, stream_index):

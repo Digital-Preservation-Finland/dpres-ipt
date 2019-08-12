@@ -160,7 +160,7 @@ SCRAPER_STREAMS = {
 }
 
 # The default result message if comparison does not find any errors.
-DEFAULT_VALID_MESSAGE = 'Mets metadata matches scraper metadata.'
+DEFAULT_VALID_MESSAGE = 'METS metadata matches scraper metadata.'
 
 VALID_TEST_CASES = [
     {'reason': 'Valid plaintext must pass.',

@@ -73,7 +73,7 @@ TESTCASES = [
      'filename': 'valid_1.7.0_plaintext_alt_format',
      'expected_result': {
          'returncode': 0,
-         'stdout': ['Found alternative mimetype "text/html" in mets, but '
+         'stdout': ['Found alternative mimetype "text/html" in METS, but '
                     'validating as "text/plain".'],
          'stderr': ''}},
     {'testcase': 'Digital object with audiomd metadata.',
@@ -371,6 +371,6 @@ def test_metadata_info_erros():
 
     result = results[0]
     assert not result['is_valid']
-    assert result['messages'] == ('Failed parsing metadata, skipping '
+    assert result['messages'] == ('Failed parsing METS, skipping '
                                   'validation.')
     assert result['errors'] == 'Some error'
