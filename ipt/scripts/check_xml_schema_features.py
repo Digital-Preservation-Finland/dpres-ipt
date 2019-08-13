@@ -2,6 +2,8 @@
 # -*- encoding:utf-8 -*-
 # vim:ft=python
 
+"""Check well-formedness of XML file and validate against an XML schema."""
+
 from __future__ import print_function, unicode_literals
 import os
 import sys
@@ -54,10 +56,11 @@ def main(arguments=None):
 
     if errors or not scraper.well_formed:
         return 117
-
     return 0
 
 
+# pylint: disable=duplicate-code
+# Main function can be similar in different scripts
 if __name__ == '__main__':
     # If run from the command line, take out the program name from sys.argv
     RETVAL = main(sys.argv[1:])

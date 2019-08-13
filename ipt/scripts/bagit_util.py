@@ -34,7 +34,7 @@ def main(arguments=None):
     parser = optparse.OptionParser(usage=usage)
     if not arguments:
         arguments = sys.argv
-    (options, args) = parser.parse_args(arguments)
+    (_, args) = parser.parse_args(arguments)
 
     if len(args) != 3:
         sys.stderr.write("Must provide make_manifest command and SIP directory"

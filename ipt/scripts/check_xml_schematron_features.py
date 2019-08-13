@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- encoding:utf-8 -*-
 # vim:ft=python
+
+"""Validate XML file using Schematron."""
+
 from __future__ import print_function, unicode_literals
 import os
 import sys
@@ -61,10 +64,11 @@ def main(arguments=None):
 
     if error_string or not scraper.well_formed:
         return 117
-
     return 0
 
 
+# Main function can be similar in different scripts
+# pylint: disable=duplicate-code
 if __name__ == '__main__':
     # If run from the command line, take out the program name from sys.argv
     RETVAL = main(sys.argv[1:])

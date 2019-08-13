@@ -13,6 +13,7 @@ Usage ::
     report is created to same directory as premis-xml-report is.
 
 """
+from __future__ import print_function, unicode_literals
 
 import optparse
 import os
@@ -54,7 +55,7 @@ def main(arguments=None):
             close_fds=True, shell=False)
         (_, stderr) = proc.communicate()
 
-    if len(stderr) > 0:
+    if stderr:
         print("xsltproc had stderr output:")
         print(stderr)
 

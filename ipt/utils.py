@@ -42,7 +42,7 @@ def merge_dicts(*dicts):
     """
     result = {}
     for dictionary in dicts:
-        if len(dictionary) == 0:
+        if not dictionary:
             continue
         for key in dictionary.keys():
             if key in result:
@@ -237,13 +237,13 @@ def _filter_dicts(list1, list2, included_keys, parent_key, forcekeys):
     Filters lists according to given keys.
     """
     for listx in [list1, list2]:
-        for index in range(0, len(listx)):
-            tmpdict = {key: listx[index][key]
+        for index, dictx in enumerate(listx):
+            tmpdict = {key: dictx[key]
                        for key in included_keys[parent_key]}
             if forcekeys:
-                for key in set(listx[index].keys()). \
+                for key in set(dictx.keys()). \
                         intersection(set(forcekeys)):
-                    tmpdict[key] = listx[index][key]
+                    tmpdict[key] = dictx[key]
             listx[index] = tmpdict
 
     for dict1 in list1:
@@ -322,6 +322,16 @@ def concat(lines, prefix=''):
 
 
 def get_scraper_info(scraper):
+    """
+    Gather messages and errors from scraper.info dictionary, filtering empty
+    errors. Prepend each message with the name of the scraper class which
+    produced it.
+
+    :scraper: The scraper object which has conducted scraping.
+    :returns: (messages, errors) tuple, where
+              - messages is a list of gathered messages
+              - errors is a list of gathered errors
+    """
     messages, errors = [], []
     for info in six.itervalues(scraper.info):
         scraper_class = info['class']

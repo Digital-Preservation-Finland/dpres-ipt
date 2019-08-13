@@ -61,7 +61,7 @@ def make_manifest(bagit_dir):
     """This function creates bagit manifest.
     :bagit_dir: base directory of bagit."""
     manifest = []
-    for dir_name, dir_list, file_list in os.walk(bagit_dir):
+    for dir_name, _, file_list in os.walk(bagit_dir):
         for file_name in file_list:
             path = os.path.join(dir_name, file_name)
             # Manifest should be updated, not re-icluded in new manifest
