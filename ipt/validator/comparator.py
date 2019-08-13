@@ -12,6 +12,9 @@ from ipt.utils import handle_div, synonymize_stream_keys
 _ETAL_ALLOWED_KEYS = ('display_aspect_ratio',)
 _AUDIOMD_INTEGER_VALUE_KEYS = ('data_rate',)
 _METS_UNAVAILABLE_VALUES = ('(:unav)', '0')
+_PDF_VERSION_SUBSETS = {'1.4': ('A-1a', 'A-1b'),
+                        '1.7': ('A-2a', 'A-2b', 'A-2u',
+                                'A-3a', 'A-3b', 'A-3u')}
 
 
 class MetadataComparator(object):
@@ -202,6 +205,28 @@ class MetadataComparator(object):
         raise ValueError('Invalid stream type {}'.format(stream_type))
 
 
+def _mets_ok_versions(scraper_format):
+    """
+    Get a set of versions which are allowed in mets, given the
+    mimetype/version information found by scraper.
+
+    :scraper_format: Dict with keys 'mimetype' and 'version' (from scraper).
+    :returns: Set of allowed file versions in mets.
+    """
+    ok_versions = {scraper_format['version']}
+    # If scraper does not find a version, empty string in mets is ok
+    if scraper_format['version'] in ('(:unav)', '(:unap)', '', None):
+        ok_versions.add('')
+    # PDF file special case:
+    # If scraper finds a version which is a subset of the version given METS,
+    # the more general mets value is allowed (e.g, mets: 1.4, scraper: A-1b)
+    if scraper_format['mimetype'] == 'application/pdf':
+        for super_version, sub_versions in six.iteritems(_PDF_VERSION_SUBSETS):
+            if scraper_format['version'] in sub_versions:
+                ok_versions.add(super_version)
+    return ok_versions
+
+
 def _compare_mimetype_version(mets_format, scraper_format, is_textfile=False):
     """
     Helper to check if mimetype and version in mets match scraper.
@@ -211,16 +236,12 @@ def _compare_mimetype_version(mets_format, scraper_format, is_textfile=False):
     :is_textfile: True if checking a text file.
     :returns: True iff mets mimetype and version match what scraper found.
     """
-    ok_mimetypes = [scraper_format['mimetype']]
-    ok_versions = [scraper_format['version']]
+    ok_mimetypes = {scraper_format['mimetype']}
     # Subsets of text/plain (e.g., text/html) can be submitted as plaintext
     if is_textfile:
-        ok_mimetypes.append('text/plain')
-    # If scraper does not find a version, empty string in mets is ok
-    if scraper_format['version'] in ('(:unav)', '(:unap)', '', None):
-        ok_versions.extend(['(:unap)', ''])
+        ok_mimetypes.add('text/plain')
     return all((mets_format['mimetype'] in ok_mimetypes,
-                mets_format['version'] in ok_versions))
+                mets_format['version'] in _mets_ok_versions(scraper_format)))
 
 
 def _match_streams(mets_streams, scraper_streams, stream_type):
