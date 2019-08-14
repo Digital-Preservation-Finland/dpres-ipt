@@ -11,9 +11,9 @@ import errno
 import scandir
 
 import xml_helpers.utils as u
+from file_scraper.utils import hexdigest
 from ipt.validator.utils import iter_metadata_info
 from ipt.six_utils import ensure_text
-from ipt.fileutils.checksum import BigFile
 
 
 def iter_files(path):
@@ -63,10 +63,9 @@ def check_checksums(mets_path):
             yield _message(metadata_info, "Could not find checksum algorithm")
         else:
 
-            checksum = BigFile(metadata_info["algorithm"])
-
             try:
-                hex_digest = checksum.hexdigest(metadata_info["filename"])
+                hex_digest = hexdigest(metadata_info['filename'],
+                                       metadata_info['algorithm'])
             except IOError as exception:
                 if exception.errno == errno.ENOENT:
                     yield _message(metadata_info, "File does not exist")
