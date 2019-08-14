@@ -27,22 +27,19 @@ TESTCASES = [
      'filename': 'invalid_1.7.1_invalid_object',
      'expected_result': {
          'returncode': 117,
-         'stdout': ['ERROR: warc errors at'],
-         'stderr': ''}},
+         'stdout': ['ERROR: warc errors at']}},
     {'testcase': 'Invalid xml file submitted as text/xml.',
      'filename': 'invalid_1.7.1_invalid_xml_as_xml',
      'expected_result': {
          'returncode': 117,
-         'stdout': ['Failed: document is not well-formed.'],
-         'stderr': ''}},
+         'stdout': ['Failed: document is not well-formed.']}},
     {'testcase': 'Missing digital object.',
      'filename': 'invalid_1.7.1_missing_object',
      'expected_result': {
          'returncode': 117,
          'stdout': ['ERROR: File {}/sips/invalid_1.7.1_missing_object/'
                     'data/valid_1.2.png does not exist.'
-                    .format(testcommon.settings.TESTDATADIR)],
-         'stderr': ''}},
+                    .format(testcommon.settings.TESTDATADIR)]}},
     {'testcase': 'Unsupported mimetype, with version.',
      'filename': 'invalid_1.7.1_unsupported_mimetype',
      'patch': {'mimetype': 'application/kissa',
@@ -50,8 +47,7 @@ TESTCASES = [
      'expected_result': {
          'returncode': 117,
          'stdout': ['Proper scraper was not found. The file was not '
-                    'analyzed.'],
-         'stderr': ''}},
+                    'analyzed.']}},
     {'testcase': 'Unsupported mimetype, without version.',
      'filename': 'invalid_1.7.1_unsupported_mimetype_no_version',
      'patch': {'mimetype': 'application/kissa',
@@ -59,67 +55,57 @@ TESTCASES = [
      'expected_result': {
          'returncode': 117,
          'stdout': ['Proper scraper was not found. The file was not '
-                    'analyzed.'],
-         'stderr': ''}},
+                    'analyzed.']}},
     {'testcase': 'Unsupported version with supported mimetype.',
      'filename': 'invalid_1.7.1_unsupported_version',
      'patch': {'mimetype': 'image/jpeg',
                'version': '3.1415'},
      'expected_result': {
          'returncode': 117,
-         'stdout': ['Missing or incorrect mimetype/version.'],
-         'stderr': ''}},
+         'stdout': ['Missing or incorrect mimetype/version.']}},
     {'testcase': 'Report alt-format when validating as primary mimetype.',
      'filename': 'valid_1.7.0_plaintext_alt_format',
      'expected_result': {
          'returncode': 0,
          'stdout': ['Found alternative mimetype "text/html" in METS, but '
-                    'validating as "text/plain".'],
-         'stderr': ''}},
+                    'validating as "text/plain".']}},
     {'testcase': 'Digital object with audiomd metadata.',
      'filename': 'valid_1.7.1_audio_stream',
      'expected_result': {
          'returncode': 0,
-         'stdout': '',
-         'stderr': ''}},
+         'stdout': []}},
     {'testcase': 'Digital object with mix metadata.',
      'filename': 'valid_1.7.1_image',
      'expected_result': {
          'returncode': 0,
-         'stdout': '',
-         'stderr': ''}},
+         'stdout': []}},
     {'testcase': 'Invalid xml submitted as valid text/plain.',
      'filename': 'valid_1.7.1_invalid_xml_as_plaintext',
      'expected_result': {
          'returncode': 0,
          'stdout': ['Detected mimetype "text/xml", version "1.0", but '
-                    'validating as "text/plain".'],
-         'stderr': ''}},
+                    'validating as "text/plain".']}},
     {'testcase': 'SIP with multiple digital objects.',
      'filename': 'valid_1.7.1_multiple_objects',
      'expected_result': {
          'returncode': 0,
-         'stdout': '',
-         'stderr': ''}},
+         'stdout': []}},
     {'testcase': 'Valid plaintext.',
      'filename': 'valid_1.7.1_plaintext',
      'expected_result': {
          'returncode': 0,
-         'stdout': '',
-         'stderr': ''}},
+         'stdout': []}},
     {'testcase': 'Videocontainer with audiomd/videomd metadata.',
      'filename': 'valid_1.7.1_video_container',
      'expected_result': {
          'returncode': 0,
-         'stdout': '',
-         'stderr': ''}},
+         'stdout': []}},
     {'testcase': 'Whitespace in sip and digital object names.',
      'filename': 'valid_1.7.1_white space',
      'expected_result': {
          'returncode': 0,
-         'stdout': '',
-         'stderr': ''}},
-     ]
+         'stdout': []}},
+    ]
 
 """
 This list contains the following cases:
@@ -162,6 +148,17 @@ RESULT_CASES = [
               'type': 'id-type',
               'value': 'this-id-should-not-be-forgotten'}}}]
 ]
+
+
+def test_testcases_stdout():
+    """
+    Ensure that all test cases wrap expected stdout message in a list.
+    Otherwise test_check_sip_digital_objects will check that the
+    individual characters of the expected message can be found in
+    stdout, instead of the entire string.
+    """
+    assert all(isinstance(case['expected_result']['stdout'], list)
+               for case in TESTCASES)
 
 
 @pytest.mark.parametrize(
@@ -246,15 +243,12 @@ def patch_validate(monkeypatch):
         # pylint: disable=unused-argument
         if metadata_info['filename'] == 'pdf':
             result = {'is_valid': True,
-                      'messages': 'Mimetype and version ok.',
+                      'messages': 'Some message.',
                       'errors': ''}
         else:
             result = {'is_valid': False,
                       'messages': '',
-                      'errors': ("MetadataComparator: ERROR: Mimetype and "
-                                 "version mismatch. Expected "
-                                 "['application/cdr', '9.0'], found "
-                                 "['None', '''None']")}
+                      'errors': 'Some error.'}
         return result
 
     def _iter_metadata_info(mets_tree, mets_path):
