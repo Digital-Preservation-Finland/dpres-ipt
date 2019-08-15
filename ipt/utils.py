@@ -14,11 +14,11 @@ _SCRAPER_PARAM_ADDML_KEY_RELATION = (('fields', 'header_fields'),
                                      ('separator', 'separator'),
                                      ('delimiter', 'delimiter'))
 
-_FFMPEG_FILE_SCRAPER_KEY_SYNONYMS = (('frame_rate', 'avg_frame_rate'),
-                                     ('data_rate', 'bit_rate'),
-                                     ('dar', 'display_aspect_ratio'),
-                                     ('num_channels', 'channels'),
-                                     ('sampling_frequency', 'sample_rate'))
+_FFMPEG_FILE_SCRAPER_KEY_SYNONYMS = {'frame_rate': 'avg_frame_rate',
+                                     'data_rate': 'bit_rate',
+                                     'dar': 'display_aspect_ratio',
+                                     'num_channels': 'channels',
+                                     'sampling_frequency': 'sample_rate'}
 
 
 class UnknownException(Exception):
@@ -290,15 +290,15 @@ def synonymize_stream_keys(stream):
     RuntimeException if the key that is being named to already exists.
     """
 
-    for first_key, second_key in _FFMPEG_FILE_SCRAPER_KEY_SYNONYMS:
-        if hasattr(stream, second_key):
-            raise RuntimeError('Stream [%s] key already exists' % second_key)
-        try:
-            stream[second_key] = stream[first_key]
-        except KeyError:
-            # "scrape_key"-key did not exist therefore no need to do anything.
-            pass
-    return stream
+    new_stream = {}
+    for key, value in six.iteritems(stream):
+        # Get the equivalent METS key if one exists, otherwise use old key
+        new_key = _FFMPEG_FILE_SCRAPER_KEY_SYNONYMS.get(key, key)
+        if new_key in new_stream:
+            raise RuntimeError('Stream [%s] key already exists' % new_key)
+        new_stream[new_key] = value
+
+    return new_stream
 
 
 def concat(lines, prefix=''):
