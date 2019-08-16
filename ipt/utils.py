@@ -266,6 +266,45 @@ def _filter_dicts(list1, list2, included_keys, parent_key, forcekeys):
     return (list1, list2)
 
 
+def pair_compatible_list_elements(list_a, list_b, check_compatible):
+    """
+    Check if the elements of two lists can be matched perfectly so that every
+    element in list_a has a pair in list_b and vice versa, and no element
+    gets more than one pair. Elements p and q can be paired iff
+    check_compatible(p, q) returns True.
+
+    :a: List of elements to pair
+    :b: List of elements to pair
+    :check_compatible: Function to test if some element in list_a can be paired
+                       with some element in list_b
+    :returns: Set of (idx_a, idx_b) tuples, where idx_a is the index of element
+              in list_a which was paired with list_b[idx_b], or empty set if
+              pairing is not possible.
+    """
+    def _match(indices_a, indices_b):
+        if not indices_a:
+            # Nothing left to pair
+            return set()
+        idx_a = iter(indices_a).next()
+        for idx_b in indices_b:
+            if check_compatible(list_a[idx_a], list_b[idx_b]):
+                # Found matching elements, remove matched indices and pair
+                # the rest recursively
+                matched_indices = _match(indices_a - {idx_a},
+                                         indices_b - {idx_b})
+                if matched_indices or len(indices_a) == 1:
+                    # Pairing was successful, add indices of current matching
+                    # elements into the set of matched indices
+                    return matched_indices.union({(idx_a, idx_b)})
+        # list_a[idx_a] could not be paired with any element in list_b
+        return set()
+
+    if len(list_a) != len(list_b):
+        # If list lengths don't match, perfect pairing is impossible
+        return set()
+    return _match(set(range(len(list_a))), set(range(len(list_b))))
+
+
 def create_scraper_params(metadata_info):
     """Creates a suitable dictionary for keyword arguments for Scraper.
 

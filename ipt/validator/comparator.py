@@ -3,10 +3,10 @@ Module to compare metadata found in mets to metadata scraped by file-scraper.
 """
 
 from __future__ import unicode_literals
-import itertools
 import six
 from file_scraper.scraper import Scraper
-from ipt.utils import handle_div, synonymize_stream_keys
+from ipt.utils import (handle_div, synonymize_stream_keys,
+                       pair_compatible_list_elements)
 
 
 _ETAL_ALLOWED_KEYS = ('display_aspect_ratio',)
@@ -246,8 +246,9 @@ def _compare_mimetype_version(mets_format, scraper_format, is_textfile=False):
 
 def _match_streams(mets_streams, scraper_streams, stream_type):
     """
-    Check that mets contains as many streams as scraper found, and that every
-    stream in mets matches some scraper stream.
+    Check that mets_streams can be paired perfectly with scraper_streams,
+    so that each mets_stream and scraper_stream has a pair, and no stream
+    is paired more than once.
 
     :mets_streams: List of prepared audio or video streams parsed from mets.
     :scraper_streams: List of prepared audio or video streams from scraper.
@@ -268,8 +269,8 @@ def _match_streams(mets_streams, scraper_streams, stream_type):
         scraper_stream: A prepared scraper stream dictionary.
         :returns: True iff mets_stream matches scraper_stream.
         """
-        if not _compare_mimetype_version(mets_stream['format'],
-                                         scraper_stream['format']):
+        if not _compare_mimetype_version(
+                mets_stream['format'], scraper_stream['format']):
             return False
 
         for key, mets_value in six.iteritems(mets_stream[stream_type]):
@@ -279,8 +280,6 @@ def _match_streams(mets_streams, scraper_streams, stream_type):
                     continue
                 # Check special cases where value mismatch is allowed
                 if mets_value in _METS_UNAVAILABLE_VALUES:
-                    notes.append('Found value for {} -- {}.'.format(
-                        {key: mets_value}, {key: scraper_value}))
                     continue
                 if scraper_value == '(:unav)':
                     continue
@@ -292,22 +291,26 @@ def _match_streams(mets_streams, scraper_streams, stream_type):
                 pass
         return True
 
-    # Number of streams must match
-    if len(mets_streams) != len(scraper_streams):
-        return (False, [])
+    index_pairs = pair_compatible_list_elements(mets_streams, scraper_streams,
+                                                _compare_stream_dicts)
 
-    # Try to pair each mets stream with one scraper stream.
-    # NOTE This is a brute-force algorithm which tries every possible
-    # pairing combination (O(n!) time complexity). Typically the number of
-    # streams is small, so this should not be a problem.
-    # TODO Special handling for cases when there are too many streams,
-    # or implement a completely different smarter algorithm?
-    for mets_perm in itertools.permutations(mets_streams):
+    if index_pairs:
+        # Streams were matched successfully; add message for all cases where
+        # mets had an unavailable value, but scraper found an actual value
         notes = []
-        if all([_compare_stream_dicts(mets_stream, scraper_stream)
-                for mets_stream, scraper_stream in
-                zip(mets_perm, scraper_streams)]):
-            return (True, notes)
-    # All combinations tried, could not match the streams. Notes are only
-    # useful if the streams were matched successfully, so return empty list.
+        for mets_idx, scraper_idx in index_pairs:
+            scraper_stream = scraper_streams[scraper_idx][stream_type]
+            for key, mets_value in \
+                    six.iteritems(mets_streams[mets_idx][stream_type]):
+                try:
+                    scraper_value = scraper_stream[key]
+                    if mets_value != scraper_value and \
+                            mets_value in _METS_UNAVAILABLE_VALUES:
+                        notes.append('Found value for {} -- {}.'.format(
+                            {key: mets_value}, {key: scraper_value}))
+                except KeyError:
+                    pass
+        return (True, notes)
+    # Streams could not be matched (or there were no streams, in which case
+    # this function should not have been called at all)
     return (False, [])

@@ -1,10 +1,12 @@
 # coding=utf-8
 """Test for utils.py."""
 
+import random
 import pytest
 
 from ipt.utils import (compare_lists_of_dicts, find_max_complete, merge_dicts,
-                       serialize_dict, uri_to_path)
+                       serialize_dict, uri_to_path,
+                       pair_compatible_list_elements)
 
 CODEC1 = {"codec": "foo"}
 CODEC2 = {"codec": "bar"}
@@ -136,3 +138,51 @@ def test_find_max_complete():
         [{'format': {'foo': 'bar'}}], None, ['format', 'mimetype'])
     assert res1 == [{'format': {'foo': 'bar'}}]
     assert res2 == []
+
+
+def test_pair_compatible_list_elements():
+    """ Test that pair_compatible_list_elements returns:
+        - empty set when pairing empty lists
+        - empty set when elements cannot be paired
+        - correct set of index tuples when pairing is possible
+    """
+    def integer_compare(a, b):
+        """Helper function to compare equality of integers"""
+        return a == b
+
+    random.seed(1)
+
+    assert pair_compatible_list_elements([], [], integer_compare) == set()
+
+    index_pairs = pair_compatible_list_elements(
+        [1, 2, 3], [2, 3, 1], integer_compare)
+    assert index_pairs == {(0, 2), (1, 0), (2, 1)}
+
+    assert not pair_compatible_list_elements(
+        [1, 2, 3], [1, 4, 2], integer_compare)
+    assert not pair_compatible_list_elements(
+        [2, 3, 3], [2, 3, 3, 1], integer_compare)
+
+    list_a = [1] * 5 + [2] * 5
+    list_b = [1] * 5 + [2] * 5
+    random.shuffle(list_b)
+    index_pairs = pair_compatible_list_elements(
+        list_a, list_b, integer_compare)
+    assert all(list_a[idx_a] == list_b[idx_b] for idx_a, idx_b in index_pairs)
+
+    list_a = [1] * 5 + [2] * 5
+    list_b = [1] * 4 + [2] * 6
+    random.shuffle(list_b)
+    assert not pair_compatible_list_elements(list_a, list_b, integer_compare)
+
+    list_a = list(range(100))
+    list_b = list(range(100))
+    random.shuffle(list_b)
+    index_pairs = pair_compatible_list_elements(
+        list_a, list_b, integer_compare)
+    assert all(list_a[idx_a] == list_b[idx_b] for idx_a, idx_b in index_pairs)
+
+    list_a = list(range(100))
+    list_b = list(range(1, 101))
+    random.shuffle(list_b)
+    assert not pair_compatible_list_elements(list_a, list_b, integer_compare)
