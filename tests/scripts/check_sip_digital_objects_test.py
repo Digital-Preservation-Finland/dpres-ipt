@@ -67,8 +67,10 @@ TESTCASES = [
      'filename': 'valid_1.7.0_plaintext_alt_format',
      'expected_result': {
          'returncode': 0,
-         'stdout': ['Found alternative mimetype "text/html" in METS, but '
-                    'validating as "text/plain".']}},
+         'stdout': ['METS alternative mimetype: text/html',
+                    'Validating as mimetype: text/plain',
+                    'The digital object will be preserved as '
+                    'mimetype: text/plain']}},
     {'testcase': 'Digital object with audiomd metadata.',
      'filename': 'valid_1.7.1_audio_stream',
      'expected_result': {
@@ -83,8 +85,10 @@ TESTCASES = [
      'filename': 'valid_1.7.1_invalid_xml_as_plaintext',
      'expected_result': {
          'returncode': 0,
-         'stdout': ['Detected mimetype "text/xml", version "1.0", but '
-                    'validating as "text/plain".']}},
+         'stdout': ['Detected mimetype: text/xml, version: 1.0',
+                    'Validating as mimetype: text/plain',
+                    'The digital object will be preserved as '
+                    'mimetype: text/plain']}},
     {'testcase': 'SIP with multiple digital objects.',
      'filename': 'valid_1.7.1_multiple_objects',
      'expected_result': {
@@ -234,8 +238,7 @@ def patch_validate(monkeypatch):
                 is_valid=None,
                 messages=['Proper scraper was not found. The file was not '
                           'analyzed.'],
-                errors=[],
-                prefix='ScraperNotFound: ')
+                errors=[])
         return (result, {})
 
     def _check_metadata_match(metadata_info, results):
@@ -243,12 +246,14 @@ def patch_validate(monkeypatch):
         # pylint: disable=unused-argument
         if metadata_info['filename'] == 'pdf':
             result = {'is_valid': True,
-                      'messages': 'Some message.',
-                      'errors': ''}
+                      'messages': ['Some message.'],
+                      'errors': [],
+                      'valid_only_messages': []}
         else:
             result = {'is_valid': False,
-                      'messages': '',
-                      'errors': 'Some error.'}
+                      'messages': [],
+                      'errors': ['Some error.'],
+                      'valid_only_messages': []}
         return result
 
     def _iter_metadata_info(mets_tree, mets_path):

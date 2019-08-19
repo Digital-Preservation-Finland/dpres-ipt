@@ -15,7 +15,7 @@ from file_scraper.scraper import Scraper
 
 from ipt.validator.utils import iter_metadata_info
 from ipt.validator.comparator import MetadataComparator
-from ipt.utils import concat, create_scraper_params, get_scraper_info
+from ipt.utils import create_scraper_params, get_scraper_info
 from ipt.six_utils import ensure_text
 
 
@@ -54,19 +54,23 @@ def contains_errors(report):
     return False
 
 
-def make_result_dict(is_valid, messages=None, errors=None, prefix=''):
+def make_result_dict(is_valid, messages=None, errors=None,
+                     valid_only_messages=None):
     """ Create a result dict from a validation component output.
 
     :is_valid: Boolean describing the validation result.
     :messages: List of message strings obtained from a validation component.
     :errors: List of error strings obtained from a validation component.
-    :prefix: Prefix string to prepend messages and errors with.
+    :valid_only_messages: List of messages that should only be appended to
+                          the end of the report if the final result is valid.
     :returns: A result_dict created from the arguments.
     """
     return {
         'is_valid': is_valid,
-        'messages': concat(messages, prefix) if messages else '',
-        'errors': concat(errors, prefix) if errors else '',
+        'messages': messages if messages else [],
+        'errors': errors if errors else [],
+        'valid_only_messages': (valid_only_messages
+                                if valid_only_messages else [])
     }
 
 
@@ -91,42 +95,66 @@ def skip_validation(metadata_info):
     return metadata_info['use'] == 'no-file-format-validation'
 
 
+def append_format_info(message, mimetype, version=None):
+    """
+    Append file format information to the message.
+
+    :returns: <prefix>mimetype: <mimetype>[, version: <version>]
+    """
+    message += 'mimetype: {}'.format(mimetype)
+    if version:
+        message += ', version: {}'.format(version)
+    return message
+
+
 def check_well_formed(metadata_info):
     """
     Check if file is well formed. If mets specifies an alternative format or
     scraper identifies the file as something else than what is given in mets,
-    add a message specifying the alternative mimetype and version. Perform
-    validation using mets mimetype.
+    add a message specifying the alternative mimetype and version. Validate
+    file as the mimetype given in mets.
 
     :metadata_info: Dictionary containing metadata parsed from mets.
     :returns: Tuple with 2 dicts: (result_dict, scraper.streams)
     """
     messages = []
+    valid_only_messages = []
     md_mimetype = metadata_info['format']['mimetype']
+    md_version = metadata_info['format']['version']
+    force_mimetype = False
 
     if 'alt-format' in metadata_info['format']:
-        messages.append('Found alternative mimetype "{}" in METS, '
-                        'but validating as "{}".'.format(
-                            metadata_info['format']['alt-format'],
-                            md_mimetype))
+        messages.append(
+            append_format_info('METS alternative ',
+                               metadata_info['format']['alt-format']))
+        force_mimetype = True
     else:
         scraper = Scraper(metadata_info['filename'])
         scraper.detect_filetype()
-        if scraper.mimetype != md_mimetype:
-            messages.append('Detected mimetype "{}", version "{}", but '
-                            'validating as "{}".'
-                            .format(
-                                scraper.mimetype, scraper.version,
-                                md_mimetype))
+        if scraper.mimetype != md_mimetype or scraper.version != md_version:
+            messages.append(
+                append_format_info('Detected ', scraper.mimetype,
+                                   scraper.version))
+            force_mimetype = True
+
+    scraper_mimetype = None
+    if force_mimetype:
+        scraper_mimetype = md_mimetype
+        messages.append(append_format_info('METS ', md_mimetype, md_version))
+        messages.append(append_format_info('Validating as ', md_mimetype))
+        valid_only_messages.append(
+            append_format_info('The digital object will be preserved as ',
+                               md_mimetype, md_version))
 
     scraper = Scraper(metadata_info['filename'],
-                      mimetype=md_mimetype,
+                      mimetype=scraper_mimetype,
                       **create_scraper_params(metadata_info))
     scraper.scrape()
 
     scraper_messages, errors = get_scraper_info(scraper)
     messages.extend(scraper_messages)
-    return (make_result_dict(scraper.well_formed, messages, errors),
+    return (make_result_dict(scraper.well_formed, messages, errors,
+                             valid_only_messages),
             scraper.streams)
 
 
@@ -141,7 +169,9 @@ def check_metadata_match(metadata_info, scraper_streams):
     """
     comparator = MetadataComparator(metadata_info, scraper_streams)
     result = comparator.result()
-    return make_result_dict(prefix='MetadataComparator: ', **result)
+    messages = ['MetadataComparator: ' + msg for msg in result['messages']]
+    errors = ['MetadataComparator: ' + err for err in result['errors']]
+    return make_result_dict(result['is_valid'], messages, errors)
 
 
 def join_validation_results(metadata_info, results):
@@ -154,17 +184,19 @@ def join_validation_results(metadata_info, results):
     :returns: Dictionary which contains metadata_info and the aggregated
               validation results.
     """
-    valids, messages, errors = [], [], []
+    valids, messages, errors, valid_only_messages = [], [], [], []
     for result_dict in results:
         valids.append(result_dict['is_valid'])
-        messages.append(result_dict['messages'])
-        errors.append(result_dict['errors'])
-    # Filter empty messages and errors
-    messages = [msg for msg in messages if msg]
-    errors = [err for err in errors if err]
+        messages.extend([msg for msg in result_dict['messages'] if msg])
+        errors.extend([err for err in result_dict['errors'] if err])
+        valid_only_messages.extend(
+            [msg for msg in result_dict['valid_only_messages'] if msg])
+    is_valid = all(valids)
+    if is_valid:
+        messages.extend(valid_only_messages)
     return {
         'metadata_info': metadata_info,
-        'is_valid': all(valids),
+        'is_valid': is_valid,
         'messages': '\n'.join(messages),
         'errors': '\n'.join(errors),
     }
