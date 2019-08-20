@@ -6,7 +6,7 @@ import os
 
 import pytest
 from tests.testcommon.utils import create_test_bagit
-from ipt.aiptools.bagit_new import make_manifest, calculate_md5, \
+from ipt.aiptools.bagit import make_manifest, calculate_md5, \
     write_manifest, write_bagit_txt, BagitError, check_directory_is_bagit,\
     check_bagit_mandatory_files
 

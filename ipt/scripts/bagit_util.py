@@ -14,14 +14,14 @@ On system error returns exit status != 0.
 .. _`Bagit specification`:
     http://www.digitalpreservation.gov/documents/bagitspec.pdf
 
-For more information see the :mod:`aiptools.bagit_new` module.
+For more information see the :mod:`aiptools.bagit` module.
 
 """
 
 import sys
 import optparse
 
-from ipt.aiptools.bagit_new import make_manifest, write_manifest, \
+from ipt.aiptools.bagit import make_manifest, write_manifest, \
     write_bagit_txt, check_directory_is_bagit, check_bagit_mandatory_files
 
 
