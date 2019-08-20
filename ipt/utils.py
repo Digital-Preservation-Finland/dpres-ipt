@@ -273,8 +273,8 @@ def pair_compatible_list_elements(list_a, list_b, check_compatible):
     gets more than one pair. Elements p and q can be paired iff
     check_compatible(p, q) returns True.
 
-    :a: List of elements to pair
-    :b: List of elements to pair
+    :list_a: List of elements to pair
+    :list_b: List of elements to pair
     :check_compatible: Function to test if some element in list_a can be paired
                        with some element in list_b
     :returns: Set of (idx_a, idx_b) tuples, where idx_a is the index of element

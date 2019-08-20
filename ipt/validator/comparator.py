@@ -20,11 +20,11 @@ _PDF_VERSION_SUBSETS = {'1.4': ('A-1a', 'A-1b'),
 class MetadataComparator(object):
     """
     This class checks that mets metadata matches scraper metadata.
-    First call to the result() method calls the _perform_checks() method,
-    which goes through all relevant sections of the metadata_info dictionary.
-    The checks for individual metadata_info sections are performed in methods
-    starting with '_check', which may call other _check methods or helper
-    functions.
+    First call to the result() method calls the _check_mets_matches_scraper()
+    method, which goes through all relevant sections of the metadata_info
+    dictionary. The checks for individual metadata_info sections are performed
+    in methods starting with '_check', which may call other _check methods or
+    helper functions.
 
     1. _check_format (always): compare mimetype and version
            _check_charset (text files only): compare character set
@@ -63,7 +63,7 @@ class MetadataComparator(object):
     def result(self):
         """Perform comparison if not already done and return the result."""
         if not any((self._messages, self._errors)):
-            self._perform_checks()
+            self._check_mets_matches_scraper()
             if self.is_valid:
                 self._messages.append('METS metadata matches '
                                       'scraper metadata.')
@@ -74,6 +74,7 @@ class MetadataComparator(object):
         }
 
     def _is_textfile(self):
+        """Helper to check if the file is a text file according to scraper."""
         return Scraper(self._metadata_info['filename']).is_textfile()
 
     def _add_error(self, info, mets_value, scraper_value):
@@ -97,11 +98,13 @@ class MetadataComparator(object):
             'version': stream['version'],
         }
 
-    def _perform_checks(self):
+    def _check_mets_matches_scraper(self):
         """
         Check that the 'format' dictionary values in metadata_info match
         the values of the first scraper stream. If metadata_info contains
-        audio/video streams, check that they can be matched with scraper
+        a single audio or video stream ('audio' or 'video' key) or a
+        video container with one or more streams ('audio_streams' and/or
+        'video_streams' keys) check that they can be matched with scraper
         streams.
         """
         self._check_format()
@@ -162,9 +165,10 @@ class MetadataComparator(object):
 
     def _prepare_scraper_av_streams(self, stream_type):
         """
-        Modify scraper streams to resemble the metadata_info dictionary.
-        Keep only streams of given type, handle divisions in values
-        and convert key names to match corresponding metadata_info keys.
+        Prepare a dictionary of metadata_info-like dictionaries from
+        scraper streams. Keep only streams of given type, handle divisions
+        in values and convert scraper key names to match corresponding
+        metadata_info keys.
 
         :scraper_streams: Streams scraped by a file-scraper object.
         :stream_type: Either 'audio' or 'video'.
@@ -176,8 +180,9 @@ class MetadataComparator(object):
         for stream in six.itervalues(self._scraper_streams):
             if stream['stream_type'] != stream_type:
                 continue
-            _dummy_dict = {}
-            _dummy_dict['format'] = self._get_stream_format(stream['index'])
+            md_info_style_dict = {}
+            md_info_style_dict['format'] = \
+                self._get_stream_format(stream['index'])
             _stream = {}
             for key, value in six.iteritems(stream):
                 decimals = 2  # Round values to two decimals by default
@@ -186,16 +191,19 @@ class MetadataComparator(object):
                     decimals = 0
                 _stream[key] = handle_div(value, decimals)
             _stream = synonymize_stream_keys(_stream)
-            _dummy_dict[stream_type] = _stream
-            prepared_dicts.append(_dummy_dict)
+            md_info_style_dict[stream_type] = _stream
+            prepared_dicts.append(md_info_style_dict)
         return prepared_dicts
 
     def _prepare_mets_av_streams(self, stream_type):
         """
         Get stream dicts of type stream_type from metadata_info into a list.
+        See https://wiki.csc.fi/KDK/MetadataInfoInWorkflow
 
         :stream_type: One of the following strings:
-                      'audio', 'audio_streams', 'video', 'video_streams'.
+                      'audio' or 'video' (single stream, not a video container)
+                      'audio_streams' or 'video_streams' (one or more streams
+                                                          in a video container)
         :returns: List of metadata dictionaries.
         """
         if stream_type in ('audio_streams', 'video_streams'):

@@ -331,7 +331,7 @@ def validation_report(results, linking_sip_type, linking_sip_id):
 
     # Create PREMIS agent, only one agent is needed
     report_agent = create_report_agent()
-    childs = [report_agent]
+    child_elements = [report_agent]
     object_list = set()
     for result in results:
         metadata_info = result['metadata_info']
@@ -341,11 +341,11 @@ def validation_report(results, linking_sip_type, linking_sip_id):
             report_object = create_report_object(metadata_info,
                                                  linking_sip_type,
                                                  linking_sip_id)
-            childs.append(report_object)
+            child_elements.append(report_object)
         report_event = create_report_event(result, report_object, report_agent)
-        childs.append(report_event)
+        child_elements.append(report_event)
 
-    return premis.premis(child_elements=childs)
+    return premis.premis(child_elements=child_elements)
 
 
 if __name__ == '__main__':
