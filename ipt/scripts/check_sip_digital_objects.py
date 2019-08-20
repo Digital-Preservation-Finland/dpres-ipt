@@ -18,6 +18,8 @@ from ipt.validator.comparator import MetadataComparator
 from ipt.utils import create_scraper_params, get_scraper_info
 from ipt.six_utils import ensure_text
 
+_UNAVAILABLE_VERSION_VALUES = ('', '(:unav)', '(:unap)')
+
 
 def main(arguments=None):
     """ The main method for check-sip-digital-objects script"""
@@ -47,6 +49,9 @@ def parse_arguments(arguments):
 
 
 def contains_errors(report):
+    """
+    Check if premis report contains any events with 'failure' as the outcome.
+    """
     events = report.findall('.//' + premis.premis_ns('eventOutcome'))
     for event in events:
         if event.text == 'failure':
@@ -95,14 +100,14 @@ def skip_validation(metadata_info):
     return metadata_info['use'] == 'no-file-format-validation'
 
 
-def append_format_info(message, mimetype, version=None):
+def append_format_info(message, mimetype, version=''):
     """
     Append file format information to the message.
 
     :returns: <prefix>mimetype: <mimetype>[, version: <version>]
     """
     message += 'mimetype: {}'.format(mimetype)
-    if version:
+    if version not in _UNAVAILABLE_VERSION_VALUES:
         message += ', version: {}'.format(version)
     return message
 
@@ -252,6 +257,7 @@ def validation(mets_path):
 
 
 def create_report_agent():
+    """Create premis agent describing who/what performed validation."""
     # TODO: Agent could be the used validator instead of script file
     agent_name = "check_sip_digital_objects.py-v0.0"
     agent_id_value = 'preservation-agent-' + agent_name + '-' + \
@@ -261,10 +267,12 @@ def create_report_agent():
         identifier_value=agent_id_value, prefix='agent')
     report_agent = premis.agent(agent_id=agent_id, agent_name=agent_name,
                                 agent_type='software')
+
     return report_agent
 
 
 def create_report_object(metadata_info, linking_sip_type, linking_sip_id):
+    """Create premis element for digital object."""
     dep_id = premis.identifier(
         metadata_info['object_id']['type'],
         metadata_info['object_id']['value'])
@@ -291,6 +299,7 @@ def create_report_object(metadata_info, linking_sip_type, linking_sip_id):
 
 
 def create_report_event(result, report_object, report_agent):
+    """Create premis element for digital object validation event."""
     event_id = premis.identifier(
         identifier_type="preservation-event-id",
         identifier_value=str(uuid.uuid4()), prefix='event')
