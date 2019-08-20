@@ -212,26 +212,29 @@ class MetadataComparator(object):
         raise ValueError('Invalid stream type {}'.format(stream_type))
 
 
-def _mets_ok_versions(scraper_format):
+def _harmonized_versions(scraper_format):
     """
-    Get a set of versions which are allowed in mets, given the
-    mimetype/version information found by scraper.
+    Harmonize the set of file format versions found by file-scraper according
+    to the specifications of the preservation service, i.e., the values that
+    can be found in the METS document.
 
     :scraper_format: Dict with keys 'mimetype' and 'version' (from scraper).
-    :returns: Set of allowed file versions in mets.
+    :returns: Set of harmonized versions.
     """
-    ok_versions = {scraper_format['version']}
-    # If scraper does not find a version, empty string in mets is ok
+    # In the normal case the version in METS should be the same as the
+    # version scraper found
+    harmonized_versions = {scraper_format['version']}
+    # If scraper does not find a version, empty string in METS is ok
     if scraper_format['version'] in ('(:unav)', '(:unap)', '', None):
-        ok_versions.add('')
+        harmonized_versions.add('')
     # PDF file special case:
     # If scraper finds a version which is a subset of the version given METS,
-    # the more general mets value is allowed (e.g, mets: 1.4, scraper: A-1b)
+    # the more general METS value is allowed (e.g, METS: 1.4, scraper: A-1b)
     if scraper_format['mimetype'] == 'application/pdf':
         for super_version, sub_versions in six.iteritems(_PDF_VERSION_SUBSETS):
             if scraper_format['version'] in sub_versions:
-                ok_versions.add(super_version)
-    return ok_versions
+                harmonized_versions.add(super_version)
+    return harmonized_versions
 
 
 def _compare_mimetype_version(mets_format, scraper_format, is_textfile=False):
@@ -243,12 +246,13 @@ def _compare_mimetype_version(mets_format, scraper_format, is_textfile=False):
     :is_textfile: True if checking a text file.
     :returns: True iff mets mimetype and version match what scraper found.
     """
-    ok_mimetypes = {scraper_format['mimetype']}
+    matching_mimetypes = {scraper_format['mimetype']}
     # Subsets of text/plain (e.g., text/html) can be submitted as plaintext
     if is_textfile:
-        ok_mimetypes.add('text/plain')
-    return all((mets_format['mimetype'] in ok_mimetypes,
-                mets_format['version'] in _mets_ok_versions(scraper_format)))
+        matching_mimetypes.add('text/plain')
+    return all((mets_format['mimetype'] in matching_mimetypes,
+                mets_format['version'] in
+                _harmonized_versions(scraper_format)))
 
 
 def _match_streams(mets_streams, scraper_streams, stream_type):
