@@ -165,12 +165,11 @@ class MetadataComparator(object):
 
     def _prepare_scraper_av_streams(self, stream_type):
         """
-        Prepare a dictionary of metadata_info-like dictionaries from
-        scraper streams. Keep only streams of given type, handle divisions
+        Prepare a list of metadata_info-like dictionaries from scraper
+        streams. Keep only streams of given type, handle divisions
         in values and convert scraper key names to match corresponding
         metadata_info keys.
 
-        :scraper_streams: Streams scraped by a file-scraper object.
         :stream_type: Either 'audio' or 'video'.
         :returns: List of metadata dictionaries prepared for comparison.
         """
