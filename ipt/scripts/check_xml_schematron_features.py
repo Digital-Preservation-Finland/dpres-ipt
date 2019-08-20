@@ -13,6 +13,7 @@ import six
 from file_scraper.scraper import Scraper
 
 from ipt.utils import concat
+from ipt.six_utils import ensure_text
 
 
 def main(arguments=None):
@@ -44,19 +45,20 @@ def main(arguments=None):
     messages, errors = [], []
     if scraper.mimetype == 'text/xml':
         scraper.scrape()
-        schematron_info = next((info for info in six.itervalues(scraper.info)
-                                if info['class'] == 'SchematronScraper'), None)
-        if schematron_info:
-            messages.append(schematron_info['messages'])
-            errors.append(schematron_info['errors'])
+        for info in six.itervalues(scraper.info):
+            if info['class'] == 'SchematronScraper':
+                messages.append(info['messages'])
+                errors.append(info['errors'])
+                break
         else:
+            # Did not break out of the for loop
             errors.append('ERROR: Could not find SchematronScraper info.')
     else:
         errors.append('ERROR: {} does not appear to be XML (found '
                       'mimetype {}).'.format(filename, scraper.mimetype))
 
-    message_string = concat(messages).strip()
-    error_string = concat(errors).strip()
+    message_string = ensure_text(concat(messages).strip())
+    error_string = ensure_text(concat(errors).strip())
     if message_string:
         print(message_string)
     if error_string:
@@ -67,8 +69,8 @@ def main(arguments=None):
     return 0
 
 
-# Main function can be similar in different scripts
 # pylint: disable=duplicate-code
+# Main function can be similar in different scripts
 if __name__ == '__main__':
     # If run from the command line, take out the program name from sys.argv
     RETVAL = main(sys.argv[1:])
