@@ -53,7 +53,7 @@ Release 0.77
 Adds support for WAV and BWF audio files.
 
 Release 0.XX
-Now makes use of ISO Schematron XSLT1 instead of dpres-xml-schemas
+Makes use of ISO Schematron XSLT1 instead of dpres-xml-schemas
 for XSLT related conversion tool.
-Now uses file-scraper to do all of the file validation and scraping.
-Now can be run under Python 3.6.
+Uses file-scraper for all file validation and metadata scraping.
+Can be run under Python 3.6.

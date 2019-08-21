@@ -12,7 +12,7 @@ Installation
 ------------
 
 The software is tested with Python 2.7 with Centos 7.x / RHEL 7.x releases.
-For running in a tested and isolated environment, get python-virtuelenv
+For running in a tested and isolated environment, get python-virtualenv
 software:
 
         pip install virtualenv
@@ -25,31 +25,19 @@ Run the following to activate the virtual environment:
 Additional requirements
 +++++++++++++++++++++++
 
-The following software is required for validation tools, depending on the file formats in the package:
+The following software is required for validation tools.
 
         * dpres-xml-schemas, see https://github.com/Digital-Preservation-Finland/dpres-xml-schemas
         * xml-helpers, see https://github.com/Digital-Preservation-Finland/xml-helpers
         * mets, see https://github.com/Digital-Preservation-Finland/mets
         * premis, see https://github.com/Digital-Preservation-Finland/premis
-        * dpx-validator, see https://github.com/Digital-Preservation-Finland/dpx-validator
-        * file-scraper, see https://public-github-url-for-file-scraper-project.com/Digital-Preservation-Finland/file-scraper
+        * file-scraper, see https://github.com/Digital-Preservation-Finland/file-scraper
+                * see file-scraper installation instructions for installing validators for individual file formats
         * libxml2 & libxslt / xmllint & xsltproc ( with exslt and Saxon line number extensions )
         * gcc
-        * python-lxml
+        * lxml
         * python-mimeparse
-        * python-dateutil
         * xml-common
-        * Jhove
-        * Ghostscript
-        * veraPDF
-        * LibreOffice
-        * PSPP
-        * pngcheck
-        * file, version 5.30 or greater
-        * ImageMagick
-        * python-wand
-        * v.Nu
-        * warctools
         * Gzip
 
 You can install the software listed in requirements_github.txt with the following command::
@@ -59,6 +47,8 @@ You can install the software listed in requirements_github.txt with the followin
 This may require that gcc is installed in your system.
 
 Other software listed above needs to be installed separately.
+
+NOTE: Running unit tests requires the full installation of file-scraper with all its requirements.
 
 Usage
 -----
