@@ -19,7 +19,7 @@ The tests check the dictionary returned by the result() method to ensure that:
 from copy import deepcopy
 import pytest
 from file_scraper.scraper import Scraper
-from ipt.validator.comparator import MetadataComparator
+from ipt.comparator.comparator import MetadataComparator
 from ipt.utils import concat
 
 METADATA_INFO = {

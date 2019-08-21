@@ -13,8 +13,8 @@ import premis
 import xml_helpers.utils
 from file_scraper.scraper import Scraper
 
-from ipt.validator.utils import iter_metadata_info
-from ipt.validator.comparator import MetadataComparator
+from ipt.comparator.utils import iter_metadata_info
+from ipt.comparator.comparator import MetadataComparator
 from ipt.utils import create_scraper_params, get_scraper_info
 from ipt.six_utils import ensure_text
 
