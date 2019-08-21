@@ -1,19 +1,9 @@
 lxml
-coverage
-pytest-coverage
-dateutils
+python-mimeparse
 scandir
 six
-pytest
-wand
-python-mimeparse
-pytest-timeout
-
-opf-fido
-file-magic
-Pillow
 
 git+https://github.com/Digital-Preservation-Finland/xml-helpers.git#egg=xml_helpers
 git+https://github.com/Digital-Preservation-Finland/mets.git#egg=mets
 git+https://github.com/Digital-Preservation-Finland/premis.git#egg=premis
-git+https://github.com/Digital-Preservation-Finland/file-scraper.git@develop#egg=file-scraper
+git+https://github.com/Digital-Preservation-Finland/file-scraper.git#egg=file-scraper

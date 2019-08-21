@@ -1,21 +1,23 @@
+# Required components
 lxml
-coverage
-pytest-coverage
-dateutils
-scandir
-six
-pytest
-wand
-six
 python-mimeparse
-pytest-timeout
+scandir  # This is included in the standard library as os.scandir in Python>=3.5
+six
 
-opf-fido
+# Unit test tools
+coverage
+pytest
+pytest-cov
+
+# Validator components required to run unit tests
+ffmpeg-python
 file-magic
+opf-fido
 Pillow
 pymediainfo
-ffmpeg-python
+wand
 
+# Required dpres-components
 git+https://gitlab.csc.fi/dpres/xml-helpers.git@develop#egg=xml_helpers
 git+https://gitlab.csc.fi/dpres/mets.git@develop#egg=mets
 git+https://gitlab.csc.fi/dpres/premis.git@develop#egg=premis
