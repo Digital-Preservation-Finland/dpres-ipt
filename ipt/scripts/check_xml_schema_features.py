@@ -12,6 +12,7 @@ import optparse
 from file_scraper.scraper import Scraper
 
 from ipt.utils import concat, get_scraper_info
+from ipt.six_utils import ensure_text
 
 
 def main(arguments=None):
@@ -51,8 +52,10 @@ def main(arguments=None):
         errors.append('ERROR: {} does not appear to be XML (found '
                       'mimetype {}).'.format(filename, scraper.mimetype))
 
-    print(concat(messages), file=sys.stdout)
-    print(concat(errors), file=sys.stderr)
+    if messages:
+        print(ensure_text(concat(messages)), file=sys.stdout)
+    if errors:
+        print(ensure_text(concat(errors)), file=sys.stderr)
 
     if errors or not scraper.well_formed:
         return 117
