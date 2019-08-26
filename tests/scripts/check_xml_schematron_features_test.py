@@ -28,13 +28,13 @@ def is_parsable_xml(string):
     [
         ('valid_1.7.1_mets.xml',
          {'returncode': 0,
-          'stderr': None}),
+          'stderr_part': None}),
         ('invalid_1.7.1_mets.xml',
          {'returncode': 117,
-          'stderr': None}),
+          'stderr_part': None}),
         ('invalid__not_xml.txt',
          {'returncode': 117,
-          'stderr': 'invalid__not_xml.txt does not appear to be XML'})
+          'stderr_part': 'invalid__not_xml.txt does not appear to be XML'})
     ])
 def test_check_xml_schematron_features(filename, expected):
     """
@@ -50,8 +50,8 @@ def test_check_xml_schematron_features(filename, expected):
     args = ['-s', schema_path, mets_path]
     (returncode, stdout, stderr) = shell.run_main(main, args)
 
-    if expected['stderr']:
-        assert expected['stderr'] in stderr
+    if expected['stderr_part']:
+        assert expected['stderr_part'] in stderr
     else:
         assert not stderr
     if stdout:
