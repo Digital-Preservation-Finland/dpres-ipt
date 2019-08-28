@@ -4,6 +4,7 @@
 import os
 import uuid
 
+import lxml.etree as ET
 import pytest
 import premis
 
@@ -16,7 +17,8 @@ from tests.testcommon import shell
 # Module to test
 from ipt.scripts.check_sip_digital_objects import (main, validation,
                                                    validation_report,
-                                                   make_result_dict)
+                                                   make_result_dict,
+                                                   join_validation_results)
 import ipt.scripts.check_sip_digital_objects
 
 METSDIR = os.path.abspath(
@@ -231,29 +233,25 @@ def patch_validate(monkeypatch):
                 is_valid=True,
                 messages=['JHovePdfScraper: Well-Formed and valid',
                           ('MagicScraper: The file was analyzed '
-                           'successfully.')],
-                errors=[])
+                           'successfully.')])
         elif metadata_info['filename'] == 'cdr':
             result = make_result_dict(
                 is_valid=None,
                 messages=['Proper scraper was not found. The file was not '
-                          'analyzed.'],
-                errors=[])
+                          'analyzed.'])
         return (result, {})
 
     def _check_metadata_match(metadata_info, results):
         """Monkeypatch metadata matching: there are no real files to scrape."""
         # pylint: disable=unused-argument
         if metadata_info['filename'] == 'pdf':
-            result = {'is_valid': True,
-                      'messages': ['Some message.'],
-                      'errors': [],
-                      'valid_only_messages': []}
+            result = make_result_dict(
+                is_valid=True,
+                messages=['Some message.'])
         else:
-            result = {'is_valid': False,
-                      'messages': [],
-                      'errors': ['Some error.'],
-                      'valid_only_messages': []}
+            result = make_result_dict(
+                is_valid=False,
+                errors=['Some error.'])
         return result
 
     def _iter_metadata_info(mets_tree, mets_path):
@@ -373,3 +371,26 @@ def test_metadata_info_erros():
     assert result['messages'] == ('Failed parsing METS, skipping '
                                   'validation.')
     assert result['errors'] == 'Some error'
+
+
+def test_join_validation_results():
+    """Test joining result dictionaries made with make_result_dict."""
+    extension1 = ET.fromstring('<ext1 />')
+    extension2 = ET.fromstring('<ext2></ext2>')
+    res1 = make_result_dict(True, messages=['message1'],
+                            extensions=[extension1])
+    res2 = make_result_dict(False, messages=['message2'], errors=['error'],
+                            extensions=[extension2])
+    res3 = make_result_dict(True, valid_only_messages=['valid'])
+    joined1 = join_validation_results({}, [res1, res2])
+    joined2 = join_validation_results({}, [res1, res3])
+
+    assert not joined1['is_valid']
+    assert joined1['messages'] == 'message1\nmessage2'
+    assert joined1['errors'] == 'error'
+    assert joined1['extensions'] == [extension1, extension2]
+
+    assert joined2['is_valid']
+    assert joined2['messages'] == 'message1\nvalid'
+    assert not joined2['errors']
+    assert joined2['extensions'] == [extension1]
