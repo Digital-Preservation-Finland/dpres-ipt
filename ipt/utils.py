@@ -368,9 +368,10 @@ def get_scraper_info(scraper):
     def _add_text_xml(scraper_info, info_key, prefix):
         strings = scraper_info[info_key]
         text, extensions = [], []
+        parser = ET.XMLParser(remove_blank_text=True)
         for string in strings:
             try:
-                extensions.append(ET.fromstring(ensure_binary(string)))
+                extensions.append(ET.fromstring(ensure_binary(string), parser))
             except ET.XMLSyntaxError:
                 text.append(prefix + string)
         if extensions:
