@@ -15,7 +15,7 @@ from file_scraper.scraper import Scraper
 
 from ipt.comparator.utils import iter_metadata_info
 from ipt.comparator.comparator import MetadataComparator
-from ipt.utils import create_scraper_params, get_scraper_info
+from ipt.utils import merge_dicts, create_scraper_params, get_scraper_info
 from ipt.six_utils import ensure_text
 
 _UNAVAILABLE_VERSION_VALUES = ('', '(:unav)', '(:unap)')
@@ -60,20 +60,28 @@ def contains_errors(report):
 
 
 def make_result_dict(is_valid, messages=None, errors=None,
-                     valid_only_messages=None):
+                     extensions=None, valid_only_messages=None):
     """ Create a result dict from a validation component output.
 
     :is_valid: Boolean describing the validation result.
     :messages: List of message strings obtained from a validation component.
     :errors: List of error strings obtained from a validation component.
+    :extensions: List of lxml.etree elements which are added to
+                 eventOutcomeDetailExtension element in the report
     :valid_only_messages: List of messages that should only be appended to
                           the end of the report if the final result is valid.
     :returns: A result_dict created from the arguments.
     """
+    if is_valid not in (True, False, None):
+        raise TypeError('is_valid must be boolean or None, got {}'
+                        .format(type(is_valid)))
+    # Ensure all values are lists so that merge_dicts can be used
+    # to join the results
     return {
-        'is_valid': is_valid,
+        'is_valid': [is_valid],
         'messages': messages if messages else [],
         'errors': errors if errors else [],
+        'extensions': extensions if extensions else [],
         'valid_only_messages': (valid_only_messages
                                 if valid_only_messages else [])
     }
@@ -156,10 +164,13 @@ def check_well_formed(metadata_info):
                       **create_scraper_params(metadata_info))
     scraper.scrape()
 
-    scraper_messages, errors = get_scraper_info(scraper)
-    messages.extend(scraper_messages)
-    return (make_result_dict(scraper.well_formed, messages, errors,
-                             valid_only_messages),
+    scraper_info = get_scraper_info(scraper)
+    messages.extend(scraper_info['messages'])
+    return (make_result_dict(is_valid=scraper.well_formed,
+                             messages=messages,
+                             errors=scraper_info['errors'],
+                             extensions=scraper_info['extensions'],
+                             valid_only_messages=valid_only_messages),
             scraper.streams)
 
 
@@ -174,8 +185,8 @@ def check_metadata_match(metadata_info, scraper_streams):
     """
     comparator = MetadataComparator(metadata_info, scraper_streams)
     result = comparator.result()
-    messages = ['MetadataComparator: ' + msg for msg in result['messages']]
-    errors = ['MetadataComparator: ' + err for err in result['errors']]
+    messages = ['[MetadataComparator] ' + msg for msg in result['messages']]
+    errors = ['[MetadataComparator] ' + err for err in result['errors']]
     return make_result_dict(result['is_valid'], messages, errors)
 
 
@@ -189,21 +200,17 @@ def join_validation_results(metadata_info, results):
     :returns: Dictionary which contains metadata_info and the aggregated
               validation results.
     """
-    valids, messages, errors, valid_only_messages = [], [], [], []
-    for result_dict in results:
-        valids.append(result_dict['is_valid'])
-        messages.extend([msg for msg in result_dict['messages'] if msg])
-        errors.extend([err for err in result_dict['errors'] if err])
-        valid_only_messages.extend(
-            [msg for msg in result_dict['valid_only_messages'] if msg])
-    is_valid = all(valids)
+    joined_result = merge_dicts(*results)
+    messages = joined_result['messages']
+    is_valid = all(joined_result['is_valid'])
     if is_valid:
-        messages.extend(valid_only_messages)
+        messages.extend(joined_result['valid_only_messages'])
     return {
         'metadata_info': metadata_info,
         'is_valid': is_valid,
         'messages': '\n'.join(messages),
-        'errors': '\n'.join(errors),
+        'errors': '\n'.join(joined_result['errors']),
+        'extensions': joined_result['extensions']
     }
 
 
@@ -238,11 +245,11 @@ def validation(mets_path):
 
         mets_result = check_mets_errors(metadata_info)
         results.append(mets_result)
-        if not mets_result['is_valid'] or skip_validation(metadata_info):
+        if not mets_result['is_valid'][0] or skip_validation(metadata_info):
             return join_validation_results(metadata_info, results)
         scraper_result, streams = check_well_formed(metadata_info)
         results.append(scraper_result)
-        if scraper_result['is_valid']:
+        if scraper_result['is_valid'][0]:
             results.append(check_metadata_match(metadata_info, streams))
         return join_validation_results(metadata_info, results)
 
@@ -310,8 +317,9 @@ def create_report_event(result, report_object, report_agent):
     else:
         detail_note = result["messages"]
 
+    extensions = result.get('extensions', None)
     outcome = premis.outcome(outcome=outresult, detail_note=detail_note,
-                             detail_extension=None)
+                             detail_extension=extensions)
 
     report_event = premis.event(
         event_id=event_id, event_type="validation",

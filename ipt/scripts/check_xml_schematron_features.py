@@ -47,8 +47,8 @@ def main(arguments=None):
         scraper.scrape()
         for info in six.itervalues(scraper.info):
             if info['class'] == 'SchematronScraper':
-                messages.append(info['messages'])
-                errors.append(info['errors'])
+                messages.extend(info['messages'])
+                errors.extend(info['errors'])
                 break
         else:
             # Did not break out of the for loop

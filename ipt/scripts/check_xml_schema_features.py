@@ -47,7 +47,9 @@ def main(arguments=None):
     messages, errors = [], []
     if scraper.mimetype == 'text/xml':
         scraper.scrape()
-        messages, errors = get_scraper_info(scraper)
+        info = get_scraper_info(scraper)
+        messages.extend(info['messages'])
+        errors.extend(info['errors'])
     else:
         errors.append('ERROR: {} does not appear to be XML (found '
                       'mimetype {}).'.format(filename, scraper.mimetype))

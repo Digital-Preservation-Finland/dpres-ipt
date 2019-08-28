@@ -6,6 +6,7 @@ import urllib
 from collections import defaultdict
 from copy import deepcopy
 from fractions import Fraction
+import lxml.etree as ET
 
 import six
 
@@ -353,21 +354,35 @@ def concat(lines, prefix=''):
 
 def get_scraper_info(scraper):
     """
-    Gather messages and errors from scraper.info dictionary, filtering empty
-    errors. Prepend each message with the name of the scraper class which
-    produced it.
+    Gather messages and errors from scraper.info dictionary.
+    Prepend each message with the name of the scraper class which
+    produced it, and any plain text errors with 'ERROR: '. If a message
+    or error can be parsed as XML, return it as lxml.etree element instead.
 
     :scraper: The scraper object which has conducted scraping.
-    :returns: (messages, errors) tuple, where
-              - messages is a list of gathered messages
-              - errors is a list of gathered errors
+    :returns: {'messages': ['[MyScraper] Message', ...],
+               'errors': ['[MyScraper] ERROR: Failed', ...],
+               'extensions': [ET._Element, ...]}
     """
-    messages, errors = [], []
-    for info in six.itervalues(scraper.info):
-        scraper_class = info['class']
-        # Keep empty messages to see which scrapers were used,
-        # but filter empty errors
-        messages.append(scraper_class + ': ' + info['messages'])
-        if info['errors']:
-            errors.append(scraper_class + ': ' + info['errors'])
-    return messages, errors
+    def _add_text_xml(scraper_info, info_key, prefix):
+        strings = scraper_info[info_key]
+        text, extensions = [], []
+        for string in strings:
+            try:
+                extensions.append(ET.fromstring(six.ensure_binary(string)))
+            except ET.XMLSyntaxError:
+                text.append(prefix + string)
+        if extensions:
+            text.append(prefix + 'See eventOutcomeDetailExtension '
+                                 'for details.')
+        info[info_key].extend(text)
+        info['extensions'].extend(extensions)
+
+    info = {'messages': [],
+            'errors': [],
+            'extensions': []}
+    for scraper_info in six.itervalues(scraper.info):
+        scraper_prefix = '[' + scraper_info['class'] + '] '
+        _add_text_xml(scraper_info, 'messages', scraper_prefix)
+        _add_text_xml(scraper_info, 'errors', scraper_prefix + 'ERROR: ')
+    return info
