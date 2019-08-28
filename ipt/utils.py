@@ -9,6 +9,7 @@ from fractions import Fraction
 import lxml.etree as ET
 
 import six
+from ipt.six_utils import ensure_binary
 
 import mimeparse
 _SCRAPER_PARAM_ADDML_KEY_RELATION = (('fields', 'header_fields'),
@@ -369,7 +370,7 @@ def get_scraper_info(scraper):
         text, extensions = [], []
         for string in strings:
             try:
-                extensions.append(ET.fromstring(six.ensure_binary(string)))
+                extensions.append(ET.fromstring(ensure_binary(string)))
             except ET.XMLSyntaxError:
                 text.append(prefix + string)
         if extensions:
