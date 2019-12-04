@@ -29,12 +29,15 @@ def is_parsable_xml(string):
         ('valid_1.7.1_mets.xml',
          {'returncode': 0,
           'stderr_part': None}),
+        ('valid_1.7.1_mets_noheader.xml',
+         {'returncode': 0,
+          'stderr_part': None}),
         ('invalid_1.7.1_mets.xml',
          {'returncode': 117,
           'stderr_part': None}),
         ('invalid__not_xml.txt',
          {'returncode': 117,
-          'stderr_part': 'invalid__not_xml.txt does not appear to be XML'})
+          'stderr_part': 'parser error : Start tag expected'})
     ])
 def test_check_xml_schematron_features(filename, expected):
     """

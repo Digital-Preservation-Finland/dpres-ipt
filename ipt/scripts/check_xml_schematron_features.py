@@ -9,8 +9,7 @@ import os
 import sys
 import optparse
 
-import six
-from file_scraper.scraper import Scraper
+from file_scraper.schematron.schematron_scraper import SchematronScraper
 
 from ipt.utils import concat
 from ipt.six_utils import ensure_text
@@ -39,26 +38,12 @@ def main(arguments=None):
     if os.path.isdir(filename):
         filename = os.path.join(filename, 'mets.xml')
 
-    scraper = Scraper(filename, schematron=options.schemapath)
-    scraper.detect_filetype()
+    scraper = SchematronScraper(
+        filename, params={"schematron": options.schemapath})
+    scraper.scrape_file()
 
-    messages, errors = [], []
-    if scraper.mimetype == 'text/xml':
-        scraper.scrape()
-        for info in six.itervalues(scraper.info):
-            if info['class'] == 'SchematronScraper':
-                messages.extend(info['messages'])
-                errors.extend(info['errors'])
-                break
-        else:
-            # Did not break out of the for loop
-            errors.append('ERROR: Could not find SchematronScraper info.')
-    else:
-        errors.append('ERROR: {} does not appear to be XML (found '
-                      'mimetype {}).'.format(filename, scraper.mimetype))
-
-    message_string = ensure_text(concat(messages).strip())
-    error_string = ensure_text(concat(errors).strip())
+    message_string = ensure_text(concat(scraper.messages()).strip())
+    error_string = ensure_text(concat(scraper.errors()).strip())
     if message_string:
         print(message_string)
     if error_string:

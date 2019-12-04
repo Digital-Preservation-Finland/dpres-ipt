@@ -20,6 +20,10 @@ from tests.testcommon.settings import TESTDATADIR
          {'returncode': 0,
           'stdout_part': 'Success',
           'stderr_part': None}),
+        ('valid_1.7.1_mets_noheader.xml',
+         {'returncode': 0,
+          'stdout_part': 'Success',
+          'stderr_part': None}),
         ('invalid_1.7.1_mets.xml',
          {'returncode': 117,
           'stdout_part': None,
@@ -27,7 +31,8 @@ from tests.testcommon.settings import TESTDATADIR
         ('invalid__not_xml.txt',
          {'returncode': 117,
           'stdout_part': None,
-          'stderr_part': 'invalid__not_xml.txt does not appear to be XML'})
+          'stderr_part': 'XML parsing failed: document information could not '
+                         'be gathered.'})
     ])
 def test_check_xml_schema_features(filename, expected):
     """

@@ -41,18 +41,14 @@ def main(arguments=None):
 
     filename = args[0]
     scraper = Scraper(filename, schema=options.schemapath,
-                      catalog_path=options.catalogpath)
-    scraper.detect_filetype()
+                      catalog_path=options.catalogpath,
+                      mimetype='text/xml', version='1.0')
 
     messages, errors = [], []
-    if scraper.mimetype == 'text/xml':
-        scraper.scrape()
-        info = get_scraper_info(scraper)
-        messages.extend(info['messages'])
-        errors.extend(info['errors'])
-    else:
-        errors.append('ERROR: {} does not appear to be XML (found '
-                      'mimetype {}).'.format(filename, scraper.mimetype))
+    scraper.scrape()
+    info = get_scraper_info(scraper)
+    messages.extend(info['messages'])
+    errors.extend(info['errors'])
 
     if messages:
         print(ensure_text(concat(messages)), file=sys.stdout)
