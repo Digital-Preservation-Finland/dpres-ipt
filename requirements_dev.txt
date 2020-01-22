@@ -12,7 +12,7 @@ pytest-cov
 # Validator components required to run unit tests
 ffmpeg-python
 file-magic
-opf-fido
+opf-fido==1.4.0
 Pillow
 pymediainfo
 wand
