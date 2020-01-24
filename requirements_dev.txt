@@ -12,7 +12,6 @@ pytest-cov
 # Validator components required to run unit tests
 ffmpeg-python
 file-magic
-opf-fido==1.4.0
 Pillow
 pymediainfo
 wand
@@ -22,3 +21,4 @@ git+https://gitlab.csc.fi/dpres/xml-helpers.git@develop#egg=xml_helpers
 git+https://gitlab.csc.fi/dpres/mets.git@develop#egg=mets
 git+https://gitlab.csc.fi/dpres/premis.git@develop#egg=premis
 git+https://gitlab.csc.fi/dpres/file-scraper.git@develop#egg=file-scraper
+git+https://gitlab.csc.fi/dpres/fido.git@develop#egg=opf_fido
