@@ -42,7 +42,8 @@ def main(arguments=None):
     filename = args[0]
     scraper = Scraper(filename, schema=options.schemapath,
                       catalog_path=options.catalogpath,
-                      mimetype='text/xml', version='1.0')
+                      mimetype="text/xml", version="1.0",
+                      charset="UTF-8")
 
     messages, errors = [], []
     scraper.scrape()

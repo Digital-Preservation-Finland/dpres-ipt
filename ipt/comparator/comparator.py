@@ -75,7 +75,7 @@ class MetadataComparator(object):
 
     def _is_textfile(self):
         """Helper to check if the file is a text file according to scraper."""
-        return Scraper(self._metadata_info['filename']).is_textfile()
+        return self._scraper_streams[0]["stream_type"] == "text"
 
     def _add_error(self, info, mets_value, scraper_value):
         """

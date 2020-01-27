@@ -315,6 +315,9 @@ def create_scraper_params(metadata_info):
     """
     params = {}
 
+    if "format" in metadata_info and "charset" in metadata_info["format"]:
+        params["charset"] = metadata_info["format"]["charset"]
+
     for scr_param_key, addml_key in _SCRAPER_PARAM_ADDML_KEY_RELATION:
         try:
             params[scr_param_key] = metadata_info['addml'][addml_key]
