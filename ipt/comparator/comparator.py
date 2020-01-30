@@ -4,7 +4,6 @@ Module to compare metadata found in mets to metadata scraped by file-scraper.
 
 from __future__ import unicode_literals
 import six
-from file_scraper.scraper import Scraper
 from ipt.utils import (handle_div, synonymize_stream_keys,
                        pair_compatible_list_elements)
 
