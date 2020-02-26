@@ -64,7 +64,7 @@ TESTCASES = [
                'version': '3.1415'},
      'expected_result': {
          'returncode': 117,
-         'stdout': ['Missing or incorrect mimetype/version.']}},
+         'stdout': ["Predefined version '3.1415' and resulted version '1.01' mismatch."]}},
     {'testcase': 'Report alt-format when validating as primary mimetype.',
      'filename': 'valid_1.7.0_plaintext_alt_format',
      'expected_result': {
@@ -192,7 +192,7 @@ def test_check_sip_digital_objects(case, monkeypatch):
     assert stderr == ''
 
     for match_string in case['expected_result']['stdout']:
-        assert match_string in stdout
+        assert match_string in stdout, stdout
 
     message = '\n'.join([
         'got:', str(returncode), 'expected:',

@@ -143,24 +143,27 @@ def check_well_formed(metadata_info):
         force_mimetype = True
     else:
         scraper = Scraper(metadata_info['filename'])
-        scraper.detect_filetype()
-        if scraper.mimetype != md_mimetype or scraper.version != md_version:
+        (mime, version) = scraper.detect_filetype()
+        if mime != md_mimetype or version != md_version:
             messages.append(
-                append_format_info('Detected ', scraper.mimetype,
-                                   scraper.version))
+                append_format_info('Detected ', mime, version))
             force_mimetype = True
 
     scraper_mimetype = None
+    scraper_version = None
     if force_mimetype:
         scraper_mimetype = md_mimetype
+        scraper_version = md_version
         messages.append(append_format_info('METS ', md_mimetype, md_version))
-        messages.append(append_format_info('Validating as ', md_mimetype))
+        messages.append(append_format_info('Validating as ', md_mimetype,
+                                           md_version))
         valid_only_messages.append(
             append_format_info('The digital object will be preserved as ',
                                md_mimetype, md_version))
 
     scraper = Scraper(metadata_info['filename'],
                       mimetype=scraper_mimetype,
+                      version=scraper_version,
                       **create_scraper_params(metadata_info))
     scraper.scrape()
 
