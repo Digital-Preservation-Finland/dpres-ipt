@@ -39,7 +39,8 @@ def main(arguments=None):
         filename = os.path.join(filename, 'mets.xml')
 
     scraper = SchematronScraper(
-        filename, params={"schematron": options.schemapath})
+        filename, mimetype="text/xml",
+        params={"schematron": options.schemapath})
     scraper.scrape_file()
 
     message_string = ensure_text(concat(scraper.messages()).strip())
