@@ -14,6 +14,25 @@ _METS_UNAVAILABLE_VALUES = ('(:unav)', '0')
 _PDF_VERSION_SUBSETS = {'1.4': ('A-1a', 'A-1b'),
                         '1.7': ('A-2a', 'A-2b', 'A-2u',
                                 'A-3a', 'A-3b', 'A-3u')}
+_KNOWN_UNAV_VERSIONS = {
+    "application/vnd.oasis.opendocument.text": ["1.0", "1.1", "1.2"],
+    "application/vnd.oasis.opendocument.spreadsheet": [
+        "1.0", "1.1", "1.2"],
+    "application/vnd.oasis.opendocument.presentation": [
+        "1.0", "1.1", "1.2"],
+    "application/vnd.oasis.opendocument.graphics": ["1.0", "1.1", "1.2"],
+    "application/vnd.oasis.opendocument.formula": ["1.0", "1.2"],
+    "application/msword": ["8.0", "8.5", "9.0", "10.0", "11.0"],
+    "application/vnd.ms-excel": ["8.0", "9.0", "10.0", "11.0"],
+    "application/vnd.ms-powerpoint": ["8.0", "9.0", "10.0", "11.0"],
+    "application/vnd.openxmlformats-officedocument.wordprocessingml."
+    "document": ["12.0", "14.0", "15.0"],
+    "application/vnd.openxmlformats-officedocument."
+    "spreadsheetml.sheet": ["12.0", "14.0", "15.0"],
+    "application/vnd.openxmlformats-officedocument.presentationml."
+    "presentation": ["12.0", "14.0", "15.0"],
+    "application/x-internet-archive": ["1.0", "1.1"]
+}
 
 
 class MetadataComparator(object):
@@ -220,12 +239,21 @@ def _harmonized_versions(scraper_format):
     :scraper_format: Dict with keys 'mimetype' and 'version' (from scraper).
     :returns: Set of harmonized versions.
     """
-    # In the normal case the version in METS should be the same as the
-    # version scraper found
-    harmonized_versions = {scraper_format['version']}
-    # If scraper does not find a version, empty string in METS is ok
-    if scraper_format['version'] in ('(:unav)', '(:unap)', '', None):
+    harmonized_versions = set()
+    # If scraper denotes version as unapplicable, empty string in METS is
+    # expected.
+    if scraper_format['version'] == '(:unap)':
         harmonized_versions.add('')
+    # If scraper is unable to resolve version, we expect only values from
+    # some file formats in a list.
+    elif scraper_format['version'] in ['(:unav)', None] and \
+            _KNOWN_UNAV_VERSIONS.get(scraper_format['mimetype'], None):
+        for version in _KNOWN_UNAV_VERSIONS[scraper_format['mimetype']]:
+            harmonized_versions.add(version)
+    # In the normal case the version in METS should be the same as the
+    # version scraper found. Do not allow "(:unap)" nor "(:unav)" in METS.
+    else:
+    	harmonized_versions.add(scraper_format['version'])
     # PDF file special case:
     # If scraper finds a version which is a subset of the version given METS,
     # the more general METS value is allowed (e.g, METS: 1.4, scraper: A-1b)

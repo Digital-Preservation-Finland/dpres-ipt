@@ -26,7 +26,6 @@
               <premis:format>
                 <premis:formatDesignation>
                   <premis:formatName>text/plain; charset=UTF-8</premis:formatName>
-                  <premis:formatVersion>(:unap)</premis:formatVersion>
                 </premis:formatDesignation>
               </premis:format>
               <premis:creatingApplication>

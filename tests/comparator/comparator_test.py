@@ -23,11 +23,15 @@ from ipt.comparator.comparator import MetadataComparator
 from ipt.utils import concat
 
 METADATA_INFO = {
-    'valid_text': {
+   'valid_text': {
         'filename': 'textfile',
         'format': {'charset': 'UTF-8',
                    'mimetype': 'text/plain',
                    'version': ''}},
+   'valid_office': {
+        'filename': 'officefile',
+        'format': {'mimetype': 'application/vnd.oasis.opendocument.text',
+                   'version': '1.0'}},
     'valid_image': {
         'filename': 'imagefile',
         'format': {'mimetype': 'image/jpeg',
@@ -69,6 +73,11 @@ SCRAPER_STREAMS = {
             'index': 0,
             'mimetype': 'text/plain',
             'stream_type': 'text',
+            'version': '(:unap)'}},
+    'valid_office': {
+        0: {'index': 0,
+            'mimetype': 'application/vnd.oasis.opendocument.text',
+            'stream_type': 'binary',
             'version': '(:unav)'}},
     'valid_image': {
         0: {'bps_unit': 'integer',
@@ -97,7 +106,7 @@ SCRAPER_STREAMS = {
             'num_channels': '2',
             'sampling_frequency': '44.1',
             'stream_type': 'audio',
-            'version': ''}},
+            'version': '(:unap)'}},
     'valid_video': {
         0: {'codec_creator_app': 'Lavf56.40.101',
             'codec_creator_app_version': '56.40.101',
@@ -105,7 +114,7 @@ SCRAPER_STREAMS = {
             'index': 0,
             'mimetype': 'video/mp4',
             'stream_type': 'videocontainer',
-            'version': '(:unav)'},
+            'version': '(:unap)'},
         1: {'bits_per_sample': '8',
             'codec_creator_app': 'Lavf56.40.101',
             'codec_creator_app_version': '56.40.101',
@@ -125,7 +134,7 @@ SCRAPER_STREAMS = {
             'signal_format': '(:unap)',
             'sound': 'Yes',
             'stream_type': 'video',
-            'version': '(:unav)',
+            'version': '(:unap)',
             'width': '320'},
         2: {'audio_data_encoding': 'AAC',
             'bits_per_sample': '(:unav)',
@@ -141,7 +150,7 @@ SCRAPER_STREAMS = {
             'num_channels': '4',
             'sampling_frequency': '48',
             'stream_type': 'audio',
-            'version': '(:unav)'},
+            'version': '(:unap)'},
         3: {'audio_data_encoding': 'AAC',
             'bits_per_sample': '(:unav)',
             'codec_creator_app': 'Lavf56.40.101',
@@ -156,7 +165,7 @@ SCRAPER_STREAMS = {
             'num_channels': '2',
             'sampling_frequency': '44.1',
             'stream_type': 'audio',
-            'version': '(:unav)'}},
+            'version': '(:unap)'}},
 }
 
 # The default result message if comparison does not find any errors.
@@ -165,6 +174,8 @@ DEFAULT_VALID_MESSAGE = 'METS metadata matches scraper metadata.'
 VALID_TEST_CASES = [
     {'reason': 'Valid plaintext must pass.',
      'base': 'valid_text'},
+    {'reason': 'Valid office must pass even with scraper (:unav) version.',
+     'base': 'valid_office'},
     {'reason': 'Valid non-plaintext must pass.',
      'base': 'valid_image'},
     {'reason': 'Valid single-stream file must pass.',
@@ -201,6 +212,12 @@ INVALID_TEST_CASES = [
      'expected_error': ('audio streams in {} are not what is described '
                         'in metadata'.format(
                             METADATA_INFO['valid_video']['filename']))},
+    {'reason': 'File format version is not allowed to be (:unav) in METS',
+     'base': 'valid_office',
+     'md_patch': [['format',
+                   {'mimetype': 'application/vnd.oasis.opendocument.text',
+                    'version': '(:unav)'}]],
+     'expected_error': 'Missing or incorrect mimetype/version'}
 ]
 
 
