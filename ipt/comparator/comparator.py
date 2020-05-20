@@ -246,13 +246,15 @@ def _harmonized_versions(scraper_format):
         harmonized_versions.add('')
     # If scraper is unable to resolve version, we expect only values from
     # some file formats in a list.
-    elif scraper_format['version'] in ['(:unav)', None] and \
-            _KNOWN_UNAV_VERSIONS.get(scraper_format['mimetype'], None):
-        harmonized_versions.update(
-            _KNOWN_UNAV_VERSIONS[scraper_format['mimetype']])
+    elif scraper_format['version'] in ['(:unav)', None]:
+        # We handle (:unav) version result from Scraper only in known cases.
+        # For other cases we leave harmonized_versions empty, which results
+        # error.
+        if _KNOWN_UNAV_VERSIONS.get(scraper_format['mimetype'], None):
+            harmonized_versions.update(
+                _KNOWN_UNAV_VERSIONS[scraper_format['mimetype']])
     # In the normal case the version in METS should be the same as the
-    # version scraper found. Scraper results error if (:unav) is given
-    # as version for some other than Office or ARC file formats.
+    # version scraper found.
     else:
     	harmonized_versions.add(scraper_format['version'])
     # PDF file special case:
