@@ -202,7 +202,7 @@ INVALID_TEST_CASES = [
      'base': 'valid_text',
      'md_patch': [['format', {'mimetype': None, 'version': None}]],
      'expected_error': 'Missing or incorrect mimetype/version.'},
-    {'reason': 'Version is required except when scraper does not find it.',
+    {'reason': 'Version is required except when scraper results (:unap).',
      'base': 'valid_image',
      'md_patch': [['format', 'version', '']],
      'expected_error': 'Missing or incorrect mimetype/version.'},
@@ -214,9 +214,7 @@ INVALID_TEST_CASES = [
                             METADATA_INFO['valid_video']['filename']))},
     {'reason': 'File format version is not allowed to be (:unav) in METS',
      'base': 'valid_office',
-     'md_patch': [['format',
-                   {'mimetype': 'application/vnd.oasis.opendocument.text',
-                    'version': '(:unav)'}]],
+     'md_patch': [['format', 'version', '(:unav)']],
      'expected_error': 'Missing or incorrect mimetype/version'}
 ]
 
