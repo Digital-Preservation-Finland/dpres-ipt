@@ -131,9 +131,10 @@ def iter_metadata_info(mets_tree, mets_path):
     for element in mets.parse_files(mets_tree):
 
         loc = mets.parse_flocats(element)[0]
+        filename = uri_to_path(mets.parse_href(loc)).decode('utf-8')
         object_filename = os.path.join(
             os.path.dirname(mets_path),
-            uri_to_path(mets.parse_href(loc)))
+            filename)
         use = mets.parse_use(element)
 
         metadata_info = create_metadata_info(

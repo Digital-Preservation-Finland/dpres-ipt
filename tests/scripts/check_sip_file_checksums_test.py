@@ -1,5 +1,7 @@
 """Test the `ipt.scripts.test_sip_file_checksums` module"""
 
+# coding: utf-8
+
 import os
 
 import pytest
@@ -106,3 +108,16 @@ def test_checksum_extra_file(temp_sip):
     assert 'Nonlisted file: extra_file.txt' in stdout
     assert 'tmp' not in stdout
     assert returncode == 117
+
+
+def test_checksum_utf8(temp_sip):
+    sip_path = temp_sip('valid_1.7.1_utf8')
+
+    (returncode, stdout, stderr) = run_main(sip_path)
+
+    assert stderr == ''
+    for line in stdout.splitlines():
+        assert 'Checksum OK' in line
+    assert 'Checksum OK: data/valid_äö.txt' in stdout
+    assert 'tmp' not in stdout
+    assert returncode == 0
