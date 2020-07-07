@@ -1,6 +1,6 @@
-"""Test the `ipt.scripts.test_sip_file_checksums` module"""
-
 # coding: utf-8
+
+"""Test the `ipt.scripts.test_sip_file_checksums` module"""
 
 import os
 
@@ -118,6 +118,6 @@ def test_checksum_utf8(temp_sip):
     assert stderr == ''
     for line in stdout.splitlines():
         assert 'Checksum OK' in line
-    assert 'Checksum OK: data/valid_äö.txt' in stdout
+    assert 'Checksum OK: data/valid_äö.txt'.decode('UTF-8') in stdout
     assert 'tmp' not in stdout
     assert returncode == 0
