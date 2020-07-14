@@ -121,7 +121,7 @@ def uri_to_path(uri):
 
     """
     uri = uri.encode("utf-8") if six.PY2 else uri
-    path = urllib.unquote_plus(uri).replace('file://', '')
+    path = urllib.parse.unquote_plus(uri).replace('file://', '')
     return path.lstrip('./')
 
 
