@@ -4,6 +4,7 @@ import os
 
 import mets
 import premis
+import six
 
 from ipt.utils import merge_dicts, uri_to_path, parse_mimetype
 import ipt.addml.addml
@@ -129,9 +130,10 @@ def iter_metadata_info(mets_tree, mets_path):
     """
 
     for element in mets.parse_files(mets_tree):
-
         loc = mets.parse_flocats(element)[0]
-        filename = uri_to_path(mets.parse_href(loc))
+        filename = uri_to_path(mets.parse_href(loc)) \
+            .decode("utf-8") if six.PY2 \
+            else uri_to_path(mets.parse_href(loc))
         object_filename = os.path.join(
             os.path.dirname(mets_path),
             filename)
