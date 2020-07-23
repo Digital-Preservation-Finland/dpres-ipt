@@ -2,7 +2,6 @@
 Utility functions.
 """
 
-import urllib
 from collections import defaultdict
 from copy import deepcopy
 from fractions import Fraction
@@ -121,8 +120,7 @@ def uri_to_path(uri):
 
     """
     uri = uri.encode("utf-8") if six.PY2 else uri
-    path = urllib.unquote_plus(uri).replace('file://', '') if six.PY2 \
-        else urllib.parse.unquote_plus(uri).replace('file://', '')
+    path = six.moves.urllib_parse.unquote_plus(uri).replace('file://', '')
     return path.lstrip('./')
 
 

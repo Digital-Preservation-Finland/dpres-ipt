@@ -6,6 +6,7 @@ import os
 
 import pytest
 import six
+from ipt.six_utils import ensure_text
 
 from ipt.scripts.check_sip_file_checksums import main
 import tests.testcommon.shell
@@ -121,7 +122,6 @@ def test_checksum_utf8(temp_sip):
     assert stderr == ''
     for line in stdout.splitlines():
         assert 'Checksum OK' in line
-    assert 'Checksum OK: data/valid_äö.txt'.decode('UTF-8') if six.PY2 \
-        else 'Checksum OK: data/valid_äö.txt' in stdout
+    assert ensure_text('Checksum OK: data/valid_äö.txt') in stdout
     assert 'tmp' not in stdout
     assert returncode == 0
