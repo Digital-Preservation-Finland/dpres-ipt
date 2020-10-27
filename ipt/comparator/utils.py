@@ -213,11 +213,11 @@ def collect_supplementary_filepaths(mets_tree, supplementary_type):
     :supplementary_type: The type of supplementary files as a string
     :returns: A list of supplementary file paths
     """
-    filepaths = []
+    filepaths = set()
     for filegrp in mets.parse_filegrps(
             mets_tree, use=SUPPLEMENTARY_TYPES[supplementary_type]):
         for file_elem in mets.parse_files(filegrp):
             for flocat in mets.parse_flocats(file_elem):
-                filepaths.append(mets.parse_href(flocat))
+                filepaths.add(mets.parse_href(flocat))
 
-    return filepaths
+    return list(filepaths)
