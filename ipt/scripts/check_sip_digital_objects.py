@@ -13,7 +13,8 @@ import premis
 import xml_helpers.utils
 from file_scraper.scraper import Scraper
 
-from ipt.comparator.utils import iter_metadata_info
+from ipt.comparator.utils import (iter_metadata_info,
+                                  collect_supplementary_filepaths)
 from ipt.comparator.comparator import MetadataComparator
 from ipt.utils import merge_dicts, create_scraper_params, get_scraper_info
 from ipt.six_utils import ensure_text
@@ -257,12 +258,20 @@ def validation(mets_path):
         return join_validation_results(metadata_info, results)
 
     mets_tree = None
+    xml_schemas = []
     if mets_path is not None:
         if os.path.isdir(mets_path):
             mets_path = os.path.join(mets_path, 'mets.xml')
         mets_tree = xml_helpers.utils.readfile(mets_path)
 
-    for metadata_info in iter_metadata_info(mets_tree, mets_path):
+        # xml_schemas is a list of paths to local XML schemas needed for
+        # digital object validation
+        xml_schemas = collect_supplementary_filepaths(
+            mets_tree=mets_tree, supplementary_type='xml_schemas')
+
+    for metadata_info in iter_metadata_info(mets_tree,
+                                            mets_path,
+                                            xml_schemas=xml_schemas):
         yield _validate(metadata_info)
 
 

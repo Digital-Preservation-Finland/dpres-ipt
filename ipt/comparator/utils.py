@@ -13,6 +13,11 @@ import ipt.audiomd.audiomd
 from ipt.six_utils import ensure_text
 
 
+SUPPLEMENTARY_TYPES = {
+    'xml_schemas': 'fi-preservation-xml-schemas'
+}
+
+
 def mdwrap_to_metadata_info(mdwrap_element):
     """Extract metadata_info dict from mdwrap element.
 
@@ -119,7 +124,7 @@ def create_metadata_info(mets_tree, element, object_filename, use,
     return metadata_info
 
 
-def iter_metadata_info(mets_tree, mets_path):
+def iter_metadata_info(mets_tree, mets_path, xml_schemas=None):
     """Iterate all files in given mets document and return metadata_info
     dictionary for each file and bitstream.
 
@@ -144,6 +149,8 @@ def iter_metadata_info(mets_tree, mets_path):
 
         metadata_info['audio_streams'] = []
         metadata_info['video_streams'] = []
+        if xml_schemas:
+            metadata_info['xml_schemas'] = xml_schemas
         for stream_elem in mets.parse_streams(element):
 
             stream_info = create_metadata_info(
@@ -195,3 +202,20 @@ def premis_to_dict(premis_xml):
         premis_dict["format"]["version"] = format_version
 
     return premis_dict
+
+
+def collect_supplementary_filepaths(mets_tree, supplementary_type):
+    """Iterate files in a supplementary fileGrp and return
+    their file paths if they exist.
+
+    :mets_tree: metadata in mets xml format
+    :returns: A list of supplementary file paths
+    """
+    filepaths = []
+    for filegrp in mets.parse_filegrps(
+            mets_tree, use=SUPPLEMENTARY_TYPES[supplementary_type]):
+        for file_elem in mets.parse_files(filegrp):
+            for flocat in mets.parse_flocats(file_elem):
+                filepaths.append(mets.parse_href(flocat))
+
+    return filepaths

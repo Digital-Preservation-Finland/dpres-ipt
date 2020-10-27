@@ -323,6 +323,11 @@ def create_scraper_params(metadata_info):
         except KeyError:
             # "addml_key"-key did not exist therefore no need to do anything.
             pass
+
+    # Add local XML schema paths as a parameter if they exist
+    if "xml_schemas" in metadata_info and metadata_info["xml_schemas"]:
+        params["xml_schemas"] = metadata_info["xml_schemas"]
+
     return params
 
 
