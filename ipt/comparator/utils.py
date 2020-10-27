@@ -130,6 +130,7 @@ def iter_metadata_info(mets_tree, mets_path, xml_schemas=None):
 
     :mets_tree: metadata in mets xml format
     :mets_path: path to the mets document
+    :xml_schemas: A list of paths to local XML schema files
 
     :returns: Iterable on metadata_info dictionaries
 
@@ -209,6 +210,7 @@ def collect_supplementary_filepaths(mets_tree, supplementary_type):
     their file paths if they exist.
 
     :mets_tree: metadata in mets xml format
+    :supplementary_type: The type of supplementary files as a string
     :returns: A list of supplementary file paths
     """
     filepaths = []
