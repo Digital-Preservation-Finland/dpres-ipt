@@ -14,6 +14,7 @@ import xml_helpers.utils
 from file_scraper.scraper import Scraper
 
 from ipt.comparator.utils import (iter_metadata_info,
+                                  collect_xml_schemas,
                                   collect_supplementary_filepaths)
 from ipt.comparator.comparator import MetadataComparator
 from ipt.utils import merge_dicts, create_scraper_params, get_scraper_info
@@ -266,12 +267,10 @@ def validation(mets_path):
 
         # xml_schemas is a list of paths to local XML schemas needed for
         # digital object validation
-        xml_schemas = collect_supplementary_filepaths(
-            mets_tree=mets_tree, supplementary_type='xml_schemas')
+        xml_schemas = collect_xml_schemas(mets_tree=mets_tree)
 
     for metadata_info in iter_metadata_info(mets_tree,
-                                            mets_path,
-                                            xml_schemas=xml_schemas):
+                                            mets_path):
         yield _validate(metadata_info)
 
 

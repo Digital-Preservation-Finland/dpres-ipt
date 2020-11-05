@@ -209,7 +209,7 @@ def collect_supplementary_filepaths(mets_tree, supplementary_type):
     """Iterate files in a supplementary fileGrp and return
     their file paths if they exist.
 
-    :mets_tree: metadata in mets xml format
+    :mets_tree: Metadata as Elementree.Element
     :supplementary_type: The type of supplementary files as a string
     :returns: A list of supplementary file paths
     """
@@ -221,3 +221,25 @@ def collect_supplementary_filepaths(mets_tree, supplementary_type):
                 filepaths.add(mets.parse_href(flocat))
 
     return list(filepaths)
+
+
+def collect_xml_schemas(mets_tree):
+    """Collect all XML schemas from the METS.
+
+    :mets_tree: Metadata as Elementree.Element
+    :returns: a dictionary of schema URIs and paths
+    """
+    schemas = {}
+    environment = None
+    for techmd in mets.iter_techmd(mets_tree):
+        environment = premis.parse_environment(techmd,
+                                               purpose='xml-schemas')
+    if environment:
+        for dependency in premis.parse_dependency(environment[0]):
+            name = premis.iter_elements(dependency,
+                                        'dependencyName').next().text
+            (_, value) = premis.parse_identifier_type_value(
+                dependency, prefix='dependency')
+            schemas[value] = name
+
+    return schemas
