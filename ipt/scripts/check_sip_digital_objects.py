@@ -219,11 +219,11 @@ def join_validation_results(metadata_info, results):
     }
 
 
-def validation(mets_path):
+def validation(sip_path):
     """
     Validate all files enumerated in mets.xml files.
 
-    :mets_path: Path to the directory which contains the mets.xml file
+    :sip_path: Path to the directory which contains the mets.xml file
     :yields: {
                 'metadata_info': metadata_info,
                 'is_valid': Boolean which is True iff all validation components
@@ -259,18 +259,20 @@ def validation(mets_path):
         return join_validation_results(metadata_info, results)
 
     mets_tree = None
-    xml_schemas = []
-    if mets_path is not None:
-        if os.path.isdir(mets_path):
-            mets_path = os.path.join(mets_path, 'mets.xml')
+    linking_catalog_path = None
+    if sip_path is not None:
+        if os.path.isdir(sip_path):
+            mets_path = os.path.join(sip_path, 'mets.xml')
         mets_tree = xml_helpers.utils.readfile(mets_path)
 
-        # xml_schemas is a list of paths to local XML schemas needed for
-        # digital object validation
-        xml_schemas = collect_xml_schemas(mets_tree=mets_tree)
+        # Check METS and contruct local catalog if schemas are found
+        linking_catalog_path = define_schema_catalog(sip_path, mets_tree)
 
+    else:
+        mets_path = sip_path
     for metadata_info in iter_metadata_info(mets_tree,
-                                            mets_path):
+                                            mets_path,
+                                            catalog_path=linking_catalog_path):
         yield _validate(metadata_info)
 
 
@@ -367,6 +369,42 @@ def validation_report(results, linking_sip_type, linking_sip_id):
         child_elements.append(report_event)
 
     return premis.premis(child_elements=child_elements)
+
+
+def define_schema_catalog(sip_path, mets_tree):
+    """Checks the METS XML for existence of local schemas. If these
+    are found, a temporary catalog file is created containing the local
+    schemas. Another temporary catalog file containing the catalog
+    linkings, both from the SGML_CATALOG_FILES environment variable
+    and the temporary local catalog, is created.
+
+    :sip_path: The path to the SIP contents
+    :mets_tree: The METS metadata as an Elementtree.Element
+
+    :returns: The absolute path to the linking catalog file
+    """
+    linking_catalog_path = None
+
+    xml_schemas = collect_xml_schemas(mets_tree=mets_tree)
+
+    # Create a catalog file if xml_schemas were found in the metadata
+    if xml_schemas:
+        next_catalogs = []
+        existing_catalogs = os.environ.get('SGML_CATALOG_FILES')
+        if existing_catalogs:
+            for catalog in existing_catalogs.split(':'):
+                next_catalogs.append(catalog)
+        temp_catalog_path = xml_helpers.utils.construct_catalog_xml(
+            filename='tmp/my-temp-catalog.xml',
+            base_path=sip_path,
+            rewrite_rules=xml_schemas)
+        next_catalogs.append(temp_catalog_path)
+        linking_catalog_path = xml_helpers.utils.construct_catalog_xml(
+            filename='tmp/my-linking-catalog.xml',
+            base_path=sip_path,
+            next_catalogs=next_catalogs)
+
+    return linking_catalog_path
 
 
 if __name__ == '__main__':

@@ -259,7 +259,7 @@ def patch_validate(monkeypatch):
                 errors=['Some error.'])
         return result
 
-    def _iter_metadata_info(mets_tree, mets_path, xml_schemas=None):
+    def _iter_metadata_info(mets_tree, mets_path, catalog_path=None):
         """Monkeypatch mets reading."""
         # pylint: disable=unused-argument
         md_info = [
@@ -335,7 +335,7 @@ def test_native_marked():
 def patch_metadata_info(monkeypatch):
     """Patch iter_metadata_info to return output for erroneus pdf mets."""
 
-    def _iter_metadata_info(mets_tree, mets_path, xml_schemas=None):
+    def _iter_metadata_info(mets_tree, mets_path, catalog_path=None):
         """Mock iter_metadata_info to return """
         # pylint: disable=unused-argument
         return [{'filename': 'pdf', 'use': '', 'errors': 'Some error',
