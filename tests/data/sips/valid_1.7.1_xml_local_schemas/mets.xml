@@ -86,7 +86,7 @@
                 <premis:dependencyName>data/local.xsd</premis:dependencyName>
                 <premis:dependencyIdentifier>
                   <premis:dependencyIdentifierType>URI</premis:dependencyIdentifierType>
-                  <premis:dependencyIdentifierValue>loucalll.xsd</premis:dependencyIdentifierValue>
+                  <premis:dependencyIdentifierValue>http://localhost/loucalll.xsd</premis:dependencyIdentifierValue>
                 </premis:dependencyIdentifier>
               </premis:dependency>
             </premis:environment>
