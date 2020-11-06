@@ -238,6 +238,8 @@ def collect_xml_schemas(mets_tree):
         for dependency in premis.parse_dependency(environment[0]):
             name = premis.iter_elements(dependency,
                                         'dependencyName').next().text
+            if six.moves.urllib.parse.urlparse(name).scheme == 'file':
+                name = name[len('file:'):].strip("/")
             (_, value) = premis.parse_identifier_type_value(
                 dependency, prefix='dependency')
             schemas[value] = name

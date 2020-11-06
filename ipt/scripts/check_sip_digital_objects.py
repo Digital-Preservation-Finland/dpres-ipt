@@ -8,6 +8,7 @@ import datetime
 import os
 import sys
 import uuid
+import tempfile
 
 import premis
 import xml_helpers.utils
@@ -259,6 +260,7 @@ def validation(sip_path):
         return join_validation_results(metadata_info, results)
 
     mets_tree = None
+    temp_catalog_path = None
     linking_catalog_path = None
     if sip_path is not None:
         if os.path.isdir(sip_path):
@@ -266,7 +268,8 @@ def validation(sip_path):
         mets_tree = xml_helpers.utils.readfile(mets_path)
 
         # Check METS and contruct local catalog if schemas are found
-        linking_catalog_path = define_schema_catalog(sip_path, mets_tree)
+        (temp_catalog_path, linking_catalog_path) = define_schema_catalog(
+            sip_path, mets_tree)
 
     else:
         mets_path = sip_path
@@ -274,6 +277,11 @@ def validation(sip_path):
                                             mets_path,
                                             catalog_path=linking_catalog_path):
         yield _validate(metadata_info)
+
+    # Remove constructed catalogs after validation
+    for filepath in [temp_catalog_path, linking_catalog_path]:
+        if filepath:
+            os.remove(filepath)
 
 
 def create_report_agent():
@@ -383,6 +391,7 @@ def define_schema_catalog(sip_path, mets_tree):
 
     :returns: The absolute path to the linking catalog file
     """
+    temp_catalog_path = None
     linking_catalog_path = None
 
     xml_schemas = collect_xml_schemas(mets_tree=mets_tree)
@@ -394,16 +403,19 @@ def define_schema_catalog(sip_path, mets_tree):
         if existing_catalogs:
             for catalog in existing_catalogs.split(':'):
                 next_catalogs.append(catalog)
+        (_, filename) = tempfile.mkstemp(prefix="dpres-ipt-", suffix=".tmp")
         temp_catalog_path = xml_helpers.utils.construct_catalog_xml(
-            filename='tmp/my-temp-catalog.xml',
+            filename=filename,
             base_path=sip_path,
             rewrite_rules=xml_schemas)
+        (_, linking_filename) = tempfile.mkstemp(prefix="dpres-ipt-",
+                                                 suffix=".tmp")
         next_catalogs.append(temp_catalog_path)
         linking_catalog_path = xml_helpers.utils.construct_catalog_xml(
-            filename='tmp/my-linking-catalog.xml',
+            filename=linking_filename,
             next_catalogs=next_catalogs)
 
-    return linking_catalog_path
+    return temp_catalog_path, linking_catalog_path
 
 
 if __name__ == '__main__':
