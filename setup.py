@@ -27,7 +27,7 @@ def main():
         entry_points={'console_scripts': scripts_list()},
         install_requires=[
             'python-mimeparse',
-            'scandir',
+            'scandir; python_version == "2.7"',
             'six'
         ]
     )

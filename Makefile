@@ -33,6 +33,20 @@ install:
 	# setup.py seems to be unable to create directories,
 	# create them here if needed
 
+install3:
+	# Cleanup temporary files
+	rm -f INSTALLED_FILES
+
+	# write version module
+	python3 version.py > "ipt/version.py"
+
+	# Use Python setuptools
+	python3 setup.py build ; python3 ./setup.py install -O1 --prefix="${PREFIX}" --root="${ROOT}" --record=INSTALLED_FILES
+	cat INSTALLED_FILES | sed 's/^/\//g' >> INSTALLED_FILES
+
+	# setup.py seems to be unable to create directories,
+	# create them here if needed
+
 devinstall:
 	# quick and dirty installation...
 	# not for production

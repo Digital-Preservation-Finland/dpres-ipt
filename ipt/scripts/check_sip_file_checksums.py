@@ -3,17 +3,20 @@
 
 from __future__ import print_function, unicode_literals
 
-import os
-import sys
 import argparse
 import errno
-
-import scandir
+import os
+import sys
 
 import xml_helpers.utils as u
 from file_scraper.utils import hexdigest
 from ipt.comparator.utils import iter_metadata_info
 from ipt.six_utils import ensure_text
+
+try:
+    from os import walk
+except ImportError:
+    from scandir import walk
 
 
 def iter_files(path):
@@ -27,7 +30,7 @@ def iter_files(path):
 
     ignored_files = ['mets.xml', 'varmiste.sig', 'signature.sig']
 
-    for root, _, files in scandir.walk(path):
+    for root, _, files in walk(path):
         for filename in files:
             if root == path and filename in ignored_files:
                 continue

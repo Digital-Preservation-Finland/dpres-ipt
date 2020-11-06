@@ -1,7 +1,7 @@
 # Required components
 lxml
 python-mimeparse
-scandir  # This is included in the standard library as os.scandir in Python>=3.5
+scandir ; python_version == '2.7' # This is included in the standard library as os.scandir in Python>=3.5
 six
 
 # Unit test tools
