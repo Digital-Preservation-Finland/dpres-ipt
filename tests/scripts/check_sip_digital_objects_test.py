@@ -18,7 +18,8 @@ from tests.testcommon import shell
 from ipt.scripts.check_sip_digital_objects import (main, validation,
                                                    validation_report,
                                                    make_result_dict,
-                                                   join_validation_results)
+                                                   join_validation_results,
+                                                   define_schema_catalog)
 import ipt.scripts.check_sip_digital_objects
 
 METSDIR = os.path.abspath(
@@ -399,3 +400,16 @@ def test_join_validation_results():
     assert joined2['messages'] == 'message1\nvalid'
     assert not joined2['errors']
     assert joined2['extensions'] == [extension1]
+
+
+def test_define_schema_catalog():
+    """Tests the define_schema_catalog function."""
+
+    sip_path = 'tests/data/sips/valid_1.7.1_xml_local_schemas/'
+    mets_tree = ET.parse(os.path.join(sip_path, 'mets.xml')).getroot()
+    path = define_schema_catalog(sip_path, mets_tree)
+    assert os.path.isfile(path)
+    root = ET.parse(path).getroot()
+    ns = {'catalog': 'urn:oasis:names:tc:entity:xmlns:xml:catalog'}
+    assert len(root.xpath('./catalog:nextCatalog[@catalog]',
+                          namespaces=ns)) == 1

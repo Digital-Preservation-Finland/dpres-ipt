@@ -401,7 +401,6 @@ def define_schema_catalog(sip_path, mets_tree):
         next_catalogs.append(temp_catalog_path)
         linking_catalog_path = xml_helpers.utils.construct_catalog_xml(
             filename='tmp/my-linking-catalog.xml',
-            base_path=sip_path,
             next_catalogs=next_catalogs)
 
     return linking_catalog_path
