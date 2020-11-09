@@ -19,6 +19,7 @@ from ipt.scripts.check_sip_digital_objects import (main, validation,
                                                    validation_report,
                                                    make_result_dict,
                                                    join_validation_results,
+                                                   collect_xml_schemas,
                                                    define_schema_catalog)
 import ipt.scripts.check_sip_digital_objects
 
@@ -417,7 +418,31 @@ def test_define_schema_catalog():
     root = ET.parse(catalog_path).getroot()
     assert len(root.xpath('./catalog:rewriteURI',
                           namespaces=ns)) == 1
-    assert root.xpath('./catalog:rewriteURI/@uriStartString',
-                      namespaces=ns)[0] == 'http://localhost/loucalll.xsd'
+    assert 'loucalll.xsd' in root.xpath('./catalog:rewriteURI/@uriStartString',
+                                        namespaces=ns)[0]
     assert root.xpath('./catalog:rewriteURI/@rewritePrefix',
                       namespaces=ns)[0] == 'data/local.xsd'
+
+
+def test_collect_xml_schemas():
+    """Tests the collect_xml_schemas function."""
+    xml = '<mets:mets xmlns:mets="http://www.loc.gov/METS/" ' \
+          'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' \
+          '<mets:amdSec><mets:techMD><mets:mdWrap><mets:xmlData>' \
+          '<premis:object xmlns:premis="info:lc/xmlns/premis-v2" '\
+          'xsi:type="premis:representation"><premis:environment>' \
+          '<premis:environmentPurpose>xml-schemas' \
+          '</premis:environmentPurpose><premis:dependency>' \
+          '<premis:dependencyName>schemas/my_schema.xsd' \
+          '</premis:dependencyName><premis:dependencyIdentifier>' \
+          '<premis:dependencyIdentifierType>URI' \
+          '</premis:dependencyIdentifierType>' \
+          '<premis:dependencyIdentifierValue>http://localhost/my_schema.xsd' \
+          '</premis:dependencyIdentifierValue></premis:dependencyIdentifier>' \
+          '</premis:dependency></premis:environment></premis:object>' \
+          '</mets:xmlData></mets:mdWrap></mets:techMD>' \
+          '</mets:amdSec></mets:mets>'
+
+    schemas = collect_xml_schemas(ET.fromstring(xml), '/tmp')
+    assert len(schemas) == 1
+    assert schemas['http://localhost/my_schema.xsd'] == 'schemas/my_schema.xsd'

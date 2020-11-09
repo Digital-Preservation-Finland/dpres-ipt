@@ -28,7 +28,7 @@
               <premis:compositionLevel>0</premis:compositionLevel>
               <premis:fixity>
                 <premis:messageDigestAlgorithm>MD5</premis:messageDigestAlgorithm>
-                <premis:messageDigest>d30c71861bad2cb666cf58a1cf4c9827</premis:messageDigest>
+                <premis:messageDigest>6384bca55ff984211960a4e0bff123ad</premis:messageDigest>
               </premis:fixity>
               <premis:format>
                 <premis:formatDesignation>
@@ -86,7 +86,7 @@
                 <premis:dependencyName>file:///data/local.xsd</premis:dependencyName>
                 <premis:dependencyIdentifier>
                   <premis:dependencyIdentifierType>URI</premis:dependencyIdentifierType>
-                  <premis:dependencyIdentifierValue>http://localhost/loucalll.xsd</premis:dependencyIdentifierValue>
+                  <premis:dependencyIdentifierValue>loucalll.xsd</premis:dependencyIdentifierValue>
                 </premis:dependencyIdentifier>
               </premis:dependency>
             </premis:environment>

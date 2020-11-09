@@ -9,14 +9,14 @@ import os
 import sys
 import uuid
 import tempfile
+import six
 
+import mets
 import premis
 import xml_helpers.utils
 from file_scraper.scraper import Scraper
 
-from ipt.comparator.utils import (iter_metadata_info,
-                                  collect_xml_schemas,
-                                  collect_supplementary_filepaths)
+from ipt.comparator.utils import iter_metadata_info
 from ipt.comparator.comparator import MetadataComparator
 from ipt.utils import merge_dicts, create_scraper_params, get_scraper_info
 from ipt.six_utils import ensure_text
@@ -394,7 +394,9 @@ def define_schema_catalog(sip_path, mets_tree):
     temp_catalog_path = None
     linking_catalog_path = None
 
-    xml_schemas = collect_xml_schemas(mets_tree=mets_tree)
+    (_, filename) = tempfile.mkstemp(prefix="dpres-ipt-", suffix=".tmp")
+    xml_schemas = collect_xml_schemas(
+        mets_tree=mets_tree, catalog_path=os.path.dirname(filename))
 
     # Create a catalog file if xml_schemas were found in the metadata
     if xml_schemas:
@@ -403,7 +405,6 @@ def define_schema_catalog(sip_path, mets_tree):
         if existing_catalogs:
             for catalog in existing_catalogs.split(':'):
                 next_catalogs.append(catalog)
-        (_, filename) = tempfile.mkstemp(prefix="dpres-ipt-", suffix=".tmp")
         temp_catalog_path = xml_helpers.utils.construct_catalog_xml(
             filename=filename,
             base_path=sip_path,
@@ -416,6 +417,35 @@ def define_schema_catalog(sip_path, mets_tree):
             next_catalogs=next_catalogs)
 
     return temp_catalog_path, linking_catalog_path
+
+
+def collect_xml_schemas(mets_tree, catalog_path):
+    """Collect all XML schemas from the METS.
+
+    :mets_tree: Metadata as Elementree.Element
+    :returns: a dictionary of schema URIs and paths
+    """
+    schemas = {}
+    environment = None
+    for techmd in mets.iter_techmd(mets_tree):
+        environment = premis.parse_environment(techmd,
+                                               purpose='xml-schemas')
+    if environment:
+        for dependency in premis.parse_dependency(environment[0]):
+            parsed_name = premis.iter_elements(dependency,
+                                               'dependencyName').next().text
+            # Name as file path with leading slashes removed since name should
+            # always be a relative path
+            name = six.moves.urllib.parse.urlparse(parsed_name).path.strip('/')
+            (_, id_value) = premis.parse_identifier_type_value(
+                dependency, prefix='dependency')
+            # Add absolute path to catalog file if the value is a simple
+            # file path and not an URI
+            if not six.moves.urllib.parse.urlparse(id_value).scheme:
+                id_value = os.path.join(catalog_path, id_value)
+            schemas[id_value] = name
+
+    return schemas
 
 
 if __name__ == '__main__':

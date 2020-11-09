@@ -4,7 +4,6 @@ import os
 
 import mets
 import premis
-import six
 
 from ipt.utils import merge_dicts, uri_to_path, parse_mimetype
 import ipt.addml.addml
@@ -203,45 +202,3 @@ def premis_to_dict(premis_xml):
         premis_dict["format"]["version"] = format_version
 
     return premis_dict
-
-
-def collect_supplementary_filepaths(mets_tree, supplementary_type):
-    """Iterate files in a supplementary fileGrp and return
-    their file paths if they exist.
-
-    :mets_tree: Metadata as Elementree.Element
-    :supplementary_type: The type of supplementary files as a string
-    :returns: A list of supplementary file paths
-    """
-    filepaths = set()
-    for filegrp in mets.parse_filegrps(
-            mets_tree, use=SUPPLEMENTARY_TYPES[supplementary_type]):
-        for file_elem in mets.parse_files(filegrp):
-            for flocat in mets.parse_flocats(file_elem):
-                filepaths.add(mets.parse_href(flocat))
-
-    return list(filepaths)
-
-
-def collect_xml_schemas(mets_tree):
-    """Collect all XML schemas from the METS.
-
-    :mets_tree: Metadata as Elementree.Element
-    :returns: a dictionary of schema URIs and paths
-    """
-    schemas = {}
-    environment = None
-    for techmd in mets.iter_techmd(mets_tree):
-        environment = premis.parse_environment(techmd,
-                                               purpose='xml-schemas')
-    if environment:
-        for dependency in premis.parse_dependency(environment[0]):
-            name = premis.iter_elements(dependency,
-                                        'dependencyName').next().text
-            if six.moves.urllib.parse.urlparse(name).scheme == 'file':
-                name = name[len('file:'):].strip("/")
-            (_, value) = premis.parse_identifier_type_value(
-                dependency, prefix='dependency')
-            schemas[value] = name
-
-    return schemas
