@@ -412,7 +412,7 @@ def define_schema_catalog(sip_path, catalog_path, mets_tree):
     # Create a catalog file if xml_schemas were found in the metadata
     if xml_schemas:
         next_catalogs = []
-        if os.path.exists(catalog_path):
+        if os.path.isfile(catalog_path):
             next_catalogs.append(catalog_path)
         temp_catalog_path = xml_helpers.utils.construct_catalog_xml(
             filename=filename,
