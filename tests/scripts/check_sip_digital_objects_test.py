@@ -424,7 +424,14 @@ def test_define_schema_catalog():
                       namespaces=ns)[0] == 'data/local.xsd'
 
 
-def test_collect_xml_schemas():
+@pytest.mark.parametrize(('name', 'id_value'), [
+    ('schemas/my_schema.xsd', 'http://localhost/my_schema.xsd'),
+    ('file:///schemas/my_schema.xsd', 'file://localhost/my_schema.xsd'),
+    ('file:///schemas/my_schema.xsd', 'my_schema.xsd'),
+], ids=('Name is local path, identifier is http URI',
+        'Name and identifier are both file URIs',
+        'Name is file URI, identifier is local path'))
+def test_collect_xml_schemas(name, id_value):
     """Tests the collect_xml_schemas function."""
     xml = '<mets:mets xmlns:mets="http://www.loc.gov/METS/" ' \
           'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' \
@@ -433,16 +440,23 @@ def test_collect_xml_schemas():
           'xsi:type="premis:representation"><premis:environment>' \
           '<premis:environmentPurpose>xml-schemas' \
           '</premis:environmentPurpose><premis:dependency>' \
-          '<premis:dependencyName>schemas/my_schema.xsd' \
+          '<premis:dependencyName>{name}' \
           '</premis:dependencyName><premis:dependencyIdentifier>' \
           '<premis:dependencyIdentifierType>URI' \
           '</premis:dependencyIdentifierType>' \
-          '<premis:dependencyIdentifierValue>http://localhost/my_schema.xsd' \
+          '<premis:dependencyIdentifierValue>{id_value}' \
           '</premis:dependencyIdentifierValue></premis:dependencyIdentifier>' \
           '</premis:dependency></premis:environment></premis:object>' \
           '</mets:xmlData></mets:mdWrap></mets:techMD>' \
-          '</mets:amdSec></mets:mets>'
+          '</mets:amdSec></mets:mets>'.format(name=name, id_value=id_value)
 
     schemas = collect_xml_schemas(ET.fromstring(xml), '/tmp')
+
+    # The output name should be a path, not an URI (omit the "file:///")
+    if name.startswith('file'):
+        name = name[8:]
+    # The output identifier should include the catalog path if it isn't an URI
+    if not id_value.startswith(('file', 'http')):
+        id_value = os.path.join('/tmp', id_value)
     assert len(schemas) == 1
-    assert schemas['http://localhost/my_schema.xsd'] == 'schemas/my_schema.xsd'
+    assert schemas[id_value] == name

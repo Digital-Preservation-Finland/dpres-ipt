@@ -267,7 +267,7 @@ def validation(sip_path):
             mets_path = os.path.join(sip_path, 'mets.xml')
         mets_tree = xml_helpers.utils.readfile(mets_path)
 
-        # Check METS and contruct local catalog if schemas are found
+        # Check METS and construct local catalogs if schemas are found
         (temp_catalog_path, linking_catalog_path) = define_schema_catalog(
             sip_path, mets_tree)
 
@@ -384,7 +384,7 @@ def define_schema_catalog(sip_path, mets_tree):
     are found, a temporary catalog file is created containing the local
     schemas. Another temporary catalog file containing the catalog
     linkings, both from the SGML_CATALOG_FILES environment variable
-    and the temporary local catalog, is created.
+    and the temporary local catalog, is also created.
 
     :sip_path: The path to the SIP contents
     :mets_tree: The METS metadata as an Elementtree.Element
@@ -425,6 +425,12 @@ def collect_xml_schemas(mets_tree, catalog_path):
     a dictionary with the schemaLocations as keys and the schema paths
     as values. The schemaLocations can either be URIs or paths to
     files.
+
+    The XML schema catalog mainly understands URIs when mapping
+    locations to paths. If a local file path is used without an URI
+    syntax, the catalog needs to read the file paths as relative
+    locations from the catalog file itself in order to rewrite the
+    URI prefixes properly.
 
     :mets_tree: Metadata as Elementree.Element
     :catalog_path: The absolute path to the temporary catalog file
