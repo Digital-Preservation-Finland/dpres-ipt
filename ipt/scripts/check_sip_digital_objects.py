@@ -437,8 +437,8 @@ def collect_xml_schemas(mets_tree, catalog_path):
                                                purpose='xml-schemas')
     if environment:
         for dependency in premis.parse_dependency(environment[0]):
-            parsed_name = premis.iter_elements(dependency,
-                                               'dependencyName').next().text
+            parsed_name = next(premis.iter_elements(dependency,
+                                                    'dependencyName')).text
             # Name as file path with leading slashes removed since name should
             # always be a relative path
             name = six.moves.urllib.parse.urlparse(parsed_name).path.strip('/')
