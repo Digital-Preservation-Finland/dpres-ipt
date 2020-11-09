@@ -389,7 +389,8 @@ def define_schema_catalog(sip_path, mets_tree):
     :sip_path: The path to the SIP contents
     :mets_tree: The METS metadata as an Elementtree.Element
 
-    :returns: The absolute path to the linking catalog file
+    :returns: A tuple of absolute paths to the catalog file and the
+              linking catalog file
     """
     temp_catalog_path = None
     linking_catalog_path = None
@@ -420,10 +421,14 @@ def define_schema_catalog(sip_path, mets_tree):
 
 
 def collect_xml_schemas(mets_tree, catalog_path):
-    """Collect all XML schemas from the METS.
+    """Collect all XML schemas from the METS. The schemas are ordered as
+    a dictionary with the schemaLocations as keys and the schema paths
+    as values. The schemaLocations can either be URIs or paths to
+    files.
 
     :mets_tree: Metadata as Elementree.Element
-    :returns: a dictionary of schema URIs and paths
+    :catalog_path: The absolute path to the temporary catalog file
+    :returns: a dictionary of schema locations and paths
     """
     schemas = {}
     environment = None
