@@ -12,11 +12,6 @@ import ipt.audiomd.audiomd
 from ipt.six_utils import ensure_text
 
 
-SUPPLEMENTARY_TYPES = {
-    'xml_schemas': 'fi-preservation-xml-schemas'
-}
-
-
 def mdwrap_to_metadata_info(mdwrap_element):
     """Extract metadata_info dict from mdwrap element.
 
