@@ -233,6 +233,7 @@ def validation(sip_path, catalog_path):
     Validate all files enumerated in mets.xml files.
 
     :sip_path: Path to the directory which contains the mets.xml file
+    :catalog_path: Path to a XML catalog file
     :yields: {
                 'metadata_info': metadata_info,
                 'is_valid': Boolean which is True iff all validation components
@@ -395,6 +396,7 @@ def define_schema_catalog(sip_path, catalog_path, mets_tree):
     and the temporary local catalog, is also created.
 
     :sip_path: The path to the SIP contents
+    :catalog_path: The path to a catalog file
     :mets_tree: The METS metadata as an Elementtree.Element
 
     :returns: A tuple of absolute paths to the catalog file and the
