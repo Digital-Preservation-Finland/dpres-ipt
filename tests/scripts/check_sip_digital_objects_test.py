@@ -324,7 +324,7 @@ def test_native_marked():
     or invalid according to the normal rules.
     """
 
-    collection = [result for result in validation(None)]
+    collection = [result for result in validation(None, None)]
     assert (['no-file-format-validation' in result['metadata_info']['use'] for
              result in collection] == [False, False, True, False])
     assert ([result['is_valid'] for result in collection] ==
@@ -370,7 +370,7 @@ def patch_scraper_identify(mimetype='', version=''):
 def test_metadata_info_erros():
     """Test that when mets has errors, other validation steps are skipped."""
 
-    results = [x for x in validation(None)]
+    results = [x for x in validation(None, None)]
     assert len(results) == 1
 
     result = results[0]
@@ -403,18 +403,23 @@ def test_join_validation_results():
     assert joined2['extensions'] == [extension1]
 
 
-def test_define_schema_catalog():
+@pytest.mark.parametrize(('catalog_path', 'nextcatalog_count'), [
+    ('non-existing-file', 1),
+    ('tests/data/xml/catalog_main.xml', 2)
+])
+def test_define_schema_catalog(catalog_path, nextcatalog_count):
     """Tests the define_schema_catalog function."""
 
     sip_path = 'tests/data/sips/valid_1.7.1_xml_local_schemas/'
     mets_tree = ET.parse(os.path.join(sip_path, 'mets.xml')).getroot()
-    (catalog_path, linking_path) = define_schema_catalog(sip_path, mets_tree)
+    (catalog_path, linking_path) = define_schema_catalog(
+        sip_path, catalog_path, mets_tree)
     assert os.path.isfile(catalog_path)
     assert os.path.isfile(linking_path)
     root = ET.parse(linking_path).getroot()
     ns = {'catalog': 'urn:oasis:names:tc:entity:xmlns:xml:catalog'}
     assert len(root.xpath('./catalog:nextCatalog[@catalog]',
-                          namespaces=ns)) == 1
+                          namespaces=ns)) == nextcatalog_count
     root = ET.parse(catalog_path).getroot()
     assert len(root.xpath('./catalog:rewriteURI',
                           namespaces=ns)) == 1

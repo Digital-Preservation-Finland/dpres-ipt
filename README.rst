@@ -62,11 +62,14 @@ See the schematron files from: https://github.com/Digital-Preservation-Finland/d
 
 To validate digital objects in an information package::
 
-        python ipt/scripts/check_sip_digital_objects.py <package directory> <linking_type> <linking_value>
+        python ipt/scripts/check_sip_digital_objects.py <package directory> <linking_type> <linking_value> -c <catalog_path>
 
 Parameters <linking_type> and <linking_value> give values to PREMIS <relatedObjectIdentifierType> and
 <relatedObjectIdentifierValues> elements in the output. If you are not planning to use these, you
 may give random strings.
+
+The option <catalog_path> can be given if local XML catalog files are to be used in the validation of
+XML files.
 
 To check fixity of digital objects in an information package::
 

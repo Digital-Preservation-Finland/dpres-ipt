@@ -1,3 +1,9 @@
+Release 0.90
+
+NEW:
+Support for local schema files and catalogs in XML validation. New option --catalog_path
+is added to check-sip-digital-objects script to support this.
+
 Release 0.35
 
 NEW:

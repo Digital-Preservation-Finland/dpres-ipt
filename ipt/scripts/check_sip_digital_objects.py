@@ -29,7 +29,8 @@ def main(arguments=None):
 
     args = parse_arguments(arguments)
     report = validation_report(
-        validation(args.sip_path),
+        validation(args.sip_path,
+                   args.catalog_path),
         args.linking_sip_type,
         args.linking_sip_id)
 
@@ -43,10 +44,17 @@ def main(arguments=None):
 
 def parse_arguments(arguments):
     """ Create arguments parser and return parsed command line argumets"""
+    default_path = (
+        '/etc/xml/dpres-xml-schemas/schema_catalogs/catalog_main.xml')
+
     parser = argparse.ArgumentParser()
     parser.add_argument('sip_path', help='Path to information package')
     parser.add_argument('linking_sip_type', default=' ')
     parser.add_argument('linking_sip_id', default=' ')
+    parser.add_argument('-c', '--catalog_path', dest='catalog_path',
+                        default=default_path,
+                        help='Full path to XML catalog file',
+                        metavar='FILE')
 
     return parser.parse_args(arguments)
 
@@ -220,7 +228,7 @@ def join_validation_results(metadata_info, results):
     }
 
 
-def validation(sip_path):
+def validation(sip_path, catalog_path):
     """
     Validate all files enumerated in mets.xml files.
 
@@ -269,7 +277,7 @@ def validation(sip_path):
 
         # Check METS and construct local catalogs if schemas are found
         (temp_catalog_path, linking_catalog_path) = define_schema_catalog(
-            sip_path, mets_tree)
+            sip_path, catalog_path, mets_tree)
 
     else:
         mets_path = sip_path
@@ -379,7 +387,7 @@ def validation_report(results, linking_sip_type, linking_sip_id):
     return premis.premis(child_elements=child_elements)
 
 
-def define_schema_catalog(sip_path, mets_tree):
+def define_schema_catalog(sip_path, catalog_path, mets_tree):
     """Checks the METS XML for existence of local schemas. If these
     are found, a temporary catalog file is created containing the local
     schemas. Another temporary catalog file containing the catalog
@@ -402,10 +410,8 @@ def define_schema_catalog(sip_path, mets_tree):
     # Create a catalog file if xml_schemas were found in the metadata
     if xml_schemas:
         next_catalogs = []
-        existing_catalogs = os.environ.get('SGML_CATALOG_FILES')
-        if existing_catalogs:
-            for catalog in existing_catalogs.split(':'):
-                next_catalogs.append(catalog)
+        if os.path.exists(catalog_path):
+            next_catalogs.append(catalog_path)
         temp_catalog_path = xml_helpers.utils.construct_catalog_xml(
             filename=filename,
             base_path=sip_path,
