@@ -228,11 +228,12 @@ def join_validation_results(metadata_info, results):
     }
 
 
-def validation(sip_path, catalog_path):
+def validation(mets_path, catalog_path):
     """
     Validate all files enumerated in mets.xml files.
 
-    :sip_path: Path to the directory which contains the mets.xml file
+    :mets_path: Path to the directory which contains the mets.xml file
+                or the full path to mets.xml file itself
     :catalog_path: Path to a XML catalog file
     :yields: {
                 'metadata_info': metadata_info,
@@ -268,20 +269,26 @@ def validation(sip_path, catalog_path):
             results.append(check_metadata_match(metadata_info, streams))
         return join_validation_results(metadata_info, results)
 
+    sip_path = mets_path
     mets_tree = None
     temp_catalog_path = None
     linking_catalog_path = None
-    if sip_path is not None:
-        if os.path.isdir(sip_path):
-            mets_path = os.path.join(sip_path, 'mets.xml')
+
+    if mets_path is not None:
+
+        # If the mets_path is a directory path, add mets.xml to mets_path,
+        # otherwise set the directory path as the sip_path
+        if os.path.isdir(mets_path):
+            mets_path = os.path.join(mets_path, 'mets.xml')
+        else:
+            sip_path = os.path.dirname(mets_path)
+
         mets_tree = xml_helpers.utils.readfile(mets_path)
 
         # Check METS and construct local catalogs if schemas are found
         (temp_catalog_path, linking_catalog_path) = define_schema_catalog(
             sip_path, catalog_path, mets_tree)
 
-    else:
-        mets_path = sip_path
     for metadata_info in iter_metadata_info(mets_tree,
                                             mets_path,
                                             catalog_path=linking_catalog_path):
