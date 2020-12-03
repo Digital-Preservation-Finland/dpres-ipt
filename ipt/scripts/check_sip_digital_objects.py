@@ -414,7 +414,8 @@ def define_schema_catalog(sip_path, catalog_path, mets_tree):
 
     (_, filename) = tempfile.mkstemp(prefix="dpres-ipt-", suffix=".tmp")
     xml_schemas = collect_xml_schemas(
-        mets_tree=mets_tree, catalog_path=os.path.dirname(filename))
+        mets_tree=mets_tree, catalog_path=os.path.dirname(filename),
+        sip_path=sip_path)
 
     # Create a catalog file if xml_schemas were found in the metadata
     if xml_schemas:
@@ -435,7 +436,7 @@ def define_schema_catalog(sip_path, catalog_path, mets_tree):
     return temp_catalog_path, linking_catalog_path
 
 
-def collect_xml_schemas(mets_tree, catalog_path):
+def collect_xml_schemas(mets_tree, catalog_path, sip_path):
     """Collect all XML schemas from the METS. The schemas are ordered as
     a dictionary with the schemaLocations as keys and the schema paths
     as values. The schemaLocations can either be URIs or paths to
@@ -449,6 +450,7 @@ def collect_xml_schemas(mets_tree, catalog_path):
 
     :mets_tree: Metadata as Elementree.Element
     :catalog_path: The absolute path to the temporary catalog file
+    :sip_path: The path to the SIP contents
     :returns: a dictionary of schema locations and paths
     """
     schemas = {}
@@ -460,16 +462,24 @@ def collect_xml_schemas(mets_tree, catalog_path):
         for dependency in premis.parse_dependency(environment[0]):
             parsed_name = next(premis.iter_elements(dependency,
                                                     'dependencyName')).text
-            # Name as file path with leading slashes removed since name should
-            # always be a relative path
-            name = six.moves.urllib.parse.urlparse(parsed_name).path.strip('/')
+
+            # Schema_path as file path with leading slashes removed since
+            # schema_path should always be a relative path
+            schema_path = six.moves.urllib.parse.urlparse(
+                parsed_name).path.lstrip('/')
+            # Check that illegal paths pointing outside the SIP don't exist,
+            # i.e. skip schemas with illegal paths
+            if not os.path.abspath(
+                    os.path.join(sip_path, schema_path)).startswith(sip_path):
+                continue
+
             (_, id_value) = premis.parse_identifier_type_value(
                 dependency, prefix='dependency')
             # Add absolute path to catalog file if the value is a simple
             # file path and not an URI
             if not six.moves.urllib.parse.urlparse(id_value).scheme:
                 id_value = os.path.join(catalog_path, id_value)
-            schemas[id_value] = name
+            schemas[id_value] = schema_path
 
     return schemas
 
