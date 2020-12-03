@@ -470,7 +470,8 @@ def collect_xml_schemas(mets_tree, catalog_path, sip_path):
             # Check that illegal paths pointing outside the SIP don't exist,
             # i.e. skip schemas with illegal paths
             if not os.path.abspath(
-                    os.path.join(sip_path, schema_path)).startswith(sip_path):
+                    os.path.join(sip_path, schema_path)).startswith(
+                        os.path.abspath(sip_path)):
                 continue
 
             (_, id_value) = premis.parse_identifier_type_value(

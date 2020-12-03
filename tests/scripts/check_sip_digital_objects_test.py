@@ -455,7 +455,7 @@ def test_collect_xml_schemas(name, id_value):
           '</mets:xmlData></mets:mdWrap></mets:techMD>' \
           '</mets:amdSec></mets:mets>'.format(name=name, id_value=id_value)
 
-    schemas = collect_xml_schemas(ET.fromstring(xml), '/tmp')
+    schemas = collect_xml_schemas(ET.fromstring(xml), '/tmp', '/tmp')
 
     # The output name should be a path, not an URI (omit the "file:///")
     if name.startswith('file'):
