@@ -431,10 +431,10 @@ def test_define_schema_catalog(catalog_path, nextcatalog_count):
 
 @pytest.mark.parametrize(('name', 'id_value'), [
     ('schemas/my_schema.xsd', 'http://localhost/my_schema.xsd'),
-    ('file:///schemas/my_schema.xsd', 'file://localhost/my_schema.xsd'),
+    ('file:///schemas/my%20schema.xsd', 'file://localhost/my+schema.xsd'),
     ('file:///schemas/my_schema.xsd', 'my_schema.xsd'),
 ], ids=('Name is local path, identifier is http URI',
-        'Name and identifier are both file URIs',
+        'Name and identifier are both file URIs, name is URL encoded',
         'Name is file URI, identifier is local path'))
 def test_collect_xml_schemas(name, id_value):
     """Tests the collect_xml_schemas function."""
@@ -464,4 +464,5 @@ def test_collect_xml_schemas(name, id_value):
     if not id_value.startswith(('file', 'http')):
         id_value = os.path.join('/tmp', id_value)
     assert len(schemas) == 1
-    assert schemas[id_value] == name
+    # URL encoded name should be unquoted in the schemas dictionary
+    assert schemas[id_value] == name.replace('%20', ' ')
