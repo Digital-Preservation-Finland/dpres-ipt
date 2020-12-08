@@ -450,8 +450,8 @@ def collect_xml_schemas(mets_tree, catalog_path, sip_path):
     schemas = {}
     environment = None
     for techmd in mets.iter_techmd(mets_tree):
-        environment = premis.parse_environment(techmd,
-                                               purpose='xml-schemas')
+        environment = premis.environment_with_purpose(techmd,
+                                                      purpose='xml-schemas')
     if environment:
         for dependency in premis.parse_dependency(environment[0]):
             parsed_name = next(premis.iter_elements(dependency,
