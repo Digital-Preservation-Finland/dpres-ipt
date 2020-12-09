@@ -412,21 +412,21 @@ def test_define_schema_catalog(catalog_path, nextcatalog_count):
 
     sip_path = 'tests/data/sips/valid_1.7.1_xml_local_schemas/'
     mets_tree = ET.parse(os.path.join(sip_path, 'mets.xml')).getroot()
-    (catalog_path, linking_path) = define_schema_catalog(
-        sip_path, catalog_path, mets_tree)
-    assert os.path.isfile(catalog_path)
-    assert os.path.isfile(linking_path)
-    root = ET.parse(linking_path).getroot()
-    ns = {'catalog': 'urn:oasis:names:tc:entity:xmlns:xml:catalog'}
-    assert len(root.xpath('./catalog:nextCatalog[@catalog]',
-                          namespaces=ns)) == nextcatalog_count
-    root = ET.parse(catalog_path).getroot()
-    assert len(root.xpath('./catalog:rewriteURI',
-                          namespaces=ns)) == 1
-    assert 'loucalll.xsd' in root.xpath('./catalog:rewriteURI/@uriStartString',
-                                        namespaces=ns)[0]
-    assert root.xpath('./catalog:rewriteURI/@rewritePrefix',
-                      namespaces=ns)[0] == 'data/local.xsd'
+    with define_schema_catalog(
+            sip_path, catalog_path, mets_tree) as linking_path:
+        #assert os.path.isfile(catalog_path)
+        assert os.path.isfile(linking_path)
+        root = ET.parse(linking_path).getroot()
+        ns = {'catalog': 'urn:oasis:names:tc:entity:xmlns:xml:catalog'}
+        assert len(root.xpath('./catalog:nextCatalog[@catalog]',
+                              namespaces=ns)) == nextcatalog_count
+    #root = ET.parse(catalog_path).getroot()
+    #assert len(root.xpath('./catalog:rewriteURI',
+    #                      namespaces=ns)) == 1
+    #assert 'loucalll.xsd' in root.xpath('./catalog:rewriteURI/@uriStartString',
+    #                                    namespaces=ns)[0]
+    #assert root.xpath('./catalog:rewriteURI/@rewritePrefix',
+    #                  namespaces=ns)[0] == 'data/local.xsd'
 
 
 @pytest.mark.parametrize(('name', 'id_value'), [

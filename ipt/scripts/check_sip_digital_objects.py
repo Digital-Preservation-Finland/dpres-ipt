@@ -8,13 +8,14 @@ import datetime
 import os
 import sys
 import uuid
+from contextlib import contextmanager
 import tempfile
 from six.moves.urllib.parse import unquote_plus, urlparse
 
 import mets
 import premis
 import xml_helpers.utils
-import xml_helpers.schema_catalog
+from xml_helpers.schema_catalog import construct_catalog_xml
 from file_scraper.scraper import Scraper
 
 from ipt.comparator.utils import iter_metadata_info
@@ -271,7 +272,6 @@ def validation(mets_path, catalog_path):
         return join_validation_results(metadata_info, results)
 
     mets_tree = None
-    temp_catalog_path = None
     linking_catalog_path = None
 
     if mets_path is not None:
@@ -280,19 +280,14 @@ def validation(mets_path, catalog_path):
             mets_path = os.path.join(mets_path, 'mets.xml')
         mets_tree = xml_helpers.utils.readfile(mets_path)
 
-        # Check METS and construct local catalogs if schemas are found
-        (temp_catalog_path, linking_catalog_path) = define_schema_catalog(
-            os.path.dirname(mets_path), catalog_path, mets_tree)
-
-    for metadata_info in iter_metadata_info(mets_tree,
-                                            mets_path,
-                                            catalog_path=linking_catalog_path):
-        yield _validate(metadata_info)
-
-    # Remove constructed catalogs after validation
-    for filepath in [temp_catalog_path, linking_catalog_path]:
-        if filepath:
-            os.remove(filepath)
+    # Construct local catalogs if schemas are found
+    with define_schema_catalog(
+            mets_path,
+            catalog_path,
+            mets_tree) as linking_catalog_path:
+        for metadata_info in iter_metadata_info(
+                mets_tree, mets_path, catalog_path=linking_catalog_path):
+            yield _validate(metadata_info)
 
 
 def create_report_agent():
@@ -390,53 +385,73 @@ def validation_report(results, linking_sip_type, linking_sip_id):
     return premis.premis(child_elements=child_elements)
 
 
-def define_schema_catalog(sip_path, catalog_path, mets_tree):
+@contextmanager
+def define_schema_catalog(mets_path, catalog_path, mets_tree=None):
     """Checks the METS XML for existence of local schemas. If these
     are found, a temporary catalog file is created containing the local
     schemas. Another temporary catalog file containing the catalog
     linkings, both from the given existing catalog_path and the
     temporary local catalog, is also created.
 
-    :sip_path: The path to the SIP contents
+    :mets_path: The path to the mets.xml file
     :catalog_path: The path to a catalog file
     :mets_tree: The METS metadata as an Elementtree.Element
 
-    :returns: A tuple of absolute paths to the catalog file and the
-              linking catalog file
+    :yields: The absolute path to the linking catalog file or None
     """
     temp_catalog_path = None
     linking_catalog_path = None
 
-    (_, filename) = tempfile.mkstemp(prefix="dpres-ipt-", suffix=".tmp")
-    (_, linking_filename) = tempfile.mkstemp(prefix="dpres-ipt-",
+    # Processing is useless without METS XML
+    if mets_tree:
+        sip_path = os.path.dirname(mets_path)
+
+        # Use context manager for removal of temp files after processing
+        try:
+            (_, filename) = tempfile.mkstemp(prefix="dpres-ipt-",
                                              suffix=".tmp")
-    xml_schemas = collect_xml_schemas(
-        mets_tree=mets_tree, catalog_path=os.path.dirname(filename),
-        sip_path=sip_path)
+            (_, linking_filename) = tempfile.mkstemp(prefix="dpres-ipt-",
+                                                     suffix=".tmp")
+            xml_schemas = collect_xml_schemas(
+                mets_tree=mets_tree, catalog_path=os.path.dirname(filename),
+                sip_path=sip_path)
 
-    # Create a catalog file if xml_schemas were found in the metadata
-    if xml_schemas:
-        temp_catalog_path = os.path.abspath(filename)
-        linking_catalog_path = os.path.abspath(linking_filename)
-        next_catalogs = []
+            # Create a catalog file if xml_schemas were found in the metadata
+            if xml_schemas:
 
-        # First append existing catalog file to next_catalogs
-        if os.path.isfile(catalog_path):
-            next_catalogs.append(catalog_path)
+                temp_catalog_path = os.path.abspath(filename)
+                linking_catalog_path = os.path.abspath(linking_filename)
+                next_catalogs = []
 
-        catalog_xml = xml_helpers.schema_catalog.construct_catalog_xml(
-            base_path=sip_path,
-            rewrite_rules=xml_schemas)
-        with open(temp_catalog_path, 'w') as outfile:
-            outfile.write(xml_helpers.utils.serialize(catalog_xml))
-        next_catalogs.append(temp_catalog_path)
+                # First append existing catalog file to next_catalogs
+                if catalog_path and os.path.isfile(catalog_path):
+                    next_catalogs.append(catalog_path)
 
-        linking_catalog_xml = xml_helpers.schema_catalog.construct_catalog_xml(
-            next_catalogs=next_catalogs)
-        with open(linking_catalog_path, 'w') as outfile:
-            outfile.write(xml_helpers.utils.serialize(linking_catalog_xml))
+                catalog_xml = construct_catalog_xml(
+                    base_path=sip_path,
+                    rewrite_rules=xml_schemas)
+                with open(temp_catalog_path, 'w') as outfile:
+                    outfile.write(xml_helpers.utils.serialize(catalog_xml))
+                next_catalogs.append(temp_catalog_path)
 
-    return temp_catalog_path, linking_catalog_path
+                linking_catalog_xml = construct_catalog_xml(
+                    next_catalogs=next_catalogs)
+                with open(linking_catalog_path, 'w') as outfile:
+                    outfile.write(xml_helpers.utils.serialize(
+                        linking_catalog_xml))
+
+                yield linking_catalog_path
+            else:
+                yield None
+
+        # Remove constructed catalogs after validation
+        finally:
+            for filepath in [temp_catalog_path, linking_catalog_path]:
+                if filepath:
+                    os.remove(filepath)
+
+    else:
+        yield None
 
 
 def collect_xml_schemas(mets_tree, catalog_path, sip_path):
@@ -473,7 +488,7 @@ def collect_xml_schemas(mets_tree, catalog_path, sip_path):
             # i.e. skip schemas with illegal paths
             if not os.path.abspath(
                     os.path.join(sip_path, schema_path)).startswith(
-                        os.path.abspath(sip_path)):
+                os.path.abspath(sip_path)):
                 continue
 
             (_, id_value) = premis.parse_identifier_type_value(
