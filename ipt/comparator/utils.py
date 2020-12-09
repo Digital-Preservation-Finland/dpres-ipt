@@ -144,7 +144,7 @@ def iter_metadata_info(mets_tree, mets_path, catalog_path=None):
 
         metadata_info['audio_streams'] = []
         metadata_info['video_streams'] = []
-        if catalog_path:
+        if metadata_info['format']['mimetype'] == 'text/xml' and catalog_path:
             metadata_info['catalog_path'] = catalog_path
         for stream_elem in mets.parse_streams(element):
 
