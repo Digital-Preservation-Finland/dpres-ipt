@@ -14,6 +14,7 @@ from six.moves.urllib.parse import unquote_plus, urlparse
 import mets
 import premis
 import xml_helpers.utils
+import xml_helpers.schema_catalog
 from file_scraper.scraper import Scraper
 
 from ipt.comparator.utils import iter_metadata_info
@@ -393,8 +394,8 @@ def define_schema_catalog(sip_path, catalog_path, mets_tree):
     """Checks the METS XML for existence of local schemas. If these
     are found, a temporary catalog file is created containing the local
     schemas. Another temporary catalog file containing the catalog
-    linkings, both from the SGML_CATALOG_FILES environment variable
-    and the temporary local catalog, is also created.
+    linkings, both from the given existing catalog_path and the
+    temporary local catalog, is also created.
 
     :sip_path: The path to the SIP contents
     :catalog_path: The path to a catalog file
@@ -407,25 +408,33 @@ def define_schema_catalog(sip_path, catalog_path, mets_tree):
     linking_catalog_path = None
 
     (_, filename) = tempfile.mkstemp(prefix="dpres-ipt-", suffix=".tmp")
+    (_, linking_filename) = tempfile.mkstemp(prefix="dpres-ipt-",
+                                             suffix=".tmp")
     xml_schemas = collect_xml_schemas(
         mets_tree=mets_tree, catalog_path=os.path.dirname(filename),
         sip_path=sip_path)
 
     # Create a catalog file if xml_schemas were found in the metadata
     if xml_schemas:
+        temp_catalog_path = os.path.abspath(filename)
+        linking_catalog_path = os.path.abspath(linking_filename)
         next_catalogs = []
+
+        # First append existing catalog file to next_catalogs
         if os.path.isfile(catalog_path):
             next_catalogs.append(catalog_path)
-        temp_catalog_path = xml_helpers.utils.construct_catalog_xml(
-            filename=filename,
+
+        catalog_xml = xml_helpers.schema_catalog.construct_catalog_xml(
             base_path=sip_path,
             rewrite_rules=xml_schemas)
-        (_, linking_filename) = tempfile.mkstemp(prefix="dpres-ipt-",
-                                                 suffix=".tmp")
+        with open(temp_catalog_path, 'w') as outfile:
+            outfile.write(xml_helpers.utils.serialize(catalog_xml))
         next_catalogs.append(temp_catalog_path)
-        linking_catalog_path = xml_helpers.utils.construct_catalog_xml(
-            filename=linking_filename,
+
+        linking_catalog_xml = xml_helpers.schema_catalog.construct_catalog_xml(
             next_catalogs=next_catalogs)
+        with open(linking_catalog_path, 'w') as outfile:
+            outfile.write(xml_helpers.utils.serialize(linking_catalog_xml))
 
     return temp_catalog_path, linking_catalog_path
 
