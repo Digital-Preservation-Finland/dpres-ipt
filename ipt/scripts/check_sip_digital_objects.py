@@ -456,12 +456,12 @@ def collect_xml_schemas(mets_tree, catalog_path, sip_path):
     :returns: a dictionary of schema locations and paths
     """
     schemas = {}
-    environment = None
+    environments = None
     for techmd in mets.iter_techmd(mets_tree):
-        environment = premis.environment_with_purpose(techmd,
-                                                      purpose='xml-schemas')
-    if environment:
-        for dependency in premis.parse_dependency(environment[0]):
+        environments = premis.iter_environments(techmd)
+    for environment in premis.environments_with_purpose(environments,
+                                                        purpose='xml-schemas'):
+        for dependency in premis.parse_dependency(environment):
             parsed_name = next(premis.iter_elements(dependency,
                                                     'dependencyName')).text
 
