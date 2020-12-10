@@ -399,57 +399,41 @@ def define_schema_catalog(mets_path, catalog_path, mets_tree=None):
 
     :yields: The absolute path to the linking catalog file or None
     """
-    temp_catalog_path = None
-    linking_catalog_path = None
 
     # Processing is useless without METS XML
     if mets_tree:
         sip_path = os.path.dirname(mets_path)
 
         # Use context manager for removal of temp files after processing
-        try:
-            (_, filename) = tempfile.mkstemp(prefix="dpres-ipt-",
-                                             suffix=".tmp")
-            (_, linking_filename) = tempfile.mkstemp(prefix="dpres-ipt-",
-                                                     suffix=".tmp")
+        with tempfile.NamedTemporaryFile(
+                suffix='.tmp', prefix='dpres-ipt-') as catalog_file:
             xml_schemas = collect_xml_schemas(
-                mets_tree=mets_tree, catalog_path=os.path.dirname(filename),
+                mets_tree=mets_tree,
+                catalog_path=os.path.dirname(catalog_file.name),
                 sip_path=sip_path)
-
-            # Create a catalog file if xml_schemas were found in the metadata
             if xml_schemas:
-
-                temp_catalog_path = os.path.abspath(filename)
-                linking_catalog_path = os.path.abspath(linking_filename)
                 next_catalogs = []
-
                 # First append existing catalog file to next_catalogs
                 if catalog_path and os.path.isfile(catalog_path):
                     next_catalogs.append(catalog_path)
-
                 catalog_xml = construct_catalog_xml(
                     base_path=sip_path,
                     rewrite_rules=xml_schemas)
-                with open(temp_catalog_path, 'w') as outfile:
-                    outfile.write(xml_helpers.utils.serialize(catalog_xml))
-                next_catalogs.append(temp_catalog_path)
+                catalog_file.write(xml_helpers.utils.serialize(catalog_xml))
+                # TemporaryFile has to have read()-called to persist on disk.
+                catalog_file.read()
+                next_catalogs.append(catalog_file.name)
 
-                linking_catalog_xml = construct_catalog_xml(
-                    next_catalogs=next_catalogs)
-                with open(linking_catalog_path, 'w') as outfile:
-                    outfile.write(xml_helpers.utils.serialize(
-                        linking_catalog_xml))
-
-                yield linking_catalog_path
+                with tempfile.NamedTemporaryFile(
+                        suffix='.tmp', prefix='dpres-ipt-') as linking_file:
+                    linking_catalog_xml = construct_catalog_xml(
+                        next_catalogs=next_catalogs)
+                    linking_file.write(
+                        xml_helpers.utils.serialize(linking_catalog_xml))
+                    linking_file.read()
+                    yield linking_file.name
             else:
                 yield None
-
-        # Remove constructed catalogs after validation
-        finally:
-            for filepath in [temp_catalog_path, linking_catalog_path]:
-                if filepath:
-                    os.remove(filepath)
-
     else:
         yield None
 
