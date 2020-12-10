@@ -272,7 +272,6 @@ def validation(mets_path, catalog_path):
         return join_validation_results(metadata_info, results)
 
     mets_tree = None
-    linking_catalog_path = None
 
     if mets_path is not None:
         # If the mets_path is a directory path, add mets.xml to mets_path
@@ -397,7 +396,8 @@ def define_schema_catalog(mets_path, catalog_path, mets_tree=None):
     :catalog_path: The path to a catalog file
     :mets_tree: The METS metadata as an Elementtree.Element
 
-    :yields: The absolute path to the linking catalog file or None
+    :yields: The absolute path to the linking catalog file or empty string if
+        no temporary files are created.
     """
 
     # Processing is useless without METS XML
@@ -433,9 +433,9 @@ def define_schema_catalog(mets_path, catalog_path, mets_tree=None):
                     linking_file.read()
                     yield linking_file.name
             else:
-                yield None
+                yield ''
     else:
-        yield None
+        yield ''
 
 
 def collect_xml_schemas(mets_tree, catalog_path, sip_path):
