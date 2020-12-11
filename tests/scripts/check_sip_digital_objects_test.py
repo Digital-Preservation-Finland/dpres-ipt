@@ -118,8 +118,17 @@ TESTCASES = [
      'expected_result': {
          'returncode': 0,
          'stdout': []}},
+    {'testcase': 'SIP with local schema that is not well-formed.',
+     'filename': 'invalid_1.7.1_xml_local_schema_not_wellformed',
+     'expected_result': {
+         'returncode': 117,
+         'stdout': ['ERROR: WXS schema']}},
+    {'testcase': 'SIP with local schema with missing schema link.',
+     'filename': 'invalid_1.7.1_xml_local_schema_invalid_schema_link',
+     'expected_result': {
+         'returncode': 117,
+         'stdout': ['ERROR: warning: failed to load external entity']}},
     ]
-
 """
 This list contains the following cases:
 (1) One validation is done for one digital object
