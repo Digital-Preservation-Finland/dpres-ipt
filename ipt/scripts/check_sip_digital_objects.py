@@ -285,8 +285,10 @@ def create_report_object(metadata_info, linking_sip_type, linking_sip_id):
     """Create premis element for digital object."""
     dep_id = premis.identifier(
         metadata_info['object_id']['type'],
-        metadata_info['object_id']['value'])
-    environ = premis.environment(dep_id)
+        metadata_info['object_id']['value'],
+        prefix='dependency')
+    dependency = premis.dependency(identifiers=[dep_id])
+    environ = premis.environment(child_elements=[dependency])
 
     related_id = premis.identifier(
         identifier_type=linking_sip_type,
