@@ -20,5 +20,5 @@ wand
 git+https://gitlab.ci.csc.fi/dpres/xml-helpers.git@develop#egg=xml_helpers
 git+https://gitlab.ci.csc.fi/dpres/mets.git@develop#egg=mets
 git+https://gitlab.ci.csc.fi/dpres/premis.git@develop#egg=premis
-git+https://gitlab.ci.csc.fi/dpres/file-scraper.git@develop#egg=file-scraper
+git+https://gitlab.ci.csc.fi/dpres/file-scraper.git@develop#egg=file_scraper
 git+https://gitlab.ci.csc.fi/dpres/fido.git@develop#egg=opf_fido
