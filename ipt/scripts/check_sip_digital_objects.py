@@ -279,14 +279,10 @@ def validation(mets_path, catalog_path):
             mets_path = os.path.join(mets_path, 'mets.xml')
         mets_tree = xml_helpers.utils.readfile(mets_path)
 
-    # Construct local catalogs if schemas are found
-    with define_schema_catalog(
-            mets_path,
-            catalog_path,
-            mets_tree) as linking_catalog_path:
-        for metadata_info in iter_metadata_info(
-                mets_tree, mets_path, catalog_path=linking_catalog_path):
-            yield _validate(metadata_info)
+    for metadata_info in iter_metadata_info(mets_tree=mets_tree,
+                                            mets_path=mets_path,
+                                            catalog_path=catalog_path):
+        yield _validate(metadata_info)
 
 
 def create_report_agent():
@@ -382,108 +378,6 @@ def validation_report(results, linking_sip_type, linking_sip_id):
         child_elements.append(report_event)
 
     return premis.premis(child_elements=child_elements)
-
-
-@contextmanager
-def define_schema_catalog(mets_path, catalog_path, mets_tree=None):
-    """Checks the METS XML for existence of local schemas. If these
-    are found, a temporary catalog file is created containing the local
-    schemas. Another temporary catalog file containing the catalog
-    linkings, both from the given existing catalog_path and the
-    temporary local catalog, is also created.
-
-    :mets_path: The path to the mets.xml file
-    :catalog_path: The path to a catalog file
-    :mets_tree: The METS metadata as an Elementtree.Element
-
-    :yields: The absolute path to the linking catalog file or empty string if
-        no temporary files are created.
-    """
-
-    # Processing is useless without METS XML
-    if mets_tree:
-        sip_path = os.path.dirname(mets_path)
-
-        # Use context manager for removal of temp files after processing
-        with tempfile.NamedTemporaryFile(
-                suffix='.tmp', prefix='dpres-ipt-') as catalog_file:
-            xml_schemas = collect_xml_schemas(
-                mets_tree=mets_tree,
-                catalog_path=os.path.dirname(catalog_file.name),
-                sip_path=sip_path)
-            if xml_schemas:
-                next_catalogs = []
-                # First append existing catalog file to next_catalogs
-                if catalog_path and os.path.isfile(catalog_path):
-                    next_catalogs.append(catalog_path)
-                catalog_xml = construct_catalog_xml(
-                    base_path=sip_path,
-                    rewrite_rules=xml_schemas)
-                catalog_file.write(xml_helpers.utils.serialize(catalog_xml))
-                # TemporaryFile has to have read()-called to persist on disk.
-                catalog_file.read()
-                next_catalogs.append(catalog_file.name)
-
-                with tempfile.NamedTemporaryFile(
-                        suffix='.tmp', prefix='dpres-ipt-') as linking_file:
-                    linking_catalog_xml = construct_catalog_xml(
-                        next_catalogs=next_catalogs)
-                    linking_file.write(
-                        xml_helpers.utils.serialize(linking_catalog_xml))
-                    linking_file.read()
-                    yield linking_file.name
-            else:
-                yield ''
-    else:
-        yield ''
-
-
-def collect_xml_schemas(mets_tree, catalog_path, sip_path):
-    """Collect all XML schemas from the METS. The schemas are ordered as
-    a dictionary with the schemaLocations as keys and the schema paths
-    as values. The schemaLocations can either be URIs or paths to
-    files.
-
-    The XML schema catalog mainly understands URIs when mapping
-    locations to paths. If a local file path is used without an URI
-    syntax, the catalog needs to read the file paths as relative
-    locations from the catalog file itself in order to rewrite the
-    URI prefixes properly.
-
-    :mets_tree: Metadata as Elementree.Element
-    :catalog_path: The absolute path to the temporary catalog file
-    :sip_path: The path to the SIP contents
-    :returns: a dictionary of schema locations and paths
-    """
-    schemas = {}
-    environments = None
-    for techmd in mets.iter_techmd(mets_tree):
-        environments = premis.iter_environments(techmd)
-    for environment in premis.environments_with_purpose(environments,
-                                                        purpose='xml-schemas'):
-        for dependency in premis.parse_dependency(environment):
-            parsed_name = next(premis.iter_elements(dependency,
-                                                    'dependencyName')).text
-
-            # Schema_path as unquoted file path with leading slashes removed
-            # since schema_path should always be a relative path
-            schema_path = unquote_plus(urlparse(parsed_name).path.lstrip('/'))
-            # Check that illegal paths pointing outside the SIP don't exist,
-            # i.e. skip schemas with illegal paths
-            if not os.path.abspath(
-                    os.path.join(sip_path, schema_path)).startswith(
-                os.path.abspath(sip_path)):
-                continue
-
-            (_, id_value) = premis.parse_identifier_type_value(
-                dependency, prefix='dependency')
-            # Add absolute path to catalog file if the value is a simple
-            # file path and not an URI
-            if not urlparse(id_value).scheme:
-                id_value = os.path.join(catalog_path, id_value)
-            schemas[id_value] = schema_path
-
-    return schemas
 
 
 if __name__ == '__main__':

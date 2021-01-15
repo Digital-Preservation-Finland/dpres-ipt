@@ -15,13 +15,13 @@ from tests import testcommon
 from tests.testcommon import shell
 
 # Module to test
-from ipt.scripts.check_sip_digital_objects import (main, validation,
+from ipt.scripts.check_sip_digital_objects import (main,
+                                                   validation,
                                                    validation_report,
                                                    make_result_dict,
-                                                   join_validation_results,
-                                                   collect_xml_schemas,
-                                                   define_schema_catalog)
+                                                   join_validation_results)
 import ipt.scripts.check_sip_digital_objects
+from ipt.scripts.create_schema_catalog import main as schema_main
 
 METSDIR = os.path.abspath(
     os.path.join(testcommon.settings.TESTDATADIR, 'mets'))
@@ -43,7 +43,7 @@ TESTCASES = [
          'returncode': 117,
          'stdout': ['ERROR: File {}/sips/invalid_1.7.1_missing_object/'
                     'data/valid_1.2.png does not exist.'
-                    .format(testcommon.settings.TESTDATADIR)]}},
+                        .format(testcommon.settings.TESTDATADIR)]}},
     {'testcase': 'Unsupported mimetype, with version.',
      'filename': 'invalid_1.7.1_unsupported_mimetype',
      'patch': {'mimetype': 'application/kissa',
@@ -66,7 +66,8 @@ TESTCASES = [
                'version': '3.1415'},
      'expected_result': {
          'returncode': 117,
-         'stdout': ["Predefined version '3.1415' and resulted version '1.01' mismatch."]}},
+         'stdout': [
+             "Predefined version '3.1415' and resulted version '1.01' mismatch."]}},
     {'testcase': 'Report alt-format when validating as primary mimetype.',
      'filename': 'valid_1.7.0_plaintext_alt_format',
      'expected_result': {
@@ -128,7 +129,7 @@ TESTCASES = [
      'expected_result': {
          'returncode': 117,
          'stdout': ['ERROR: warning: failed to load external entity']}},
-    ]
+]
 """
 This list contains the following cases:
 (1) One validation is done for one digital object
@@ -186,7 +187,7 @@ def test_testcases_stdout():
 @pytest.mark.parametrize(
     'case', TESTCASES, ids=[x['testcase'] for x in TESTCASES])
 @pytest.mark.usefixtures('monkeypatch_Popen')
-def test_check_sip_digital_objects(case, monkeypatch):
+def test_check_sip_digital_objects(case, tmpdir, monkeypatch):
     """
     Test for check_sip_digital_objects
     """
@@ -201,6 +202,15 @@ def test_check_sip_digital_objects(case, monkeypatch):
         testcommon.settings.TESTDATADIR, 'sips', case['filename'])
 
     arguments = [filename, 'preservation-sip-id', str(uuid.uuid4())]
+    # Schema cases need their own catalogs created by another script.
+    schema_cases = ('valid_1.7.1_xml_local_schemas',
+                    'invalid_1.7.1_xml_local_schema_invalid_schema_link')
+    if case['filename'] in schema_cases:
+        output = tmpdir.join('my_catalog_schema.xml').strpath
+        mets = os.path.join(filename, 'mets.xml')
+        shell.run_main(schema_main, [mets, filename, output])
+        arguments.append('-c')
+        arguments.append(output)
 
     (returncode, stdout, stderr) = shell.run_main(
         main, arguments)
@@ -339,6 +349,7 @@ def test_native_marked():
     assert ([result['is_valid'] for result in collection] ==
             [True, False, True, False])
 
+
 # TODO add test for native files needing to have a supported companion file?
 
 
@@ -410,68 +421,3 @@ def test_join_validation_results():
     assert joined2['messages'] == 'message1\nvalid'
     assert not joined2['errors']
     assert joined2['extensions'] == [extension1]
-
-
-@pytest.mark.parametrize(('catalog_path', 'nextcatalog_count'), [
-    ('non-existing-file', 1),
-    ('tests/data/xml/catalog_main.xml', 2)
-])
-def test_define_schema_catalog(catalog_path, nextcatalog_count):
-    """Tests the define_schema_catalog function."""
-
-    sip_path = 'tests/data/sips/valid_1.7.1_xml_local_schemas/'
-    mets_tree = ET.parse(os.path.join(sip_path, 'mets.xml')).getroot()
-    with define_schema_catalog(
-            sip_path, catalog_path, mets_tree) as linking_path:
-        #assert os.path.isfile(catalog_path)
-        assert os.path.isfile(linking_path)
-        root = ET.parse(linking_path).getroot()
-        ns = {'catalog': 'urn:oasis:names:tc:entity:xmlns:xml:catalog'}
-        assert len(root.xpath('./catalog:nextCatalog[@catalog]',
-                              namespaces=ns)) == nextcatalog_count
-    #root = ET.parse(catalog_path).getroot()
-    #assert len(root.xpath('./catalog:rewriteURI',
-    #                      namespaces=ns)) == 1
-    #assert 'loucalll.xsd' in root.xpath('./catalog:rewriteURI/@uriStartString',
-    #                                    namespaces=ns)[0]
-    #assert root.xpath('./catalog:rewriteURI/@rewritePrefix',
-    #                  namespaces=ns)[0] == 'data/local.xsd'
-
-
-@pytest.mark.parametrize(('name', 'id_value'), [
-    ('schemas/my_schema.xsd', 'http://localhost/my_schema.xsd'),
-    ('file:///schemas/my%20schema.xsd', 'file://localhost/my+schema.xsd'),
-    ('file:///schemas/my_schema.xsd', 'my_schema.xsd'),
-], ids=('Name is local path, identifier is http URI',
-        'Name and identifier are both file URIs, name is URL encoded',
-        'Name is file URI, identifier is local path'))
-def test_collect_xml_schemas(name, id_value):
-    """Tests the collect_xml_schemas function."""
-    xml = '<mets:mets xmlns:mets="http://www.loc.gov/METS/" ' \
-          'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' \
-          '<mets:amdSec><mets:techMD><mets:mdWrap><mets:xmlData>' \
-          '<premis:object xmlns:premis="info:lc/xmlns/premis-v2" '\
-          'xsi:type="premis:representation"><premis:environment>' \
-          '<premis:environmentPurpose>xml-schemas' \
-          '</premis:environmentPurpose><premis:dependency>' \
-          '<premis:dependencyName>{name}' \
-          '</premis:dependencyName><premis:dependencyIdentifier>' \
-          '<premis:dependencyIdentifierType>URI' \
-          '</premis:dependencyIdentifierType>' \
-          '<premis:dependencyIdentifierValue>{id_value}' \
-          '</premis:dependencyIdentifierValue></premis:dependencyIdentifier>' \
-          '</premis:dependency></premis:environment></premis:object>' \
-          '</mets:xmlData></mets:mdWrap></mets:techMD>' \
-          '</mets:amdSec></mets:mets>'.format(name=name, id_value=id_value)
-
-    schemas = collect_xml_schemas(ET.fromstring(xml), '/tmp', '/tmp')
-
-    # The output name should be a path, not an URI (omit the "file:///")
-    if name.startswith('file'):
-        name = name[8:]
-    # The output identifier should include the catalog path if it isn't an URI
-    if not id_value.startswith(('file', 'http')):
-        id_value = os.path.join('/tmp', id_value)
-    assert len(schemas) == 1
-    # URL encoded name should be unquoted in the schemas dictionary
-    assert schemas[id_value] == name.replace('%20', ' ')
