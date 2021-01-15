@@ -41,9 +41,10 @@ TESTCASES = [
      'filename': 'invalid_1.7.1_missing_object',
      'expected_result': {
          'returncode': 117,
-         'stdout': ['ERROR: File {}/sips/invalid_1.7.1_missing_object/'
-                    'data/valid_1.2.png does not exist.'
-                        .format(testcommon.settings.TESTDATADIR)]}},
+         'stdout': [
+             'ERROR: File {}/sips/invalid_1.7.1_missing_object/'
+             'data/valid_1.2.png does not exist.'.format(
+                 testcommon.settings.TESTDATADIR)]}},
     {'testcase': 'Unsupported mimetype, with version.',
      'filename': 'invalid_1.7.1_unsupported_mimetype',
      'patch': {'mimetype': 'application/kissa',
@@ -66,8 +67,8 @@ TESTCASES = [
                'version': '3.1415'},
      'expected_result': {
          'returncode': 117,
-         'stdout': [
-             "Predefined version '3.1415' and resulted version '1.01' mismatch."]}},
+         'stdout': [("Predefined version '3.1415' and "
+                     "resulted version '1.01' mismatch.")]}},
     {'testcase': 'Report alt-format when validating as primary mimetype.',
      'filename': 'valid_1.7.0_plaintext_alt_format',
      'expected_result': {
