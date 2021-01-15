@@ -19,7 +19,7 @@ def main(arguments=None):
     args = parse_arguments(arguments)
     result = _create_schema_catalog(mets=args.mets,
                                     sip=args.sip,
-                                    output=args.output,
+                                    output_path=args.output_path,
                                     catalog=args.catalog)
     return result
 
@@ -34,31 +34,33 @@ def parse_arguments(arguments):
     parser = argparse.ArgumentParser()
     parser.add_argument('mets',
                         metavar='METS',
-                        help='File path to read given METS file for schemas')
+                        help=('File path to METS document containing local '
+                              'schema linkings.'))
     parser.add_argument('sip',
                         metavar='SIP',
                         help='Path to information package')
-    parser.add_argument('output',
+    parser.add_argument('output_path',
                         metavar='OUTPUT',
                         help='Write the catalog to given file path')
     parser.add_argument(
         '-c', '--catalog',
         dest='catalog',
         default=default_path,
-        help='File path to another catalog to add to current schema catalog')
+        help=('File path to another existing (main) schema catalog to be '
+              'added to the schema catalog that is constructed.'))
 
     return parser.parse_args(arguments)
 
 
-def _create_schema_catalog(mets, sip, output, catalog):
+def _create_schema_catalog(mets, sip, output_path, catalog):
     """Create schema catalog based on given METS XML, and possibly catalog
     file.
 
     :param mets: METS XML file to fetch the schema URIs.
     :param sip: SIP path where all package content is located under.
-    :param output: File to create the schema catalog to.
+    :param output_path: File to create the schema catalog to.
     :param catalog: Catalog file to be added as nextCatalog entry.
-    :return:
+    :return: Integer 0 when no issue arises. 117 if METS file is missing.
     """
     try:
         mets_tree = xml_helpers.utils.readfile(mets)
@@ -72,7 +74,7 @@ def _create_schema_catalog(mets, sip, output, catalog):
         base_path=sip,
         rewrite_rules=schemas,
         next_catalogs=[catalog])
-    with open(output, 'wb') as out_file:
+    with open(output_path, 'wb') as out_file:
         out_file.write(xml_helpers.utils.serialize(catalog_xml))
     return 0
 
