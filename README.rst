@@ -75,6 +75,13 @@ To check fixity of digital objects in an information package::
 
         python ipt/scripts/check_sip_file_checksums.py <package directory>
 
+To create local XML catalog file::
+
+        python -m ipt/scripts/create_schema_catalog <mets_filepath> <sip_dirpath> <FILE>[-c <catalog_path>]
+
+The created local XML catalog file can be used together with
+*check_sip_digital_objects*.
+
 Copyright
 ---------
 Copyright (C) 2018 CSC - IT Center for Science Ltd.
