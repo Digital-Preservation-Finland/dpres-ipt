@@ -11,20 +11,23 @@ import mets
 import premis
 import xml_helpers.utils
 from xml_helpers.schema_catalog import construct_catalog_xml
+from ipt.six_utils import ensure_text
 
 
-def main():
+def main(arguments=None):
     """ The main method for create-schema-catalog script"""
-    args = parse_arguments()
-    _create_schema_catalog(mets=args.mets,
-                           sip=args.sip,
-                           output=args.output,
-                           catalog=args.catalog)
-    return 0
+    args = parse_arguments(arguments)
+    result = _create_schema_catalog(mets=args.mets,
+                                    sip=args.sip,
+                                    output=args.output,
+                                    catalog=args.catalog)
+    return result
 
 
-def parse_arguments():
-    """ Create arguments parser and return parsed command line arguments"""
+def parse_arguments(arguments):
+    """ Create arguments parser and return parsed command line arguments
+    :param arguments: Arguments given to the argparser.
+    """
     default_path = (
         '/etc/xml/dpres-xml-schemas/schema_catalogs/catalog_main.xml')
 
@@ -44,7 +47,7 @@ def parse_arguments():
         default=default_path,
         help='File path to another catalog to add to current schema catalog')
 
-    return parser.parse_args()
+    return parser.parse_args(arguments)
 
 
 def _create_schema_catalog(mets, sip, output, catalog):
@@ -57,18 +60,24 @@ def _create_schema_catalog(mets, sip, output, catalog):
     :param catalog: Catalog file to be added as nextCatalog entry.
     :return:
     """
+    try:
+        mets_tree = xml_helpers.utils.readfile(mets)
+    except IOError as err:
+        print(ensure_text(str(err)))
+        return 117
 
     schemas = _collect_xml_schemas(sip_path=sip,
-                                   mets_filepath=mets)
+                                   mets_tree=mets_tree)
     catalog_xml = construct_catalog_xml(
         base_path=sip,
         rewrite_rules=schemas,
         next_catalogs=[catalog])
     with open(output, 'wb') as out_file:
         out_file.write(xml_helpers.utils.serialize(catalog_xml))
+    return 0
 
 
-def _collect_xml_schemas(sip_path, mets_filepath):
+def _collect_xml_schemas(sip_path, mets_tree):
     """Collect all XML schemas from the METS. The schemas are ordered as
     a dictionary with the schemaLocations as keys and the schema paths
     as values. The schemaLocations can either be URIs or paths to
@@ -81,10 +90,9 @@ def _collect_xml_schemas(sip_path, mets_filepath):
     URI prefixes properly.
 
     :param sip_path: The path to the SIP contents
-    :param mets_filepath: METS XML filepath.
+    :param mets_tree: METS XML tree
     :returns: a dictionary of schema locations and paths
     """
-    mets_tree = xml_helpers.utils.readfile(mets_filepath)
     schemas = {}
     environments = None
     for techmd in mets.iter_techmd(mets_tree):
