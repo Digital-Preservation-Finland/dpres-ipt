@@ -38,7 +38,7 @@ def parse_arguments(arguments):
                               'schema linkings.'))
     parser.add_argument('sip',
                         metavar='SIP',
-                        help='Path to information package')
+                        help='Path to information package directory')
     parser.add_argument('output_path',
                         metavar='OUTPUT',
                         help='Write the catalog to given file path')
