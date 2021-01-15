@@ -8,14 +8,9 @@ import datetime
 import os
 import sys
 import uuid
-from contextlib import contextmanager
-import tempfile
-from six.moves.urllib.parse import unquote_plus, urlparse
 
-import mets
 import premis
 import xml_helpers.utils
-from xml_helpers.schema_catalog import construct_catalog_xml
 from file_scraper.scraper import Scraper
 
 from ipt.comparator.utils import iter_metadata_info
