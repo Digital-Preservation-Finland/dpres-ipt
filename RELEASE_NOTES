@@ -4,6 +4,9 @@ NEW:
 Support for local schema files and catalogs in XML validation. New option --catalog_path
 is added to check-sip-digital-objects script to support this.
 
+Support to create local schema catalogs with create-schema-catalog script.
+The created local schema catalog can be used for check-sip-digital-objects script.
+
 Release 0.35
 
 NEW:
