@@ -118,7 +118,7 @@ def _collect_xml_schemas(sip_path, mets_tree):
             # Add absolute path to catalog file if the value is a simple
             # file path and not an URI
             if not urlparse(id_value).scheme:
-                schema_path = os.path.join(sip_path, id_value)
+                schema_path = os.path.join(sip_path, schema_path)
             schemas[id_value] = schema_path
 
     return schemas
