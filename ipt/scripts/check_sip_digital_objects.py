@@ -128,14 +128,15 @@ def append_format_info(message, mimetype, version=''):
     return message
 
 
-def check_well_formed(metadata_info):
+def check_well_formed(metadata_info, catalog_path):
     """
     Check if file is well formed. If mets specifies an alternative format or
     scraper identifies the file as something else than what is given in mets,
     add a message specifying the alternative mimetype and version. Validate
     file as the mimetype given in mets.
 
-    :metadata_info: Dictionary containing metadata parsed from mets.
+    :param metadata_info: Dictionary containing metadata parsed from mets.
+    :param catalog_path: Schema XML catalog path to pass to file-scraper.
     :returns: Tuple with 2 dicts: (result_dict, scraper.streams)
     """
     messages = []
@@ -172,6 +173,7 @@ def check_well_formed(metadata_info):
     scraper = Scraper(metadata_info['filename'],
                       mimetype=scraper_mimetype,
                       version=scraper_version,
+                      catalog_path=catalog_path,
                       **create_scraper_params(metadata_info))
     scraper.scrape()
 
@@ -260,7 +262,8 @@ def validation(mets_path, catalog_path):
         results.append(mets_result)
         if not mets_result['is_valid'][0] or skip_validation(metadata_info):
             return join_validation_results(metadata_info, results)
-        scraper_result, streams = check_well_formed(metadata_info)
+        scraper_result, streams = check_well_formed(metadata_info,
+                                                    catalog_path=catalog_path)
         results.append(scraper_result)
         if scraper_result['is_valid'][0]:
             results.append(check_metadata_match(metadata_info, streams))
@@ -275,8 +278,7 @@ def validation(mets_path, catalog_path):
         mets_tree = xml_helpers.utils.readfile(mets_path)
 
     for metadata_info in iter_metadata_info(mets_tree=mets_tree,
-                                            mets_path=mets_path,
-                                            catalog_path=catalog_path):
+                                            mets_path=mets_path):
         yield _validate(metadata_info)
 
 

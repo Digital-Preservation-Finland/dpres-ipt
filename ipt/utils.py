@@ -11,6 +11,7 @@ import six
 from ipt.six_utils import ensure_binary
 
 import mimeparse
+
 _SCRAPER_PARAM_ADDML_KEY_RELATION = (('fields', 'header_fields'),
                                      ('separator', 'separator'),
                                      ('delimiter', 'delimiter'))
@@ -282,6 +283,7 @@ def pair_compatible_list_elements(list_a, list_b, check_compatible):
               in list_a which was paired with list_b[idx_b], or empty set if
               pairing is not possible.
     """
+
     def _match(indices_a, indices_b):
         if not indices_a:
             # Nothing left to pair
@@ -323,10 +325,6 @@ def create_scraper_params(metadata_info):
         except KeyError:
             # "addml_key"-key did not exist therefore no need to do anything.
             pass
-
-    # Add local schema catalog path as a parameter if it exists
-    if "catalog_path" in metadata_info and metadata_info["catalog_path"]:
-        params["catalog_path"] = metadata_info["catalog_path"]
 
     return params
 
@@ -372,6 +370,7 @@ def get_scraper_info(scraper):
                'errors': ['[MyScraper] ERROR: Failed', ...],
                'extensions': [ET._Element, ...]}
     """
+
     def _add_text_xml(scraper_info, info_key, prefix):
         strings = scraper_info[info_key]
         text, extensions = [], []

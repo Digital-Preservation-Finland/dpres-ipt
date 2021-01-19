@@ -118,13 +118,12 @@ def create_metadata_info(mets_tree, element, object_filename, use,
     return metadata_info
 
 
-def iter_metadata_info(mets_tree, mets_path, catalog_path=None):
+def iter_metadata_info(mets_tree, mets_path):
     """Iterate all files in given mets document and return metadata_info
     dictionary for each file and bitstream.
 
     :mets_tree: metadata in mets xml format
     :mets_path: path to the mets document
-    :catalog_path: A path to local schema catalog
 
     :returns: Iterable on metadata_info dictionaries
 
@@ -144,8 +143,6 @@ def iter_metadata_info(mets_tree, mets_path, catalog_path=None):
 
         metadata_info['audio_streams'] = []
         metadata_info['video_streams'] = []
-        if metadata_info['format']['mimetype'] == 'text/xml' and catalog_path:
-            metadata_info['catalog_path'] = catalog_path
         for stream_elem in mets.parse_streams(element):
 
             stream_info = create_metadata_info(

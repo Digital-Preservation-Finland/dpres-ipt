@@ -251,7 +251,7 @@ def patch_validate(monkeypatch):
     and three cdr fles (native, not validated).
     """
 
-    def _check_well_formed(metadata_info):
+    def _check_well_formed(metadata_info, catalog_path):
         """Monkeypatch well-formedness check (there are no real files)."""
         result = {}
 
