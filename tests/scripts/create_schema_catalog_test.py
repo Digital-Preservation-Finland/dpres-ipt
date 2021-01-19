@@ -57,3 +57,19 @@ def test_create_schema_catalog(tmpdir,
         assert rewrite_uri_count == expected_rewrite_uri
     else:
         assert os.path.isfile(output) is False
+
+
+@pytest.mark.parametrize(('sip', 'expected_error'), [
+    ('invalid_1.7.1_xml_local_schemas_path', RuntimeError)
+], ids=['Local schema pointing outside of SIP directory'])
+def test_create_schema_catalog_error(tmpdir,
+                                     sip,
+                                     expected_error):
+    """Test error case that comes from running the XML creation script."""
+    output = tmpdir.join('my_catalog_schema.xml').strpath
+    sip = os.path.join(TESTDATADIR, 'sips', sip)
+    mets = os.path.join(sip, 'mets.xml')
+    args = [mets, sip, output]
+
+    with pytest.raises(expected_error):
+        shell.run_main(main, args)

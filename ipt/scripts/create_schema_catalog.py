@@ -112,11 +112,13 @@ def _collect_xml_schemas(sip_path, mets_tree):
                 schema_path = unquote_plus(
                     urlparse(parsed_name).path.lstrip('/'))
                 # Check that illegal paths pointing outside the SIP don't
-                # exist, i.e. skip schemas with illegal paths
+                # exist. Raise error if such case happens as it is
+                # considered malformed mets.xml content.
                 if not os.path.abspath(
                         os.path.join(sip_path, schema_path)).startswith(
                     os.path.abspath(sip_path)):
-                    continue
+                    raise RuntimeError(('Schema [%s] must not point outside '
+                                        'of SIP directory') % schema_path)
 
                 (_, id_value) = premis.parse_identifier_type_value(
                     dependency, prefix='dependency')
