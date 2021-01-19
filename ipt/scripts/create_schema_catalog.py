@@ -99,29 +99,32 @@ def _collect_xml_schemas(sip_path, mets_tree):
     environments = None
     for techmd in mets.iter_techmd(mets_tree):
         environments = premis.iter_environments(techmd)
-    for environment in premis.environments_with_purpose(environments,
-                                                        purpose='xml-schemas'):
-        for dependency in premis.parse_dependency(environment):
-            parsed_name = next(premis.iter_elements(dependency,
-                                                    'dependencyName')).text
+    if environments is not None:
+        for environment in premis.environments_with_purpose(
+                environments,
+                purpose='xml-schemas'):
+            for dependency in premis.parse_dependency(environment):
+                parsed_name = next(premis.iter_elements(dependency,
+                                                        'dependencyName')).text
 
-            # Schema_path as unquoted file path with leading slashes removed
-            # since schema_path should always be a relative path
-            schema_path = unquote_plus(urlparse(parsed_name).path.lstrip('/'))
-            # Check that illegal paths pointing outside the SIP don't exist,
-            # i.e. skip schemas with illegal paths
-            if not os.path.abspath(
-                    os.path.join(sip_path, schema_path)).startswith(
-                os.path.abspath(sip_path)):
-                continue
+                # Schema_path as unquoted file path with leading slashes
+                # removed since schema_path should always be a relative path
+                schema_path = unquote_plus(
+                    urlparse(parsed_name).path.lstrip('/'))
+                # Check that illegal paths pointing outside the SIP don't
+                # exist, i.e. skip schemas with illegal paths
+                if not os.path.abspath(
+                        os.path.join(sip_path, schema_path)).startswith(
+                    os.path.abspath(sip_path)):
+                    continue
 
-            (_, id_value) = premis.parse_identifier_type_value(
-                dependency, prefix='dependency')
-            # Add absolute path to catalog file if the value is a simple
-            # file path and not an URI
-            if not urlparse(id_value).scheme:
-                schema_path = os.path.join(sip_path, schema_path)
-            schemas[id_value] = schema_path
+                (_, id_value) = premis.parse_identifier_type_value(
+                    dependency, prefix='dependency')
+                # Add absolute path to catalog file if the value is a simple
+                # file path and not an URI
+                if not urlparse(id_value).scheme:
+                    schema_path = os.path.join(sip_path, schema_path)
+                schemas[id_value] = schema_path
 
     return schemas
 
