@@ -234,9 +234,19 @@ def test_check_sip_digital_objects(case, tmpdir, monkeypatch):
     [(RESULT_CASES[0], 1, 1),
      (RESULT_CASES[1], 1, 2),
      (RESULT_CASES[2], 2, 3)])
-def test_validation_report(results, object_count, event_count):
+def test_validation_report(monkeypatch, results, object_count, event_count):
     """Test that validation report creates correct number of premis sections"""
-    premis_xml = validation_report(results, 'sip-type', 'sip-value')
+
+    def _validation(*_, **__):
+        return (result for result in results)
+
+    monkeypatch.setattr(ipt.scripts.check_sip_digital_objects,
+                        'validation',
+                        _validation)
+    premis_xml = validation_report('sip-path',
+                                   'catalog-path',
+                                   'sip-type',
+                                   'sip-value')
     assert premis.object_count(premis_xml) == object_count
     assert premis.event_count(premis_xml) == event_count
     assert premis.agent_count(premis_xml) == 1

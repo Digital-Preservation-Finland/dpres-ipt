@@ -22,14 +22,14 @@ _UNAVAILABLE_VERSION_VALUES = ('', '(:unav)', '(:unap)')
 
 
 def main(arguments=None):
-    """ The main method for check-sip-digital-objects script"""
+    """The main method for check-sip-digital-objects script"""
 
     args = parse_arguments(arguments)
     report = validation_report(
-        validation(args.sip_path,
-                   args.catalog_path),
-        args.linking_sip_type,
-        args.linking_sip_id)
+        sip_path=args.sip_path,
+        catalog_path=args.catalog_path,
+        linking_sip_type=args.linking_sip_type,
+        linking_sip_id=args.linking_sip_id)
 
     print(ensure_text(xml_helpers.utils.serialize(report)))
 
@@ -352,17 +352,17 @@ def create_report_event(result, report_object, report_agent):
     return report_event
 
 
-def validation_report(results, linking_sip_type, linking_sip_id):
-    """ Format validation results to Premis report"""
-
-    if results is None:
-        raise TypeError
+def validation_report(sip_path,
+                      catalog_path,
+                      linking_sip_type,
+                      linking_sip_id):
+    """Format validation results to Premis report"""
 
     # Create PREMIS agent, only one agent is needed
     report_agent = create_report_agent()
     child_elements = [report_agent]
     object_list = set()
-    for result in results:
+    for result in validation(mets_path=sip_path, catalog_path=catalog_path):
         metadata_info = result['metadata_info']
         # Create PREMIS object only if not already in the report
         if metadata_info['object_id']['value'] not in object_list:
