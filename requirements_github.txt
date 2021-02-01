@@ -6,5 +6,5 @@ six
 git+https://github.com/Digital-Preservation-Finland/xml-helpers.git#egg=xml_helpers
 git+https://github.com/Digital-Preservation-Finland/mets.git#egg=mets
 git+https://github.com/Digital-Preservation-Finland/premis.git#egg=premis
-git+https://github.com/Digital-Preservation-Finland/file-scraper.git#egg=file-scraper
+git+https://github.com/Digital-Preservation-Finland/file-scraper.git#egg=file_scraper
 git+https://github.com/Digital-Preservation-Finland/fido.git#egg=opf_fido
