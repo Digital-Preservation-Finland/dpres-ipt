@@ -13,11 +13,13 @@ from tests.testcommon.settings import TESTDATADIR
     [('valid_1.7.1_xml_local_schemas', 'mets.xml', None, 1, 0),
      ('valid_1.7.1_xml_local_schemas', 'mets.xml', '/other/catalog.xml', 1, 0),
      ('valid_1.7.1_video_container', 'mets.xml', None, 0, 0),
-     ('valid_1.7.1_xml_local_schemas', 'no_mets.xml', None, None, 117)],
+     ('valid_1.7.1_xml_local_schemas', 'no_mets.xml', None, None, 117),
+     ('invalid_1.7.1_xml_local_schemas_path', 'mets.xml', None, None, 117)],
     ids=['METS contain local schemas',
          'Different main catalog given from the default',
          'METS does not contain local schemas',
-         'METS missing'])
+         'METS missing',
+         'Invalid XML local schema'])
 def test_create_schema_catalog(tmpdir,
                                sip,
                                mets,
@@ -36,7 +38,7 @@ def test_create_schema_catalog(tmpdir,
         args.append('-c')
         args.append(catalog)
 
-    (returncode, _, _) = shell.run_main(main, args)
+    (returncode, msg, err) = shell.run_main(main, args)
     assert expected_return_code == returncode
     if expected_return_code == 0:
         root_element = xml_utils.readfile(output).getroot()
@@ -57,19 +59,3 @@ def test_create_schema_catalog(tmpdir,
         assert rewrite_uri_count == expected_rewrite_uri
     else:
         assert os.path.isfile(output) is False
-
-
-@pytest.mark.parametrize(('sip', 'expected_error'), [
-    ('invalid_1.7.1_xml_local_schemas_path', RuntimeError)
-], ids=['Local schema pointing outside of SIP directory'])
-def test_create_schema_catalog_error(tmpdir,
-                                     sip,
-                                     expected_error):
-    """Test error case that comes from running the XML creation script."""
-    output = tmpdir.join('my_catalog_schema.xml').strpath
-    sip = os.path.join(TESTDATADIR, 'sips', sip)
-    mets = os.path.join(sip, 'mets.xml')
-    args = [mets, sip, output]
-
-    with pytest.raises(expected_error):
-        shell.run_main(main, args)

@@ -356,7 +356,14 @@ def validation_report(sip_path,
                       catalog_path,
                       linking_sip_type,
                       linking_sip_id):
-    """Format validation results to Premis report"""
+    """Format validation results to PREMIS report
+
+    :param sip_path: Path to the SIP package's content.
+    :param catalog_path: Path to the XML catalog.
+    :param linking_sip_type: PREMIS object identifier type.
+    :param linking_sip_id: PREMIS object identifier value.
+    :return: PREMIS XML element.
+    """
 
     # Create PREMIS agent, only one agent is needed
     report_agent = create_report_agent()

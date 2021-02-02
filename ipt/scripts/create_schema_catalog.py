@@ -65,11 +65,16 @@ def _create_schema_catalog(mets, sip, output_path, catalog):
     try:
         mets_tree = xml_helpers.utils.readfile(mets)
     except IOError as err:
-        print(ensure_text(str(err)))
+        print(ensure_text(str(err)), file=sys.stderr)
         return 117
 
-    schemas = _collect_xml_schemas(sip_path=sip,
-                                   mets_tree=mets_tree)
+    try:
+        schemas = _collect_xml_schemas(sip_path=sip,
+                                       mets_tree=mets_tree)
+    except ValueError as err:
+        print(ensure_text(str(err)), file=sys.stderr)
+        return 117
+
     catalog_xml = construct_catalog_xml(
         base_path=sip,
         rewrite_rules=schemas,
@@ -117,8 +122,8 @@ def _collect_xml_schemas(sip_path, mets_tree):
                 if not os.path.abspath(
                         os.path.join(sip_path, schema_path)).startswith(
                     os.path.abspath(sip_path)):
-                    raise RuntimeError(('Schema [%s] must not point outside '
-                                        'of SIP directory') % schema_path)
+                    raise ValueError(('Schema [%s] must not point outside '
+                                      'of SIP directory') % schema_path)
 
                 (_, id_value) = premis.parse_identifier_type_value(
                     dependency, prefix='dependency')
