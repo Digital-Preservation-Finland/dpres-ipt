@@ -114,8 +114,10 @@ def _collect_xml_schemas(sip_path, mets_tree):
 
                 # Schema_path as unquoted file path with leading slashes
                 # removed since schema_path should always be a relative path
-                schema_path = unquote_plus(
-                    urlparse(parsed_name).path.lstrip('/'))
+                urlparsed_name = urlparse(parsed_name)
+                schema_path = unquote_plus(os.path.join(
+                    urlparsed_name.netloc,
+                    urlparsed_name.path.lstrip('/')))
                 # Check that illegal paths pointing outside the SIP don't
                 # exist. Raise error if such case happens as it is
                 # considered malformed mets.xml content.
