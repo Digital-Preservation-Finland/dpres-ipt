@@ -2,7 +2,6 @@
 Utility functions.
 """
 import os
-import re
 from collections import defaultdict
 from copy import deepcopy
 from fractions import Fraction
@@ -417,4 +416,4 @@ def parse_uri_filepath(uri_path, accepeted_schemes):
     # cases with ambigious number of slashes... Like file-URI scheme where
     # usage can vary between one to even four slashes.
     return unquote_plus(os.path.join(parsed_result.netloc,
-                                     re.sub(r"^\W+", "", parsed_result.path)))
+                                     parsed_result.path.lstrip('/')))

@@ -195,8 +195,6 @@ def test_pair_compatible_list_elements():
     'file:///data/local.xsd',
     'data/local.xsd',
     '/data/local.xsd',
-    './data/local.xsd',
-    '/./data/local.xsd',
     'http:/data/local.xsd',
     'http://data/local.xsd',
     'http:///data/local.xsd',
