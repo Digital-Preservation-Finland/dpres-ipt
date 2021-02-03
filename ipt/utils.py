@@ -1,13 +1,15 @@
 """
 Utility functions.
 """
-
+import os
+import re
 from collections import defaultdict
 from copy import deepcopy
 from fractions import Fraction
 import lxml.etree as ET
 
 import six
+from six.moves.urllib.parse import unquote_plus, urlparse
 from ipt.six_utils import ensure_binary
 
 import mimeparse
@@ -394,3 +396,25 @@ def get_scraper_info(scraper):
         _add_text_xml(scraper_info, 'messages', scraper_prefix)
         _add_text_xml(scraper_info, 'errors', scraper_prefix + 'ERROR: ')
     return info
+
+
+def parse_uri_filepath(uri_path, accepeted_schemes):
+    """Parses and return the filepath from uri path by omitting the scheme and
+    unquoting the path.
+
+    :param uri_path: URI path that is being parsed.
+    :param accepeted_schemes: Iterable of accepted URI schemes.
+    :return: Relative path of the given uri path in string.
+    """
+    # Schema_path as unquoted file path with leading slashes
+    # removed since schema_path should always be a relative path
+    parsed_result = urlparse(uri_path)
+    if parsed_result.scheme not in accepeted_schemes:
+        raise ValueError(('Scheme [%s] is not among the accepted schemes '
+                          '[%s]') % (parsed_result.scheme,
+                                     ', '.join(accepeted_schemes)))
+    # Joining by netlock and stripping special characters from path is for the
+    # cases with ambigious number of slashes... Like file-URI scheme where
+    # usage can vary between one to even four slashes.
+    return unquote_plus(os.path.join(parsed_result.netloc,
+                                     re.sub(r"^\W+", "", parsed_result.path)))

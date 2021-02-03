@@ -6,7 +6,7 @@ import pytest
 
 from ipt.utils import (compare_lists_of_dicts, find_max_complete, merge_dicts,
                        serialize_dict, uri_to_path,
-                       pair_compatible_list_elements)
+                       pair_compatible_list_elements, parse_uri_filepath)
 
 CODEC1 = {"codec": "foo"}
 CODEC2 = {"codec": "bar"}
@@ -146,6 +146,7 @@ def test_pair_compatible_list_elements():
         - empty set when elements cannot be paired
         - correct set of index tuples when pairing is possible
     """
+
     def integer_compare(a, b):
         """Helper function to compare equality of integers"""
         return a == b
@@ -186,3 +187,27 @@ def test_pair_compatible_list_elements():
     list_b = list(range(1, 101))
     random.shuffle(list_b)
     assert not pair_compatible_list_elements(list_a, list_b, integer_compare)
+
+
+@pytest.mark.parametrize('case', [
+    'file:/data/local.xsd',
+    'file://data/local.xsd',
+    'file:///data/local.xsd',
+    'data/local.xsd',
+    '/data/local.xsd',
+    './data/local.xsd',
+    '/./data/local.xsd',
+    'http:/data/local.xsd',
+    'http://data/local.xsd',
+    'http:///data/local.xsd',
+])
+def test_parse_uri_filepath(case):
+    path = parse_uri_filepath(uri_path=case,
+                              accepeted_schemes=('http', 'file', ''))
+    assert path == 'data/local.xsd'
+
+
+def test_parse_uri_filepath_error():
+    with pytest.raises(ValueError):
+        parse_uri_filepath(uri_path='file:///does-not-exist.txt',
+                           accepeted_schemes=('http',))
