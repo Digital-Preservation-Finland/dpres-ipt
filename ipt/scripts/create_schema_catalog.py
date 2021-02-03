@@ -112,7 +112,7 @@ def _collect_xml_schemas(sip_path, mets_tree):
 
                 schema_path = parse_uri_filepath(
                     uri_path=parsed_name,
-                    accepeted_schemes=('file', ''))
+                    accepted_schemes=('file', ''))
                 # Check that illegal paths pointing outside the SIP don't
                 # exist. Raise error if such case happens as it is
                 # considered malformed mets.xml content.

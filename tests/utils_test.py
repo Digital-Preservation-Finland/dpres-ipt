@@ -201,11 +201,11 @@ def test_pair_compatible_list_elements():
 ])
 def test_parse_uri_filepath(case):
     path = parse_uri_filepath(uri_path=case,
-                              accepeted_schemes=('http', 'file', ''))
+                              accepted_schemes=('http', 'file', ''))
     assert path == 'data/local.xsd'
 
 
 def test_parse_uri_filepath_error():
     with pytest.raises(ValueError):
         parse_uri_filepath(uri_path='file:///does-not-exist.txt',
-                           accepeted_schemes=('http',))
+                           accepted_schemes=('http',))
