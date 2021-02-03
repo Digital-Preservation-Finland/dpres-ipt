@@ -38,7 +38,7 @@ def test_create_schema_catalog(tmpdir,
         args.append('-c')
         args.append(catalog)
 
-    (returncode, msg, err) = shell.run_main(main, args)
+    (returncode, _, _) = shell.run_main(main, args)
     assert expected_return_code == returncode
     if expected_return_code == 0:
         root_element = xml_utils.readfile(output).getroot()

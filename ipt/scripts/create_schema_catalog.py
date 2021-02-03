@@ -29,9 +29,6 @@ def parse_arguments(arguments):
     """ Create arguments parser and return parsed command line arguments
     :param arguments: Arguments given to the argparser.
     """
-    default_path = (
-        '/etc/xml/dpres-xml-schemas/schema_catalogs/catalog_main.xml')
-
     parser = argparse.ArgumentParser()
     parser.add_argument('mets',
                         metavar='METS',
@@ -46,7 +43,7 @@ def parse_arguments(arguments):
     parser.add_argument(
         '-c', '--catalog',
         dest='catalog',
-        default=default_path,
+        default='/etc/xml/dpres-xml-schemas/schema_catalogs/catalog_main.xml',
         help=('File path to another existing (main) schema catalog to be '
               'added to the schema catalog that is constructed.'))
 
@@ -119,9 +116,10 @@ def _collect_xml_schemas(sip_path, mets_tree):
                 # Check that illegal paths pointing outside the SIP don't
                 # exist. Raise error if such case happens as it is
                 # considered malformed mets.xml content.
-                if not os.path.abspath(
-                        os.path.join(sip_path, schema_path)).startswith(
-                    os.path.abspath(sip_path)):
+                abs_schema_path = os.path.abspath(os.path.join(sip_path,
+                                                               schema_path))
+                abs_sip_path = os.path.abspath(sip_path)
+                if not abs_schema_path.startswith(abs_sip_path):
                     raise ValueError(('Schema [%s] must not point outside '
                                       'of SIP directory') % schema_path)
 
