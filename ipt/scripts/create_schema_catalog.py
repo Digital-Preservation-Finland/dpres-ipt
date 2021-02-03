@@ -5,13 +5,14 @@ from __future__ import print_function, unicode_literals
 import argparse
 import os
 import sys
-from six.moves.urllib.parse import unquote_plus, urlparse
+from six.moves.urllib.parse import urlparse
 
 import mets
 import premis
 import xml_helpers.utils
 from xml_helpers.schema_catalog import construct_catalog_xml
 from ipt.six_utils import ensure_text
+from ipt.utils import parse_uri_filepath
 
 
 def main(arguments=None):
@@ -112,12 +113,9 @@ def _collect_xml_schemas(sip_path, mets_tree):
                 parsed_name = next(premis.iter_elements(dependency,
                                                         'dependencyName')).text
 
-                # Schema_path as unquoted file path with leading slashes
-                # removed since schema_path should always be a relative path
-                urlparsed_name = urlparse(parsed_name)
-                schema_path = unquote_plus(os.path.join(
-                    urlparsed_name.netloc,
-                    urlparsed_name.path.lstrip('/')))
+                schema_path = parse_uri_filepath(
+                    uri_path=parsed_name,
+                    accepeted_schemes=('file', ''))
                 # Check that illegal paths pointing outside the SIP don't
                 # exist. Raise error if such case happens as it is
                 # considered malformed mets.xml content.
