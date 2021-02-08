@@ -130,7 +130,7 @@ TESTCASES = [
      'expected_result': {
          'returncode': 117,
          'stdout': ['ERROR: warning: failed to load external entity']}},
-    {'testcase': 'SIP with text file containing illegal unicode character.',
+    {'testcase': 'SIP with text file containing illegal control character.',
      'filename': 'invalid_1.7.2_control_character',
      'expected_result': {
          'returncode': 117,
