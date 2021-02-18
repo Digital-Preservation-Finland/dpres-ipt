@@ -28,7 +28,6 @@ install:
 
 	# Use Python setuptools
 	python setup.py build ; python ./setup.py install -O1 --prefix="${PREFIX}" --root="${ROOT}" --record=INSTALLED_FILES
-	cat INSTALLED_FILES | sed 's/^/\//g' >> INSTALLED_FILES
 
 	# setup.py seems to be unable to create directories,
 	# create them here if needed
@@ -42,7 +41,6 @@ install3:
 
 	# Use Python setuptools
 	python3 setup.py build ; python3 ./setup.py install -O1 --prefix="${PREFIX}" --root="${ROOT}" --record=INSTALLED_FILES
-	cat INSTALLED_FILES | sed 's/^/\//g' >> INSTALLED_FILES
 
 	# setup.py seems to be unable to create directories,
 	# create them here if needed
@@ -83,7 +81,7 @@ clean-rpm:
 
 rpm-sources:
 	create-archive.sh
-	preprocess-spec-m4-macros.sh include/rhel6
+	preprocess-spec-m4-macros.sh include/rhel7
 
 rpm: clean-rpm rpm-sources
 	build-rpm.sh ${MOCK_CONFIG}
