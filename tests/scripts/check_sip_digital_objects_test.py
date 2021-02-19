@@ -315,7 +315,8 @@ def patch_validate(monkeypatch):
              'algorithm': 'MD5',
              'digest': 'aa4bddaacf5ed1ca92b30826af257a1c'},
             # CDR: not supproted, marked as native
-            {'filename': 'cdr', 'use': 'no-file-format-validation',
+            {'filename': 'cdr',
+             'use': 'fi-preservation-no-file-format-validation',
              'errors': None,
              'format': {'mimetype': 'application/cdr',
                         'version': '9.0'},
@@ -352,7 +353,7 @@ def test_native_marked():
     Test validation with native file format.
 
     These native formats have are marked with
-        'use': 'no-file-format-validation'
+        'use': 'fi-preservation-no-file-format-validation'
     in metadata_info and have a corresponding file in an acceptable format.
     This test tests that native files with valid METS are valid and no further
     validation steps are done, whereas files not marked as native can be valid
@@ -360,7 +361,8 @@ def test_native_marked():
     """
 
     collection = [result for result in validation(None, None)]
-    assert (['no-file-format-validation' in result['metadata_info']['use'] for
+    assert (['fi-preservation-no-file-format-validation' in
+             result['metadata_info']['use'] for
              result in collection] == [False, False, True, False])
     assert ([result['is_valid'] for result in collection] ==
             [True, False, True, False])

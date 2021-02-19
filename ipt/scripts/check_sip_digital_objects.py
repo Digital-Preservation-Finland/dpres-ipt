@@ -113,7 +113,7 @@ def check_mets_errors(metadata_info):
 
 def skip_validation(metadata_info):
     """ File format validation is not done for native file formats. """
-    return metadata_info['use'] == 'no-file-format-validation'
+    return metadata_info['use'] == 'fi-preservation-no-file-format-validation'
 
 
 def append_format_info(message, mimetype, version=''):
