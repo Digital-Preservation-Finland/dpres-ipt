@@ -302,6 +302,7 @@ def patch_validate(monkeypatch):
         md_info = [
             # PDF: supported and valid
             {'filename': 'pdf', 'use': '', 'errors': None,
+             'spec_version': '1.7.3',
              'format': {'mimetype': 'application/pdf',
                         'version': '1.4'},
              'object_id': {'type': 'test_object', 'value': 'pdf1'},
@@ -309,6 +310,7 @@ def patch_validate(monkeypatch):
              'digest': 'aa4bddaacf5ed1ca92b30826af257a1b'},
             # CDR: not supported, not marked as native
             {'filename': 'cdr', 'use': '', 'errors': None,
+             'spec_version': '1.7.3',
              'format': {'mimetype': 'application/cdr',
                         'version': '9.0'},
              'object_id': {'type': 'test_object', 'value': 'cdr1'},
@@ -317,6 +319,7 @@ def patch_validate(monkeypatch):
             # CDR: not supproted, marked as native
             {'filename': 'cdr',
              'use': 'fi-preservation-no-file-format-validation',
+             'spec_version': '1.7.3',
              'errors': None,
              'format': {'mimetype': 'application/cdr',
                         'version': '9.0'},
@@ -326,6 +329,7 @@ def patch_validate(monkeypatch):
             # CDR: not supported, use given but not the one that would
             #      mark it as native
             {'filename': 'cdr', 'use': 'yes-file-format-validation',
+             'spec_version': '1.7.3',
              'errors': None,
              'format': {'mimetype': 'application/cdr',
                         'version': '9.0'},
