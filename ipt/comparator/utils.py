@@ -9,6 +9,7 @@ from ipt.utils import merge_dicts, uri_to_path, parse_mimetype
 import ipt.addml.addml
 import ipt.videomd.videomd
 import ipt.audiomd.audiomd
+from ipt.xml.mets import parse_spec_version
 from ipt.six_utils import ensure_text
 
 
@@ -66,7 +67,7 @@ def mdwrap_to_metadata_info(mdwrap_element):
 
 
 def create_metadata_info(mets_tree, element, object_filename, use,
-                         object_type):
+                         object_type, spec_version):
     """Create a dictionary of technical metadata from mets metadata for
     a given section that can either be about a digital object
     or a bitstream. The function combines the created metadata_info
@@ -77,6 +78,7 @@ def create_metadata_info(mets_tree, element, object_filename, use,
     :object_filename: path to the digital object
     :use: the use attribute value for the digital object
     :object_type: type of object, i.e. a 'file' or a 'bitstream'
+    :spec_version: National specification version
 
     :returns: metadata_info as a dict
     """
@@ -92,7 +94,8 @@ def create_metadata_info(mets_tree, element, object_filename, use,
                           'value': None},
             'algorithm': None,
             'digest': None,
-            'errors': None
+            'errors': None,
+            'spec_version': spec_version
         }
     elif object_type == 'bitstream':
         metadata_info = {
@@ -128,6 +131,7 @@ def iter_metadata_info(mets_tree, mets_path):
     :returns: Iterable on metadata_info dictionaries
 
     """
+    spec_version = parse_spec_version(mets_tree.getroot())
 
     for element in mets.parse_files(mets_tree):
         loc = mets.parse_flocats(element)[0]
@@ -139,7 +143,8 @@ def iter_metadata_info(mets_tree, mets_path):
 
         metadata_info = create_metadata_info(
             mets_tree=mets_tree, element=element,
-            object_filename=object_filename, use=use, object_type='file')
+            object_filename=object_filename, use=use, object_type='file',
+            spec_version=spec_version)
 
         metadata_info['audio_streams'] = []
         metadata_info['video_streams'] = []
@@ -148,7 +153,7 @@ def iter_metadata_info(mets_tree, mets_path):
             stream_info = create_metadata_info(
                 mets_tree=mets_tree, element=stream_elem,
                 object_filename=object_filename, use=use,
-                object_type='bitstream')
+                object_type='bitstream', spec_version=spec_version)
             if 'audio' in stream_info:
                 metadata_info['audio_streams'].append(stream_info)
             elif 'video' in stream_info:
