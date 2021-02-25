@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Version 0.92
+------------
+
+Support for updated term for marking files to bit-level preservation.
+
 Version 0.91
 ------------
 
