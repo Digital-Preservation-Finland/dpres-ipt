@@ -2,8 +2,6 @@
 Module for national METS XML extensions
 """
 
-from xml_helpers.utils import decode_utf8
-
 FI_NS = 'http://digitalpreservation.fi/schemas/mets/fi-extensions'
 FI_NS_KDK = 'http://www.kdk.fi/standards/mets/kdk-extensions'
 
