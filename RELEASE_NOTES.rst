@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Version 0.93
+------------
+
+Build rhel7 python3 rpm for dpres-ipt.
+
 Version 0.92
 ------------
 
