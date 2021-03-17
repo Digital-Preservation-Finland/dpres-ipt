@@ -22,16 +22,6 @@ _KNOWN_UNAV_VERSIONS = {
         "1.0", "1.1", "1.2"],
     "application/vnd.oasis.opendocument.graphics": ["1.0", "1.1", "1.2"],
     "application/vnd.oasis.opendocument.formula": ["1.0", "1.2"],
-    "application/msword": ["8.0", "8.5", "9.0", "10.0", "11.0"],
-    "application/vnd.ms-excel": ["8.0", "9.0", "10.0", "11.0"],
-    "application/vnd.ms-powerpoint": ["8.0", "9.0", "10.0", "11.0"],
-    "application/vnd.openxmlformats-officedocument.wordprocessingml."
-    "document": ["12.0", "14.0", "15.0"],
-    "application/vnd.openxmlformats-officedocument."
-    "spreadsheetml.sheet": ["12.0", "14.0", "15.0"],
-    "application/vnd.openxmlformats-officedocument.presentationml."
-    "presentation": ["12.0", "14.0", "15.0"],
-    "application/x-internet-archive": ["1.0", "1.1"]
 }
 
 
@@ -256,7 +246,7 @@ def _harmonized_versions(scraper_format):
     # In the normal case the version in METS should be the same as the
     # version scraper found.
     else:
-    	harmonized_versions.add(scraper_format['version'])
+        harmonized_versions.add(scraper_format['version'])
     # PDF file special case:
     # If scraper finds a version which is a subset of the version given METS,
     # the more general METS value is allowed (e.g, METS: 1.4, scraper: A-1b)
