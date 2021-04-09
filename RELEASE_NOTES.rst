@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Version 0.94
+------------
+
+Remove hard coded MS Office file format versions from known unav versions list.
+
 Version 0.93
 ------------
 
