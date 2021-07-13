@@ -4,6 +4,7 @@ Module to compare metadata found in mets to metadata scraped by file-scraper.
 
 from __future__ import unicode_literals
 import six
+import json
 from ipt.utils import (handle_div, synonymize_stream_keys,
                        pair_compatible_list_elements)
 
@@ -91,7 +92,8 @@ class MetadataComparator(object):
         compared.
         """
         self._errors.append(info + ' METS: {}, Scraper: {}'.format(
-            mets_value, scraper_value))
+                            json.dumps(mets_value, indent=4),
+                            json.dumps(scraper_value, indent=4)))
 
     def _get_stream_format(self, stream_index):
         """
