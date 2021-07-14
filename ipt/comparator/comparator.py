@@ -91,7 +91,7 @@ class MetadataComparator(object):
         Add an error describing what failed and which values were
         compared.
         """
-        self._errors.append(info + ' METS: {}, Scraper: {}'.format(
+        self._errors.append(info + '\nMETS: {},\nScraper: {}\n'.format(
                             json.dumps(mets_value, indent=4),
                             json.dumps(scraper_value, indent=4)))
 
