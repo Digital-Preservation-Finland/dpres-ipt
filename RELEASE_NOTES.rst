@@ -1,6 +1,12 @@
 Release notes
 =============
 
+Version 0.95
+------------
+
+Encountering an error when checking waw files generated a very compact error
+message that was hard to read. The error message is now more human readable.
+
 Version 0.94
 ------------
 
