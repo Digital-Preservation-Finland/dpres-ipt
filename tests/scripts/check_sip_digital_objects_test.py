@@ -26,7 +26,7 @@ from ipt.scripts.create_schema_catalog import main as schema_main
 METSDIR = os.path.abspath(
     os.path.join(testcommon.settings.TESTDATADIR, 'mets'))
 
-TESTCASES = [
+TEST_CASES = [
     {'testcase': 'Invalid digital object.',
      'filename': 'invalid_1.7.1_invalid_object',
      'expected_result': {
@@ -187,11 +187,11 @@ def test_testcases_stdout():
     stdout, instead of the entire string.
     """
     assert all(isinstance(case['expected_result']['stdout'], list)
-               for case in TESTCASES)
+               for case in TEST_CASES)
 
 
 @pytest.mark.parametrize(
-    'case', TESTCASES, ids=[x['testcase'] for x in TESTCASES])
+    'case', TEST_CASES, ids=[x['testcase'] for x in TEST_CASES])
 @pytest.mark.usefixtures('monkeypatch_Popen')
 def test_check_sip_digital_objects(case, tmpdir, monkeypatch):
     """
@@ -263,13 +263,15 @@ def patch_validate(monkeypatch):
     Patch validation  to work without readable files.
 
     Metadata info dict list is always returned for package containing a pdf
-    and three cdr fles (native, not validated).
+    and three cdr files (native, not validated).
     """
 
     def _check_well_formed(metadata_info, catalog_path):
         """Monkeypatch well-formedness check (there are no real files)."""
         result = {}
+        grade = "fi-preservation-recommended-file-format"
 
+        # TODO: cleanup mocking
         if metadata_info['filename'] == 'pdf':
             result = make_result_dict(
                 is_valid=True,
@@ -278,10 +280,17 @@ def patch_validate(monkeypatch):
                            'successfully.')])
         elif metadata_info['filename'] == 'cdr':
             result = make_result_dict(
-                is_valid=None,
+                is_valid=False,
                 messages=['Proper scraper was not found. The file was not '
                           'analyzed.'])
-        return (result, {})
+            grade = "fi-preservation-bit-level-file-format"
+        elif metadata_info['filename'] == 'cdr2':
+            result = make_result_dict(
+                is_valid=False,
+                messages=['Proper scraper was not found. The file was not '
+                          'analyzed.'])
+            grade = "fi-preservation-unacceptable-file-format"
+        return (result, {}, grade)
 
     def _check_metadata_match(metadata_info, results):
         """Monkeypatch metadata matching: there are no real files to scrape."""
@@ -316,7 +325,7 @@ def patch_validate(monkeypatch):
              'object_id': {'type': 'test_object', 'value': 'cdr1'},
              'algorithm': 'MD5',
              'digest': 'aa4bddaacf5ed1ca92b30826af257a1c'},
-            # CDR: not supproted, marked as native
+            # CDR: not supported, marked as native
             {'filename': 'cdr',
              'use': 'fi-preservation-no-file-format-validation',
              'spec_version': '1.7.3',
@@ -329,6 +338,16 @@ def patch_validate(monkeypatch):
             # CDR: not supported, use given but not the one that would
             #      mark it as native
             {'filename': 'cdr', 'use': 'yes-file-format-validation',
+             'spec_version': '1.7.3',
+             'errors': None,
+             'format': {'mimetype': 'application/cdr',
+                        'version': '9.0'},
+             'object_id': {'type': 'test_object', 'value': 'cdr3'},
+             'algorithm': 'MD5',
+             'digest': 'aa4bddaacf5ed1ca92b30826af257a1d'},
+            # CDR: not supported, marked as native, but graded as UNACCEPTABLE
+            {'filename': 'cdr2',
+             'use': 'fi-preservation-no-file-format-validation',
              'spec_version': '1.7.3',
              'errors': None,
              'format': {'mimetype': 'application/cdr',
@@ -367,9 +386,11 @@ def test_native_marked():
     collection = [result for result in validation(None, None)]
     assert (['fi-preservation-no-file-format-validation' in
              result['metadata_info']['use'] for
-             result in collection] == [False, False, True, False])
-    assert ([result['is_valid'] for result in collection] ==
-            [True, False, True, False])
+             result in collection] == [False, False, True, False, True])
+    expected_result = [True, False, True, False, False]
+    # TODO: User should not be able to skip validation of UNACCEPTABLE formats
+    expected_result[-1] = True
+    assert [result['is_valid'] for result in collection] == expected_result
 
 
 # TODO add test for native files needing to have a supported companion file?

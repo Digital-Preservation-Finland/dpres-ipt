@@ -12,6 +12,12 @@ import uuid
 import premis
 import xml_helpers.utils
 from file_scraper.scraper import Scraper
+from file_scraper.defaults import (
+    RECOMMENDED,
+    ACCEPTABLE,
+    BIT_LEVEL_WITH_RECOMMENDED,
+    BIT_LEVEL
+)
 
 from ipt.comparator.utils import iter_metadata_info
 from ipt.comparator.comparator import MetadataComparator
@@ -140,7 +146,7 @@ def check_well_formed(metadata_info, catalog_path):
 
     :param metadata_info: Dictionary containing metadata parsed from mets.
     :param catalog_path: Schema XML catalog path to pass to file-scraper.
-    :returns: Tuple with 2 dicts: (result_dict, scraper.streams)
+    :returns: Tuple: (result_dict, scraper.streams, scraper.grade)
     """
     messages = []
     valid_only_messages = []
@@ -187,7 +193,8 @@ def check_well_formed(metadata_info, catalog_path):
                              errors=scraper_info['errors'],
                              extensions=scraper_info['extensions'],
                              valid_only_messages=valid_only_messages),
-            scraper.streams)
+            scraper.streams,
+            scraper.grade())
 
 
 def check_metadata_match(metadata_info, scraper_streams):
@@ -204,6 +211,34 @@ def check_metadata_match(metadata_info, scraper_streams):
     messages = ['[MetadataComparator] ' + msg for msg in result['messages']]
     errors = ['[MetadataComparator] ' + err for err in result['errors']]
     return make_result_dict(result['is_valid'], messages, errors)
+
+
+def check_grade(metadata_info, grade):
+    """
+    Check that provided mets use attribute is accepted for the grade returned
+    by scraper.
+
+    :metadata_info: Dictionary containing metadata parsed from mets.
+    :grade: Grade returned by file scraper.
+    :returns: result_dict dictionary.
+    """
+    no_validation = "fi-preservation-no-file-format-validation"
+    identification = "fi-preservation-file-format-identification"
+    use = metadata_info["use"]
+    errors = []
+    valid = False
+
+    if grade == RECOMMENDED or grade == ACCEPTABLE:
+        valid = (use == "")
+    elif grade == BIT_LEVEL_WITH_RECOMMENDED:
+        valid = (use == no_validation)
+    elif grade == BIT_LEVEL:
+        valid = (use == no_validation or use == identification)
+
+    if not valid:
+        errors.append("ERROR: Failed grade check")
+
+    return make_result_dict(valid, errors=errors)
 
 
 def join_validation_results(metadata_info, results):
@@ -256,6 +291,7 @@ def validation(mets_path, catalog_path):
         2. Check if file needs to be validated; if not, skip other steps.
         3. Check if file is well formed using scraper; if not, skip comparison.
         4. Check that mets metadata matches scraper metadata.
+        5. Check that mets use attribute and scraper grading match.
 
         :returns: Dictionary containing joined results from the above steps.
         """
@@ -263,13 +299,19 @@ def validation(mets_path, catalog_path):
 
         mets_result = check_mets_errors(metadata_info)
         results.append(mets_result)
+        # TODO: Grade still needs to be checked here. We cannot let user
+        # skip validation for arbitrary file formats.
         if not mets_result['is_valid'][0] or skip_validation(metadata_info):
             return join_validation_results(metadata_info, results)
-        scraper_result, streams = check_well_formed(metadata_info,
-                                                    catalog_path=catalog_path)
+        scraper_result, streams, grade = check_well_formed(
+            metadata_info,
+            catalog_path=catalog_path
+        )
         results.append(scraper_result)
         if scraper_result['is_valid'][0]:
             results.append(check_metadata_match(metadata_info, streams))
+        grade_result = check_grade(metadata_info, grade)
+        results.append(grade_result)
         return join_validation_results(metadata_info, results)
 
     mets_tree = None
