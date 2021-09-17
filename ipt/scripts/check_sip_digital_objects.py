@@ -232,6 +232,7 @@ def check_grade(metadata_info, grade):
     no_validation = "fi-preservation-no-file-format-validation"
     identification = "fi-preservation-file-format-identification"
     use = metadata_info["use"]
+    messages = []
     errors = []
     valid = False
 
@@ -242,10 +243,25 @@ def check_grade(metadata_info, grade):
     elif grade == BIT_LEVEL:
         valid = (use == no_validation or use == identification)
 
-    if not valid:
-        errors.append("ERROR: Failed grade check")
+    if (grade == BIT_LEVEL_WITH_RECOMMENDED or grade == BIT_LEVEL) and valid:
+        messages.append(
+            "File {} has been accepted to bit-level preservation only.".format(
+                # TODO: Use relpath as in check sip cheksums
+                metadata_info["filename"]
+            )
+        )
 
-    return make_result_dict(valid, errors=errors)
+    if not valid:
+        errors.append(
+            "ERROR: File {} with the given file format {} is unacceptable"
+            " for digital preservation.".format(
+                # TODO: Use relpath as in check sip cheksums
+                metadata_info["filename"],
+                grade
+            )
+        )
+
+    return make_result_dict(valid, messages=messages, errors=errors)
 
 
 def join_validation_results(metadata_info, results):
