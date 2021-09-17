@@ -292,6 +292,15 @@ def patch_validate(monkeypatch):
             grade = "fi-preservation-unacceptable-file-format"
         return (result, {}, grade)
 
+    def _get_scraper_grade(filepath):
+        """Monkeypatch scraper grading (there are no real files)."""
+        grade = "fi-preservation-recommended-file-format"
+        if filepath == 'cdr':
+            grade = "fi-preservation-bit-level-file-format"
+        elif filepath == 'cdr2':
+            grade = "fi-preservation-unacceptable-file-format"
+        return grade
+
     def _check_metadata_match(metadata_info, results):
         """Monkeypatch metadata matching: there are no real files to scrape."""
         # pylint: disable=unused-argument
@@ -368,6 +377,9 @@ def patch_validate(monkeypatch):
     monkeypatch.setattr(
         ipt.scripts.check_sip_digital_objects, 'iter_metadata_info',
         _iter_metadata_info)
+    monkeypatch.setattr(
+        ipt.scripts.check_sip_digital_objects, 'get_scraper_grade',
+        _get_scraper_grade)
 
 
 @pytest.mark.usefixtures('patch_validate')
@@ -388,8 +400,6 @@ def test_native_marked():
              result['metadata_info']['use'] for
              result in collection] == [False, False, True, False, True])
     expected_result = [True, False, True, False, False]
-    # TODO: User should not be able to skip validation of UNACCEPTABLE formats
-    expected_result[-1] = True
     assert [result['is_valid'] for result in collection] == expected_result
 
 

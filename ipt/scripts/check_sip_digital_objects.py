@@ -213,6 +213,13 @@ def check_metadata_match(metadata_info, scraper_streams):
     return make_result_dict(result['is_valid'], messages, errors)
 
 
+def get_scraper_grade(filepath):
+    """Scrape file and return grade."""
+    scraper = Scraper(filepath)
+    scraper.scrape()
+    return scraper.grade()
+
+
 def check_grade(metadata_info, grade):
     """
     Check that provided mets use attribute is accepted for the grade returned
@@ -299,9 +306,12 @@ def validation(mets_path, catalog_path):
 
         mets_result = check_mets_errors(metadata_info)
         results.append(mets_result)
-        # TODO: Grade still needs to be checked here. We cannot let user
-        # skip validation for arbitrary file formats.
-        if not mets_result['is_valid'][0] or skip_validation(metadata_info):
+        if not mets_result['is_valid'][0]:
+            return join_validation_results(metadata_info, results)
+        elif skip_validation(metadata_info):
+            # Check the scraper grade before allowing to skip validation
+            grade = get_scraper_grade(metadata_info["filename"])
+            results.append(check_grade(metadata_info, grade))
             return join_validation_results(metadata_info, results)
         scraper_result, streams, grade = check_well_formed(
             metadata_info,
