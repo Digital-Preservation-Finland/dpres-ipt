@@ -10,6 +10,15 @@ import premis
 
 from file_scraper.iterator import iter_detectors
 from file_scraper.scraper import Scraper
+from file_scraper.defaults import (
+    RECOMMENDED,
+    ACCEPTABLE,
+    BIT_LEVEL_WITH_RECOMMENDED,
+    BIT_LEVEL,
+    UNACCEPTABLE,
+    UNAV,
+    UNAP
+)
 
 from tests import testcommon
 from tests.testcommon import shell
@@ -257,133 +266,63 @@ def test_validation_report(monkeypatch, results, object_count, event_count):
     assert premis.agent_count(premis_xml) == 1
 
 
-@pytest.fixture(scope='function')
-def patch_validate(monkeypatch):
-    """
-    Patch validation  to work without readable files.
+PDF_MD_INFO = {
+    'filename': 'pdf',
+    'use': '',
+    'errors': None,
+    'spec_version': '1.7.3',
+    'format': {'mimetype': 'application/pdf', 'version': '1.4'},
+    'object_id': {'type': 'test_object', 'value': 'pdf1'},
+    'algorithm': 'MD5',
+    'digest': 'aa4bddaacf5ed1ca92b30826af257a1b'
+}
 
-    Metadata info dict list is always returned for package containing a pdf
-    and three cdr files (native, not validated).
-    """
+CDR_MD_INFO = {
+    'filename': 'cdr',
+    'use': '',
+    'errors': None,
+    'spec_version': '1.7.3',
+    'format': {'mimetype': 'application/cdr', 'version': '9.0'},
+    'object_id': {'type': 'test_object', 'value': 'cdr1'},
+    'algorithm': 'MD5',
+    'digest': 'aa4bddaacf5ed1ca92b30826af257a1c'
+}
 
-    def _check_well_formed(metadata_info, catalog_path):
-        """Monkeypatch well-formedness check (there are no real files)."""
-        result = {}
-        grade = "fi-preservation-recommended-file-format"
+NO_VALIDATION = "fi-preservation-no-file-format-validation"
 
-        # TODO: cleanup mocking
-        if metadata_info['filename'] == 'pdf':
-            result = make_result_dict(
-                is_valid=True,
-                messages=['JHovePdfScraper: Well-Formed and valid',
-                          ('MagicScraper: The file was analyzed '
-                           'successfully.')])
-        elif metadata_info['filename'] == 'cdr':
-            result = make_result_dict(
-                is_valid=False,
-                messages=['Proper scraper was not found. The file was not '
-                          'analyzed.'])
-            grade = "fi-preservation-bit-level-file-format"
-        elif metadata_info['filename'] == 'cdr2':
-            result = make_result_dict(
-                is_valid=False,
-                messages=['Proper scraper was not found. The file was not '
-                          'analyzed.'])
-            grade = "fi-preservation-unacceptable-file-format"
-        return (result, {}, grade)
-
-    def _get_scraper_grade(filepath):
-        """Monkeypatch scraper grading (there are no real files)."""
-        grade = "fi-preservation-recommended-file-format"
-        if filepath == 'cdr':
-            grade = "fi-preservation-bit-level-file-format"
-        elif filepath == 'cdr2':
-            grade = "fi-preservation-unacceptable-file-format"
-        return grade
-
-    def _check_metadata_match(metadata_info, results):
-        """Monkeypatch metadata matching: there are no real files to scrape."""
-        # pylint: disable=unused-argument
-        if metadata_info['filename'] == 'pdf':
-            result = make_result_dict(
-                is_valid=True,
-                messages=['Some message.'])
-        else:
-            result = make_result_dict(
-                is_valid=False,
-                errors=['Some error.'])
-        return result
-
-    def _iter_metadata_info(mets_tree, mets_path, catalog_path=None):
-        """Monkeypatch mets reading."""
-        # pylint: disable=unused-argument
-        md_info = [
-            # PDF: supported and valid
-            {'filename': 'pdf', 'use': '', 'errors': None,
-             'spec_version': '1.7.3',
-             'format': {'mimetype': 'application/pdf',
-                        'version': '1.4'},
-             'object_id': {'type': 'test_object', 'value': 'pdf1'},
-             'algorithm': 'MD5',
-             'digest': 'aa4bddaacf5ed1ca92b30826af257a1b'},
-            # CDR: not supported, not marked as native
-            {'filename': 'cdr', 'use': '', 'errors': None,
-             'spec_version': '1.7.3',
-             'format': {'mimetype': 'application/cdr',
-                        'version': '9.0'},
-             'object_id': {'type': 'test_object', 'value': 'cdr1'},
-             'algorithm': 'MD5',
-             'digest': 'aa4bddaacf5ed1ca92b30826af257a1c'},
-            # CDR: not supported, marked as native
-            {'filename': 'cdr',
-             'use': 'fi-preservation-no-file-format-validation',
-             'spec_version': '1.7.3',
-             'errors': None,
-             'format': {'mimetype': 'application/cdr',
-                        'version': '9.0'},
-             'object_id': {'type': 'test_object', 'value': 'cdr2'},
-             'algorithm': 'MD5',
-             'digest': 'aa4bddaacf5ed1ca92b30826af257a1d'},
-            # CDR: not supported, use given but not the one that would
-            #      mark it as native
-            {'filename': 'cdr', 'use': 'yes-file-format-validation',
-             'spec_version': '1.7.3',
-             'errors': None,
-             'format': {'mimetype': 'application/cdr',
-                        'version': '9.0'},
-             'object_id': {'type': 'test_object', 'value': 'cdr3'},
-             'algorithm': 'MD5',
-             'digest': 'aa4bddaacf5ed1ca92b30826af257a1d'},
-            # CDR: not supported, marked as native, but graded as UNACCEPTABLE
-            {'filename': 'cdr2',
-             'use': 'fi-preservation-no-file-format-validation',
-             'spec_version': '1.7.3',
-             'errors': None,
-             'format': {'mimetype': 'application/cdr',
-                        'version': '9.0'},
-             'object_id': {'type': 'test_object', 'value': 'cdr3'},
-             'algorithm': 'MD5',
-             'digest': 'aa4bddaacf5ed1ca92b30826af257a1d'}]
-
-        for md_element in md_info:
-            yield md_element
-
-    monkeypatch.setattr(
-        ipt.scripts.check_sip_digital_objects, 'check_metadata_match',
-        _check_metadata_match)
-    monkeypatch.setattr(
-        ipt.scripts.check_sip_digital_objects, 'check_well_formed',
-        _check_well_formed)
-    monkeypatch.setattr(
-        ipt.scripts.check_sip_digital_objects, 'iter_metadata_info',
-        _iter_metadata_info)
-    monkeypatch.setattr(
-        ipt.scripts.check_sip_digital_objects, 'get_scraper_grade',
-        _get_scraper_grade)
-
-
-@pytest.mark.usefixtures('patch_validate')
-def test_native_marked():
+@pytest.mark.parametrize(
+    ("md_info", "use", "grade", "is_valid"),
+    (
+        # Recommended file format
+        (PDF_MD_INFO, "", RECOMMENDED, True),
+        # Recommended file format skip validation
+        (PDF_MD_INFO, NO_VALIDATION, RECOMMENDED, False),
+        # Acceptable file format
+        (PDF_MD_INFO, "", ACCEPTABLE, True),
+        # Acceptable file format skip validation
+        (PDF_MD_INFO, NO_VALIDATION, ACCEPTABLE, False),
+        # Bit level format not marked as native
+        (CDR_MD_INFO, "", BIT_LEVEL, False),
+        # Bit level recommended format not marked as native
+        (CDR_MD_INFO, BIT_LEVEL_WITH_RECOMMENDED, BIT_LEVEL, False),
+        # Bit level format marked as native
+        (CDR_MD_INFO, NO_VALIDATION, BIT_LEVEL, True),
+        # Bit level recommended format marked as native
+        (CDR_MD_INFO, NO_VALIDATION, BIT_LEVEL_WITH_RECOMMENDED, True),
+        # Bit level format with wrong mets use
+        (CDR_MD_INFO, "yes-file-format-validation", BIT_LEVEL, False),
+        # Unacceptable format marked as native
+        (CDR_MD_INFO, NO_VALIDATION, UNACCEPTABLE, False),
+        # UNAP and UNAV grades should always fail
+        (CDR_MD_INFO, "", UNAP, False),
+        (CDR_MD_INFO, NO_VALIDATION, UNAP, False),
+        (CDR_MD_INFO, "", UNAV, False),
+        (CDR_MD_INFO, NO_VALIDATION, UNAV, False),
+        # Unexpected grade shoud always fail
+        (CDR_MD_INFO, NO_VALIDATION, "test", False),
+    )
+)
+def test_native_marked(md_info, use, grade, is_valid, monkeypatch):
     """
     Test validation with native file format.
 
@@ -394,13 +333,36 @@ def test_native_marked():
     validation steps are done, whereas files not marked as native can be valid
     or invalid according to the normal rules.
     """
+    def _iter_metadata_info(*args, **kwargs):
+        md_info["use"] = use
+        yield md_info
+
+    monkeypatch.setattr(
+        ipt.scripts.check_sip_digital_objects,
+        'check_metadata_match',
+        # Pass metadata check only for pdf files. This should not affect files
+        # where validation is skipped.
+        lambda *args: make_result_dict(md_info["filename"] == "pdf")
+    )
+    monkeypatch.setattr(
+        ipt.scripts.check_sip_digital_objects,
+        'check_well_formed',
+        lambda *args, **kwargs: (make_result_dict(is_valid), {}, grade)
+    )
+    monkeypatch.setattr(
+        ipt.scripts.check_sip_digital_objects,
+        'iter_metadata_info',
+        _iter_metadata_info
+    )
+    monkeypatch.setattr(
+        ipt.scripts.check_sip_digital_objects,
+        'get_scraper_grade',
+        lambda *args: grade
+    )
 
     collection = [result for result in validation(None, None)]
-    assert (['fi-preservation-no-file-format-validation' in
-             result['metadata_info']['use'] for
-             result in collection] == [False, False, True, False, True])
-    expected_result = [True, False, True, False, False]
-    assert [result['is_valid'] for result in collection] == expected_result
+    assert len(collection) == 1
+    assert collection[0]["is_valid"] == is_valid
 
 
 # TODO add test for native files needing to have a supported companion file?
