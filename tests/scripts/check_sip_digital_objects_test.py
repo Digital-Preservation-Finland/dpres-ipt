@@ -8,6 +8,8 @@ import lxml.etree as ET
 import pytest
 import premis
 
+import xml_helpers
+
 from file_scraper.iterator import iter_detectors
 from file_scraper.scraper import Scraper
 from file_scraper.defaults import (
@@ -360,7 +362,13 @@ def test_native_marked(md_info, use, grade, is_valid, monkeypatch):
         lambda *args: grade
     )
 
-    collection = [result for result in validation(None, None)]
+    monkeypatch.setattr(
+        xml_helpers.utils,
+        'readfile',
+        lambda *args: "mock"
+    )
+
+    collection = [result for result in validation("", None)]
     assert len(collection) == 1
     assert collection[0]["is_valid"] == is_valid
 
@@ -402,10 +410,15 @@ def patch_scraper_identify(mimetype='', version=''):
 
 
 @pytest.mark.usefixtures('patch_metadata_info')
-def test_metadata_info_erros():
+def test_metadata_info_erros(monkeypatch):
     """Test that when mets has errors, other validation steps are skipped."""
+    monkeypatch.setattr(
+        xml_helpers.utils,
+        'readfile',
+        lambda *args: "mock"
+    )
 
-    results = [x for x in validation(None, None)]
+    results = [x for x in validation("", None)]
     assert len(results) == 1
 
     result = results[0]
