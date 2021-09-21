@@ -21,6 +21,7 @@ from file_scraper.defaults import (
 
 from ipt.comparator.utils import iter_metadata_info
 from ipt.comparator.comparator import MetadataComparator
+from ipt.constants import METS_USE_NO_VALIDATION, METS_USE_IDENTIFICATION
 from ipt.utils import merge_dicts, create_scraper_params, get_scraper_info
 from ipt.six_utils import ensure_text
 
@@ -122,7 +123,7 @@ def skip_validation(metadata_info):
     if metadata_info['spec_version'] in [
             '1.5.0', '1.6.0', '1.6.1', '1.7.0', '1.7.1', '1.7.2']:
         return metadata_info['use'] == 'no-file-format-validation'
-    return metadata_info['use'] == 'fi-preservation-no-file-format-validation'
+    return metadata_info['use'] == METS_USE_NO_VALIDATION
 
 
 def append_format_info(message, mimetype, version=''):
@@ -229,19 +230,17 @@ def check_grade(metadata_info, grade):
     :grade: Grade returned by file scraper.
     :returns: result_dict dictionary.
     """
-    no_validation = "fi-preservation-no-file-format-validation"
-    identification = "fi-preservation-file-format-identification"
     use = metadata_info["use"]
     messages = []
     errors = []
     valid = False
 
-    if grade == RECOMMENDED or grade == ACCEPTABLE:
-        valid = (use == "")
-    elif grade == BIT_LEVEL_WITH_RECOMMENDED:
-        valid = (use == no_validation)
-    elif grade == BIT_LEVEL:
-        valid = (use == no_validation or use == identification)
+    if use == "":
+        valid = (grade == RECOMMENDED or grade == ACCEPTABLE)
+    elif use == METS_USE_NO_VALIDATION:
+        valid = (grade == BIT_LEVEL_WITH_RECOMMENDED or grade == BIT_LEVEL)
+    elif use == METS_USE_IDENTIFICATION:
+        valid = (grade == BIT_LEVEL)
 
     if (grade == BIT_LEVEL_WITH_RECOMMENDED or grade == BIT_LEVEL) and valid:
         messages.append(
