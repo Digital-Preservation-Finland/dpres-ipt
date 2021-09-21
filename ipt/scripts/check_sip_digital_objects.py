@@ -220,18 +220,15 @@ def get_scraper_grade(filepath):
     return scraper.grade()
 
 
-def check_grade(metadata_info, grade, mets_path):
+def check_grade(metadata_info, grade):
     """
     Check that provided mets use attribute is accepted for the grade returned
     by scraper.
 
     :metadata_info: Dictionary containing metadata parsed from mets.
     :grade: Grade returned by file scraper.
-    :mets_path: Path to the directory which contains the mets.xml file
-                or the full path to mets.xml file itself
     :returns: result_dict dictionary.
     """
-    sip_path, _ = os.path.split(mets_path)
     no_validation = "fi-preservation-no-file-format-validation"
     identification = "fi-preservation-file-format-identification"
     use = metadata_info["use"]
@@ -249,7 +246,7 @@ def check_grade(metadata_info, grade, mets_path):
     if (grade == BIT_LEVEL_WITH_RECOMMENDED or grade == BIT_LEVEL) and valid:
         messages.append(
             "File {} has been accepted to bit-level preservation only.".format(
-                os.path.relpath(metadata_info["filename"], sip_path)
+                metadata_info["relpath"]
             )
         )
 
@@ -257,7 +254,7 @@ def check_grade(metadata_info, grade, mets_path):
         errors.append(
             "ERROR: File {} with the given file format {} is unacceptable"
             " for digital preservation.".format(
-                os.path.relpath(metadata_info["filename"], sip_path),
+                metadata_info["relpath"],
                 metadata_info["format"]["mimetype"]
             )
         )
@@ -307,7 +304,7 @@ def validation(mets_path, catalog_path):
             }
     """
 
-    def _validate(metadata_info, mets_path):
+    def _validate(metadata_info):
         """
         Perform validation operations in the following order:
         1. Check metadata_info for errors and notes; if there are errors,
@@ -328,7 +325,7 @@ def validation(mets_path, catalog_path):
         elif skip_validation(metadata_info):
             # Check the scraper grade before allowing to skip validation
             grade = get_scraper_grade(metadata_info["filename"])
-            results.append(check_grade(metadata_info, grade, mets_path))
+            results.append(check_grade(metadata_info, grade))
             return join_validation_results(metadata_info, results)
         scraper_result, streams, grade = check_well_formed(
             metadata_info,
@@ -337,7 +334,7 @@ def validation(mets_path, catalog_path):
         results.append(scraper_result)
         if scraper_result['is_valid'][0]:
             results.append(check_metadata_match(metadata_info, streams))
-        grade_result = check_grade(metadata_info, grade, mets_path)
+        grade_result = check_grade(metadata_info, grade)
         results.append(grade_result)
         return join_validation_results(metadata_info, results)
 
@@ -350,7 +347,7 @@ def validation(mets_path, catalog_path):
 
     for metadata_info in iter_metadata_info(mets_tree=mets_tree,
                                             mets_path=mets_path):
-        yield _validate(metadata_info, mets_path)
+        yield _validate(metadata_info)
 
 
 def create_report_agent():

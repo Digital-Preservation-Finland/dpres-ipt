@@ -270,6 +270,7 @@ def test_validation_report(monkeypatch, results, object_count, event_count):
 
 PDF_MD_INFO = {
     'filename': 'pdf',
+    'relpath': 'pdf',
     'use': '',
     'errors': None,
     'spec_version': '1.7.3',
@@ -281,6 +282,7 @@ PDF_MD_INFO = {
 
 CDR_MD_INFO = {
     'filename': 'cdr',
+    'relpath': 'cdr',
     'use': '',
     'errors': None,
     'spec_version': '1.7.3',
@@ -361,7 +363,6 @@ def test_native_marked(md_info, use, grade, is_valid, monkeypatch):
         'get_scraper_grade',
         lambda *args: grade
     )
-
     monkeypatch.setattr(
         xml_helpers.utils,
         'readfile',
@@ -383,11 +384,16 @@ def patch_metadata_info(monkeypatch):
     def _iter_metadata_info(mets_tree, mets_path, catalog_path=None):
         """Mock iter_metadata_info to return """
         # pylint: disable=unused-argument
-        return [{'filename': 'pdf', 'use': '', 'errors': 'Some error',
-                 'format': {'mimetype': 'application/pdf', 'version': '1.4'},
-                 'object_id': {'type': 'test_object', 'value': 'pdffile'},
-                 'algorithm': 'MD5',
-                 'digest': 'aa4bddaacf5ed1ca92b30826af257a1b'}]
+        return [{
+            'filename': 'pdf',
+            'relpath': 'pdf',
+            'use': '',
+            'errors': 'Some error',
+            'format': {'mimetype': 'application/pdf', 'version': '1.4'},
+            'object_id': {'type': 'test_object', 'value': 'pdffile'},
+            'algorithm': 'MD5',
+            'digest': 'aa4bddaacf5ed1ca92b30826af257a1b'
+        }]
 
     monkeypatch.setattr(
         ipt.scripts.check_sip_digital_objects, 'iter_metadata_info',

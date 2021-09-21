@@ -66,7 +66,7 @@ def mdwrap_to_metadata_info(mdwrap_element):
         return {}
 
 
-def create_metadata_info(mets_tree, element, object_filename, use,
+def create_metadata_info(mets_tree, element, object_filename, relpath, use,
                          object_type, spec_version):
     """Create a dictionary of technical metadata from mets metadata for
     a given section that can either be about a digital object
@@ -76,6 +76,7 @@ def create_metadata_info(mets_tree, element, object_filename, use,
     :mets_tree: metadata in mets xml format
     :element: the metadata section with the ID to be parsed
     :object_filename: path to the digital object
+    :relpath: relative path to the file inside the package
     :use: the use attribute value for the digital object
     :object_type: type of object, i.e. a 'file' or a 'bitstream'
     :spec_version: National specification version
@@ -87,6 +88,7 @@ def create_metadata_info(mets_tree, element, object_filename, use,
     if object_type == 'file':
         metadata_info = {
             'filename': object_filename,
+            'relpath': relpath,
             'use': use,
             'format': {'mimetype': None,
                        'version': None},
@@ -135,16 +137,21 @@ def iter_metadata_info(mets_tree, mets_path):
 
     for element in mets.parse_files(mets_tree):
         loc = mets.parse_flocats(element)[0]
-        filename = ensure_text(uri_to_path(mets.parse_href(loc)))
+        relpath = ensure_text(uri_to_path(mets.parse_href(loc)))
         object_filename = os.path.join(
             os.path.dirname(mets_path),
-            filename)
+            relpath)
         use = mets.parse_use(element)
 
         metadata_info = create_metadata_info(
-            mets_tree=mets_tree, element=element,
-            object_filename=object_filename, use=use, object_type='file',
-            spec_version=spec_version)
+            mets_tree=mets_tree,
+            element=element,
+            object_filename=object_filename,
+            relpath=relpath,
+            use=use,
+            object_type='file',
+            spec_version=spec_version
+        )
 
         metadata_info['audio_streams'] = []
         metadata_info['video_streams'] = []
@@ -152,7 +159,7 @@ def iter_metadata_info(mets_tree, mets_path):
 
             stream_info = create_metadata_info(
                 mets_tree=mets_tree, element=stream_elem,
-                object_filename=object_filename, use=use,
+                object_filename=object_filename, relpath=relpath, use=use,
                 object_type='bitstream', spec_version=spec_version)
             if 'audio' in stream_info:
                 metadata_info['audio_streams'].append(stream_info)
