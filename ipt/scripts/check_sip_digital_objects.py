@@ -337,11 +337,6 @@ def validation(mets_path, catalog_path):
         results.append(grade_result)
         return join_validation_results(metadata_info, results)
 
-    mets_tree = None
-
-    # If the mets_path is a directory path, add mets.xml to mets_path
-    if os.path.isdir(mets_path):
-        mets_path = os.path.join(mets_path, 'mets.xml')
     mets_tree = xml_helpers.utils.readfile(mets_path)
 
     for metadata_info in iter_metadata_info(mets_tree=mets_tree,
@@ -436,7 +431,8 @@ def validation_report(sip_path,
     report_agent = create_report_agent()
     child_elements = [report_agent]
     object_list = set()
-    for result in validation(mets_path=sip_path, catalog_path=catalog_path):
+    mets_path = os.path.join(sip_path, "mets.xml")
+    for result in validation(mets_path=mets_path, catalog_path=catalog_path):
         metadata_info = result['metadata_info']
         # Create PREMIS object only if not already in the report
         if metadata_info['object_id']['value'] not in object_list:

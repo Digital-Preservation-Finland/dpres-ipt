@@ -5,18 +5,19 @@ from __future__ import print_function, unicode_literals
 
 import argparse
 import errno
-import os
 import sys
-
-import xml_helpers.utils as u
-from file_scraper.utils import hexdigest
-from ipt.comparator.utils import iter_metadata_info
-from ipt.six_utils import ensure_text
-
+import os
 try:
     from os import walk
 except ImportError:
     from scandir import walk
+
+import xml_helpers.utils as u
+from file_scraper.utils import hexdigest
+
+from ipt.comparator.utils import iter_metadata_info
+from ipt.six_utils import ensure_text
+
 
 
 def iter_files(path):
@@ -37,20 +38,16 @@ def iter_files(path):
             yield os.path.join(root, filename)
 
 
-def check_checksums(mets_path):
+def check_checksums(sip_path):
     """Check checksums for all digital objects in METS
 
-    :mets_path: Path to mets
+    :sip_path: The path to the SIP contents
     :returns: Iterable containing all error messages
 
     """
 
     checked_files = {}
-
-    if os.path.isdir(mets_path):
-        mets_path = os.path.join(mets_path, 'mets.xml')
-
-    sip_path = os.path.dirname(mets_path)
+    mets_path = os.path.join(sip_path, 'mets.xml')
 
     def _message(metadata_info, message):
         """Format error message"""
@@ -93,7 +90,7 @@ def main(arguments=None):
     args = parse_arguments(arguments)
 
     returncode = 0
-    for error_message in check_checksums(args.sip_path):
+    for error_message in check_checksums(ensure_text(args.sip_path)):
         print(error_message)
         returncode = 117
 
