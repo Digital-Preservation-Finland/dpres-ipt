@@ -214,13 +214,6 @@ def check_metadata_match(metadata_info, scraper_streams):
     return make_result_dict(result['is_valid'], messages, errors)
 
 
-def get_scraper_grade(filepath):
-    """Scrape file and return grade."""
-    scraper = Scraper(filepath)
-    scraper.scrape()
-    return scraper.grade()
-
-
 def check_grade(metadata_info, grade):
     """
     Check that provided mets use attribute is accepted for the grade returned
@@ -317,24 +310,34 @@ def validation(mets_path, catalog_path):
         """
         results = []
 
+        # 1. Check for mets errors
         mets_result = check_mets_errors(metadata_info)
         results.append(mets_result)
         if not mets_result['is_valid'][0]:
             return join_validation_results(metadata_info, results)
-        elif skip_validation(metadata_info):
-            # Check the scraper grade before allowing to skip validation
-            grade = get_scraper_grade(metadata_info["filename"])
-            results.append(check_grade(metadata_info, grade))
-            return join_validation_results(metadata_info, results)
+
         scraper_result, streams, grade = check_well_formed(
             metadata_info,
             catalog_path=catalog_path
         )
+
+        # 2. Check if user has specified to skip validation
+        if skip_validation(metadata_info):
+            # Check the scraper grade before allowing to skip validation
+            results.append(check_grade(metadata_info, grade))
+            return join_validation_results(metadata_info, results)
+
+        # 3. Check if the file is well-formed
         results.append(scraper_result)
+
+        # 4. Check that user provided metadata matches with scraper metadata
         if scraper_result['is_valid'][0]:
             results.append(check_metadata_match(metadata_info, streams))
+
+        # 5. Check scraper grade
         grade_result = check_grade(metadata_info, grade)
         results.append(grade_result)
+
         return join_validation_results(metadata_info, results)
 
     mets_tree = xml_helpers.utils.readfile(mets_path)

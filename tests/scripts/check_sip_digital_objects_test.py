@@ -359,11 +359,6 @@ def test_native_marked(md_info, use, grade, is_valid, monkeypatch):
         _iter_metadata_info
     )
     monkeypatch.setattr(
-        ipt.scripts.check_sip_digital_objects,
-        'get_scraper_grade',
-        lambda *args: grade
-    )
-    monkeypatch.setattr(
         xml_helpers.utils,
         'readfile',
         lambda *args: "mock"
