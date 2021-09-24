@@ -364,9 +364,9 @@ def test_native_marked(md_info, use, grade, is_valid, monkeypatch):
         lambda *args: "mock"
     )
 
-    collection = [result for result in validation("", None)]
-    assert len(collection) == 1
-    assert collection[0]["is_valid"] == is_valid
+    results = [result for result in validation("/mock/mets", "/mock/catalog")]
+    assert len(results) == 1
+    assert results[0]["is_valid"] == is_valid
 
 
 # TODO add test for native files needing to have a supported companion file?
@@ -419,7 +419,7 @@ def test_metadata_info_erros(monkeypatch):
         lambda *args: "mock"
     )
 
-    results = [x for x in validation("", None)]
+    results = [result for result in validation("/mock/mets", "/mock/catalog")]
     assert len(results) == 1
 
     result = results[0]

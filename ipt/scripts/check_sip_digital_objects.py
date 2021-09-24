@@ -229,11 +229,11 @@ def check_grade(metadata_info, grade):
     valid = False
 
     if use == "":
-        valid = (grade == RECOMMENDED or grade == ACCEPTABLE)
+        valid = grade in [RECOMMENDED, ACCEPTABLE]
     elif use == METS_USE_NO_VALIDATION:
-        valid = (grade == BIT_LEVEL_WITH_RECOMMENDED or grade == BIT_LEVEL)
+        valid = grade in [BIT_LEVEL_WITH_RECOMMENDED, BIT_LEVEL]
     elif use == METS_USE_IDENTIFICATION:
-        valid = (grade == BIT_LEVEL)
+        valid = grade == BIT_LEVEL
 
     if (grade == BIT_LEVEL_WITH_RECOMMENDED or grade == BIT_LEVEL) and valid:
         messages.append(
