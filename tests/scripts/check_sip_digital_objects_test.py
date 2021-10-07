@@ -292,7 +292,7 @@ CDR_MD_INFO = {
     'digest': 'aa4bddaacf5ed1ca92b30826af257a1c'
 }
 
-NO_VALIDATION = "fi-preservation-no-file-format-validation"
+NO_VALIDATION = "fi-dpres-no-file-format-validation"
 
 @pytest.mark.parametrize(
     ("md_info", "use", "grade", "is_valid"),
@@ -331,7 +331,7 @@ def test_native_marked(md_info, use, grade, is_valid, monkeypatch):
     Test validation with native file format.
 
     These native formats have are marked with
-        'use': 'fi-preservation-no-file-format-validation'
+        'use': 'fi-dpres-no-file-format-validation'
     in metadata_info and have a corresponding file in an acceptable format.
     This test tests that native files with valid METS are valid and no further
     validation steps are done, whereas files not marked as native can be valid

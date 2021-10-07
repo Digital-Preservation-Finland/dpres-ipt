@@ -140,7 +140,7 @@
         <mets:FLocat LOCTYPE="URL" xlink:href="file://data/valid_1.0_local_xsd.xml" xlink:type="simple"/>
       </mets:file>
     </mets:fileGrp>
-    <mets:fileGrp USE="fi-preservation-xml-schemas">
+    <mets:fileGrp USE="fi-dpres-xml-schemas">
       <mets:file ID="_79c0dcfb-0239-4139-a636-7eabd1ac911f" ADMID="_91b0e312cdd6c610c399a71412b9b041">
         <mets:FLocat LOCTYPE="URL" xlink:href="file://data/local.xsd" xlink:type="simple"/>
       </mets:file>
@@ -154,8 +154,8 @@
     </mets:div>
   </mets:structMap>
   <mets:structMap TYPE="logical">
-    <mets:div TYPE="fi-preservation-supplementary">
-      <mets:div TYPE="fi-preservation-xml-schemas" ADMID="_81b0e312cdd6c610c399a71412b9b041">
+    <mets:div TYPE="fi-dpres-supplementary">
+      <mets:div TYPE="fi-dpres-xml-schemas" ADMID="_81b0e312cdd6c610c399a71412b9b041">
         <mets:fptr FILEID="_79c0dcfb-0239-4139-a636-7eabd1ac911f"/>
       </mets:div>
     </mets:div>
