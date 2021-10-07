@@ -231,7 +231,7 @@ def check_grade(metadata_info, grade):
     if use == "":
         valid = grade in [RECOMMENDED, ACCEPTABLE]
     elif use == METS_USE_NO_VALIDATION:
-        valid = grade in [BIT_LEVEL_WITH_RECOMMENDED, BIT_LEVEL]
+        valid = grade == BIT_LEVEL_WITH_RECOMMENDED
     elif use == METS_USE_IDENTIFICATION:
         valid = grade == BIT_LEVEL
 

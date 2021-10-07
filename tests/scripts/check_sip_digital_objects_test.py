@@ -293,6 +293,7 @@ CDR_MD_INFO = {
 }
 
 NO_VALIDATION = "fi-dpres-no-file-format-validation"
+IDENTIFICATION = "fi-dpres-file-format-identification"
 
 @pytest.mark.parametrize(
     ("md_info", "use", "grade", "is_valid"),
@@ -308,11 +309,15 @@ NO_VALIDATION = "fi-dpres-no-file-format-validation"
         # Bit level format not marked as native
         (CDR_MD_INFO, "", BIT_LEVEL, False),
         # Bit level recommended format not marked as native
-        (CDR_MD_INFO, BIT_LEVEL_WITH_RECOMMENDED, BIT_LEVEL, False),
+        (CDR_MD_INFO, "", BIT_LEVEL_WITH_RECOMMENDED, False),
         # Bit level format marked as native
-        (CDR_MD_INFO, NO_VALIDATION, BIT_LEVEL, True),
-        # Bit level recommended format marked as native
+        (CDR_MD_INFO, NO_VALIDATION, BIT_LEVEL, False),
+        # Bit level format marked as native with identification
+        (CDR_MD_INFO, IDENTIFICATION, BIT_LEVEL, True),
+        # Bit level recommended format marked as native without identification
         (CDR_MD_INFO, NO_VALIDATION, BIT_LEVEL_WITH_RECOMMENDED, True),
+        # Bit level recommended format marked as native with identification
+        (CDR_MD_INFO, IDENTIFICATION, BIT_LEVEL_WITH_RECOMMENDED, False),
         # Bit level format with wrong mets use
         (CDR_MD_INFO, "yes-file-format-validation", BIT_LEVEL, False),
         # Unacceptable format marked as native
