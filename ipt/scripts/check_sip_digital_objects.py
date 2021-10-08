@@ -119,7 +119,14 @@ def check_mets_errors(metadata_info):
 
 
 def skip_validation(metadata_info):
-    """File format validation is not done for native file formats."""
+    """
+    File format validation is not done for native file formats marked
+    METS_USE_NO_VALIDATION or METS_USE_IDENTIFICATION. This means that
+    file-scraper and digital object validation handle these two cases
+    effectively identically. However, schematron checks will require files
+    marked METS_USE_NO_VALIDATION to be linked with a normalized version of
+    that file.
+    """
     use = metadata_info['use']
     return use == METS_USE_NO_VALIDATION or use == METS_USE_IDENTIFICATION
 
