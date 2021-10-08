@@ -119,11 +119,9 @@ def check_mets_errors(metadata_info):
 
 
 def skip_validation(metadata_info):
-    """ File format validation is not done for native file formats. """
-    if metadata_info['spec_version'] in [
-            '1.5.0', '1.6.0', '1.6.1', '1.7.0', '1.7.1', '1.7.2']:
-        return metadata_info['use'] == 'no-file-format-validation'
-    return metadata_info['use'] == METS_USE_NO_VALIDATION
+    """File format validation is not done for native file formats."""
+    use = metadata_info['use']
+    return use == METS_USE_NO_VALIDATION or use == METS_USE_IDENTIFICATION
 
 
 def append_format_info(message, mimetype, version=''):
