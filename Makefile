@@ -13,10 +13,7 @@ info:
 	@echo "PAS dpres-ipt"
 	@echo
 	@echo "Usage:"
-	@echo "  make test 			- Run all unit tests"
 	@echo "  make install		- Install dpres-ipt"
-	@echo "  make devinstall	- Quick and Dirty development installation"
-	@echo "  make install_deps	- Install required packages with yum"
 	@echo
 
 install:
@@ -44,33 +41,6 @@ install3:
 
 	# setup.py seems to be unable to create directories,
 	# create them here if needed
-
-devinstall:
-	# quick and dirty installation...
-	# not for production
-	
-install_deps:
-	# only for testing environment
-	yum -y install zip unzip
-	
-test:
-	py.test -svvvv --junitprefix=dpres-ipt --junitxml=junit.xml tests
-
-docs:
-	make -C doc html
-	make -C doc pdf
-
-docserver:
-	make -C doc docserver
-
-killdocserver:
-	make -C doc killdocserver
-
-coverage:
-	py.test tests --cov=ipt --cov-report=html
-	coverage report -m
-	coverage html
-	coverage xml
 
 clean: clean-rpm
 	find . -iname '*.pyc' -type f -delete
