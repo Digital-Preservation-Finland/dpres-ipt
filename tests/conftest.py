@@ -64,3 +64,31 @@ def temp_sip(testpath):
         return temp_sip_path
 
     return _temp_sip
+
+
+@pytest.fixture
+def bagit_fx(tmpdir):
+    """Create test bagit."""
+    bagit_path = tmpdir / "bagit_fx"
+    sip_path = bagit_path / "data" / "transfers" / "sippi"
+    sip_path.ensure(dir=True)
+
+    mets_path = sip_path / "mets.xml"
+    mets_path.write('asfasdfasdfsda')
+
+    image_path = sip_path / "images" / "image.jpg"
+    text_path = sip_path / "file_1.txt"
+
+    image_path.ensure().write('abcd')
+    text_path.ensure().write('abcdef')
+
+    manifest = bagit_path / "manifest-md5.txt"
+    manifest.write("\n".join([
+        'e2fc714c4727ee9395f324cd2e7f331f data/file.txt',
+        'e80b5017098950fc58aad83c8c14978e file2.txt'
+    ]))
+
+    bagit_meta = bagit_path / 'bagit.txt'
+    bagit_meta.write('foo')
+
+    return bagit_path

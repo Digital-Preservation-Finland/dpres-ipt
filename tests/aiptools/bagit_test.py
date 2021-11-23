@@ -5,7 +5,7 @@ This is a test module for bagit.py
 import os
 
 import pytest
-from tests.testcommon.utils import create_test_bagit
+
 from ipt.aiptools.bagit import make_manifest, calculate_md5, \
     write_manifest, write_bagit_txt, BagitError, check_directory_is_bagit,\
     check_bagit_mandatory_files
@@ -62,27 +62,31 @@ def test_write_bagit_txt(testpath):
         assert lines[1] == 'Tag-File-Character-Encoding: UTF-8\n'
 
 
-def test_bagit_structure(testpath):
-    """Test bagit structure."""
-    bagit_path = os.path.join(testpath, 'sippi-uuid')
-    create_test_bagit(bagit_path)
-    ret = check_directory_is_bagit(bagit_path)
-    assert ret == 0
-    ret = check_bagit_mandatory_files(bagit_path)
-    assert ret == 0
-    assert os.path.isdir(os.path.join(bagit_path, 'data'))
+def test_bagit_structure(bagit_fx):
+    """Test bagit the created bagit structure"""
+    assert (bagit_fx / 'data').isdir()
+    assert check_directory_is_bagit(str(bagit_fx)) == 0
+    assert check_bagit_mandatory_files(str(bagit_fx)) == 0
 
-    # Test mandatory bagit files missing errors
-    os.remove(os.path.join(bagit_path, 'manifest-md5.txt'))
-    with pytest.raises(BagitError):
-        check_bagit_mandatory_files(bagit_path),
 
-    os.remove(os.path.join(bagit_path, 'bagit.txt'))
+@pytest.mark.parametrize("filename", [
+    "bagit.txt",
+    "manifest-md5.txt"
+])
+def test_bagit_missing_files(bagit_fx, filename):
+    """Test that bagit util raises exception if any of the mandatory files are
+    missing"""
+    (bagit_fx / filename).remove(rec=1)
     with pytest.raises(BagitError):
-        check_bagit_mandatory_files(bagit_path)
+        check_bagit_mandatory_files(str(bagit_fx))
 
-    # data directory missing
-    no_bagit_dir = os.path.join(testpath, 'foo')
-    os.makedirs(no_bagit_dir)
+
+@pytest.mark.parametrize("filename", [
+    "data",
+])
+def test_bagit_missing_datadir(bagit_fx, filename):
+    """Test that bagit util raises exception if any of the mandatory files are
+    missing"""
+    (bagit_fx / filename).remove(rec=1)
     with pytest.raises(BagitError):
-        check_bagit_mandatory_files(no_bagit_dir)
+        check_directory_is_bagit(str(bagit_fx))
