@@ -128,7 +128,7 @@ def skip_validation(metadata_info):
     that file.
     """
     use = metadata_info['use']
-    return use == METS_USE_NO_VALIDATION or use == METS_USE_IDENTIFICATION
+    return use in [METS_USE_NO_VALIDATION, METS_USE_IDENTIFICATION]
 
 
 def append_format_info(message, mimetype, version=''):
