@@ -18,7 +18,7 @@ from ipt.utils import parse_uri_filepath
 def main(arguments=None):
     """ The main method for create-schema-catalog script"""
     args = parse_arguments(arguments)
-    result = _create_schema_catalog(mets=args.mets,
+    result = _create_schema_catalog(mets_path=args.mets,
                                     sip=args.sip,
                                     output_path=args.output_path,
                                     catalog=args.catalog)
@@ -50,18 +50,18 @@ def parse_arguments(arguments):
     return parser.parse_args(arguments)
 
 
-def _create_schema_catalog(mets, sip, output_path, catalog):
+def _create_schema_catalog(mets_path, sip, output_path, catalog):
     """Create schema catalog based on given METS XML, and possibly catalog
     file.
 
-    :param mets: METS XML file to fetch the schema URIs.
+    :param mets_path: METS XML file to fetch the schema URIs.
     :param sip: SIP path where all package content is located under.
     :param output_path: File to create the schema catalog to.
     :param catalog: Catalog file to be added as nextCatalog entry.
     :return: Integer 0 when no issue arises. 117 if METS file is missing.
     """
     try:
-        mets_tree = xml_helpers.utils.readfile(mets)
+        mets_tree = xml_helpers.utils.readfile(mets_path)
     except IOError as err:
         print(ensure_text(str(err)), file=sys.stderr)
         return 117

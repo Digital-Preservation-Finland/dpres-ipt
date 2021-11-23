@@ -48,13 +48,13 @@ creates a manifest file manifest-md5.txt with lines:
 """
 
 import os
+import io
 
 from file_scraper.utils import hexdigest
 
 
 class BagitError(Exception):
     """Raised when plugin encounters unrecoverable error"""
-    pass
 
 
 def make_manifest(bagit_dir):
@@ -65,7 +65,7 @@ def make_manifest(bagit_dir):
         for file_name in file_list:
             path = os.path.join(dir_name, file_name)
             # Manifest should be updated, not re-icluded in new manifest
-            if file_name != 'manifest-md5.txt' and file_name != 'bagit.txt':
+            if file_name not in ['manifest-md5.txt', 'bagit.txt']:
                 digest = calculate_md5(path)
                 file_path_in_manifest = path.split(bagit_dir + '/')[1]
                 manifest.append([digest, file_path_in_manifest])
@@ -87,9 +87,9 @@ def write_manifest(manifest, path):
     :path: bagit path where manifest file should be written.
     :returns: None"""
     manifest_path = os.path.join(path, 'manifest-md5.txt')
-    with open(manifest_path, 'w') as outfile:
+    with io.open(manifest_path, 'tw', encoding='utf-8') as outfile:
         for line in manifest:
-            outfile.write("%s %s\n" % (line[0], line[1]))
+            outfile.write(u"%s %s\n" % (line[0], line[1]))
 
 
 def write_bagit_txt(path):
@@ -98,9 +98,9 @@ def write_bagit_txt(path):
     :returns: None
     """
     bagit_path = os.path.join(path, 'bagit.txt')
-    with open(bagit_path, 'w') as outfile:
+    with io.open(bagit_path, 'tw', encoding='utf-8') as outfile:
         outfile.write(
-            'BagIt-Version: 0.97\nTag-File-Character-Encoding: UTF-8\n')
+            u'BagIt-Version: 0.97\nTag-File-Character-Encoding: UTF-8\n')
 
 
 def check_directory_is_bagit(bagit_dir):

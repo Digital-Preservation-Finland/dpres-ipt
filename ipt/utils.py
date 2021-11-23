@@ -5,13 +5,14 @@ import os
 from collections import defaultdict
 from copy import deepcopy
 from fractions import Fraction
+import mimeparse
+
 import lxml.etree as ET
 
 import six
 from six.moves.urllib.parse import unquote_plus, urlparse
 from ipt.six_utils import ensure_binary
 
-import mimeparse
 
 _SCRAPER_PARAM_ADDML_KEY_RELATION = (('fields', 'header_fields'),
                                      ('separator', 'separator'),
@@ -26,12 +27,10 @@ _FFMPEG_FILE_SCRAPER_KEY_SYNONYMS = {'frame_rate': 'avg_frame_rate',
 
 class UnknownException(Exception):
     """Unknown error."""
-    pass
 
 
 class ValidationException(Exception):
     """Validator error."""
-    pass
 
 
 def merge_dicts(*dicts):

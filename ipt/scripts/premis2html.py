@@ -15,8 +15,9 @@ Usage ::
 """
 from __future__ import print_function, unicode_literals
 
-import optparse
+import argparse
 import os
+import io
 import subprocess
 
 XSLT_PATH = "/usr/share/dpres-xml-schemas/preservation_schemas/stylesheet.xml"
@@ -29,7 +30,7 @@ def main(arguments=None):
     usage = \
         "usage: %prog /path/to/premis/report.xml [/path/to/html/report.html]"
 
-    parser = optparse.OptionParser(usage=usage)
+    parser = argparse.ArgumentParser(usage=usage)
 
     (_, args) = parser.parse_args(arguments)
 
@@ -48,7 +49,7 @@ def main(arguments=None):
     cmd = ['xsltproc', XSLT_PATH, args[0]]
     print(cmd)
 
-    with open(html_path, "w") as html_file:
+    with io.open(html_path, "w", encoding="utf-8") as html_file:
         proc = subprocess.Popen(
             cmd, stdin=subprocess.PIPE,
             stderr=subprocess.PIPE, stdout=html_file,

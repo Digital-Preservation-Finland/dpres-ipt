@@ -192,9 +192,13 @@ def premis_to_dict(premis_xml):
     if object_type.endswith('representation'):
         return {}
     premis_dict = {"object_id": {}}
-    (premis_dict["object_id"]["type"],
-     premis_dict["object_id"]["value"]) = premis.parse_identifier_type_value(
-         premis.parse_identifier(premis_xml, 'object'))
+
+    identifier_type, identifier_value = premis.parse_identifier_type_value(
+        premis.parse_identifier(premis_xml, 'object'))
+
+    premis_dict["object_id"]["type"] = identifier_type
+    premis_dict["object_id"]["value"] = identifier_value
+
     if object_type.endswith('file'):
         (premis_dict["algorithm"],
          premis_dict["digest"]) = premis.parse_fixity(premis_xml)

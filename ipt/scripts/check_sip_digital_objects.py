@@ -240,7 +240,7 @@ def check_grade(metadata_info, grade):
     elif use == METS_USE_IDENTIFICATION:
         valid = grade == BIT_LEVEL
 
-    if (grade == BIT_LEVEL_WITH_RECOMMENDED or grade == BIT_LEVEL) and valid:
+    if grade in [BIT_LEVEL_WITH_RECOMMENDED, BIT_LEVEL] and valid:
         messages.append(
             "File {} has been accepted to bit-level preservation only.".format(
                 metadata_info["relpath"]

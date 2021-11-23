@@ -2,10 +2,9 @@
 # vim:ft=python
 """Command line utility to create bagit manifests for AIP packages.
 
-
 Usage instructions::
 
-    create-aip <sip directory>
+    bagit_util make_manifest <sip directory>
 
 On successful operation returns exit status 0.
 On system error returns exit status != 0.
@@ -19,42 +18,36 @@ For more information see the :mod:`aiptools.bagit` module.
 """
 
 import sys
-import optparse
+import argparse
 
 from ipt.aiptools.bagit import make_manifest, write_manifest, \
     write_bagit_txt, check_directory_is_bagit, check_bagit_mandatory_files
 
 
-def main(arguments=None):
+def main(argv=None):
     """Parse command line arguments and run application.
     :arguments: Commandline parameters.
     :returns: 0 if all ok, otherwise BagitError(or other exception) is risen"""
 
-    usage = "usage: %prog make_manifest <sip_path>"
-    parser = optparse.OptionParser(usage=usage)
-    if not arguments:
-        arguments = sys.argv
-    (_, args) = parser.parse_args(arguments)
+    usage = "usage: bagit_util make_manifest <sip_path>"
+    parser = argparse.ArgumentParser(usage=usage)
 
-    if len(args) != 3:
+    parser.add_argument("make_manifest", help="Write manifest file for bagit")
+    parser.add_argument("sip_path", help="Path to SIP directory")
+
+    args = parser.parse_args(argv)
+
+    if not args.make_manifest == "make_manifest":
         sys.stderr.write("Must provide make_manifest command and SIP directory"
                          " name as parameter\n")
         parser.print_help()
         return 1
 
-    if args[1] != 'make_manifest':
-        sys.stderr.write('Wrong arguments, make_manifest must be first '
-                         'argument\n')
-        parser.print_help()
-        return 1
-
-    sip_path = args[2]
-
-    check_directory_is_bagit(sip_path)
-    manifest = make_manifest(sip_path)
-    write_manifest(manifest, sip_path)
-    write_bagit_txt(sip_path)
-    check_bagit_mandatory_files(sip_path)
+    check_directory_is_bagit(args.sip_path)
+    manifest = make_manifest(args.sip_path)
+    write_manifest(manifest, args.sip_path)
+    write_bagit_txt(args.sip_path)
+    check_bagit_mandatory_files(args.sip_path)
 
     return 0
 
