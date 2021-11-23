@@ -4,8 +4,6 @@
 
 import os
 
-import pytest
-import six
 from ipt.six_utils import ensure_text
 
 from ipt.scripts.check_sip_file_checksums import main

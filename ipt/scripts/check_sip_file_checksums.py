@@ -19,7 +19,6 @@ from ipt.comparator.utils import iter_metadata_info
 from ipt.six_utils import ensure_text
 
 
-
 def iter_files(path):
     """Iterate all files under path.
 
