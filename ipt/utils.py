@@ -288,7 +288,7 @@ def pair_compatible_list_elements(list_a, list_b, check_compatible):
         if not indices_a:
             # Nothing left to pair
             return set()
-        idx_a = iter(indices_a).next()
+        idx_a = next(iter(indices_a))
         for idx_b in indices_b:
             if check_compatible(list_a[idx_a], list_b[idx_b]):
                 # Found matching elements, remove matched indices and pair
