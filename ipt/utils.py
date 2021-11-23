@@ -122,7 +122,9 @@ def uri_to_path(uri):
     """
     uri = uri.encode("utf-8") if six.PY2 else uri
     path = six.moves.urllib_parse.unquote_plus(uri).replace('file://', '')
-    return path.lstrip('./')
+    if six.PY2:
+        return path.lstrip('./')
+    return path.lstrip('./').encode("utf-8")
 
 
 def parse_mimetype(mimetype):
