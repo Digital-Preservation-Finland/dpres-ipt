@@ -15,7 +15,7 @@ Usage ::
 """
 from __future__ import print_function, unicode_literals
 
-import argparse
+import optparse
 import os
 import io
 import subprocess
@@ -30,7 +30,7 @@ def main(arguments=None):
     usage = \
         "usage: %prog /path/to/premis/report.xml [/path/to/html/report.html]"
 
-    parser = argparse.ArgumentParser(usage=usage)
+    parser = optparse.OptionParser(usage=usage)
 
     (_, args) = parser.parse_args(arguments)
 
