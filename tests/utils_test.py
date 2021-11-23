@@ -78,12 +78,30 @@ def test_serialize_dict():
 
 
 def test_uri_to_path():
+    """Test converting XML URI path to filesystem path"""
     result = uri_to_path(u"file://files/f%C3%B5le.txt")
     assert result == b"files/f\xc3\xb5le.txt"
     assert result.decode("utf-8") == u"files/fõle.txt"
 
 
 def test_find_max_complete():
+    """Test that find_max_complete method returns aggregated version of lists
+    of dictionaries which contain dict attributes only if they exists in both
+    dictionaries.
+
+    For example::
+
+        find_max_complete(
+            [{"foo": 1, "bar": 1}, {"foo": 2}]
+        )
+
+    Should return::
+
+        [{"foo": 1}, {"foo", 2}]
+
+
+    """
+
     assert find_max_complete(None, None) == ([], [])
     assert find_max_complete([], []) == ([], [])
 
@@ -147,9 +165,9 @@ def test_pair_compatible_list_elements():
         - correct set of index tuples when pairing is possible
     """
 
-    def integer_compare(a, b):
+    def integer_compare(value_a, value_b):
         """Helper function to compare equality of integers"""
-        return a == b
+        return value_a == value_b
 
     random.seed(1)
 
@@ -200,12 +218,14 @@ def test_pair_compatible_list_elements():
     'http:///data/local.xsd',
 ])
 def test_parse_uri_filepath(case):
+    """Test parsing XML Schema URI paths to match local dictionary"""
     path = parse_uri_filepath(uri_path=case,
                               accepted_schemes=('http', 'file', ''))
     assert path == 'data/local.xsd'
 
 
 def test_parse_uri_filepath_error():
+    """Test invalid values in XML Schema URI parsing"""
     with pytest.raises(ValueError):
         parse_uri_filepath(uri_path='file:///does-not-exist.txt',
                            accepted_schemes=('http',))

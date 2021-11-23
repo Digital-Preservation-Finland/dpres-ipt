@@ -23,23 +23,23 @@ from ipt.comparator.comparator import MetadataComparator
 from ipt.utils import concat
 
 METADATA_INFO = {
-   'valid_text': {
+    'valid_text': {
         'filename': 'textfile',
         'format': {'charset': 'UTF-8',
                    'mimetype': 'text/plain',
                    'version': ''}},
-   'valid_office': {
+    'valid_office': {
         'filename': 'officefile',
         'format': {'mimetype': 'application/vnd.oasis.opendocument.text',
                    'version': '1.0'}},
     'valid_image': {
         'filename': 'imagefile',
         'format': {'mimetype': 'image/jpeg',
-                   'version': '1.02'}},
+                    'version': '1.02'}},
     'valid_audio': {
         'filename': 'audiofile',
         'format': {'mimetype': 'audio/x-wav',
-                   'version': ''},
+                    'version': ''},
         'audio': {'bit_rate': '706',
                   'bits_per_sample': '8',
                   'channels': '2',
@@ -261,6 +261,7 @@ def _is_textfile(self):
 @pytest.mark.parametrize('test_params', VALID_TEST_CASES,
                          ids=[case['reason'] for case in VALID_TEST_CASES])
 def test_valid_result(test_params, monkeypatch):
+    """Test valid input for the comparator function"""
     monkeypatch.setattr(Scraper, 'is_textfile', _is_textfile)
     base = test_params['base']
     scraper_streams = SCRAPER_STREAMS[base]
@@ -283,6 +284,8 @@ def test_valid_result(test_params, monkeypatch):
 @pytest.mark.parametrize('test_params', INVALID_TEST_CASES,
                          ids=[case['reason'] for case in INVALID_TEST_CASES])
 def test_invalid_result(test_params, monkeypatch):
+    """Test invalid input for the comparator function"""
+
     monkeypatch.setattr(Scraper, 'is_textfile', _is_textfile)
     base = test_params['base']
     scraper = SCRAPER_STREAMS[base]
