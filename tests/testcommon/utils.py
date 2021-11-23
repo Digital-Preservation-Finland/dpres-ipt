@@ -33,10 +33,6 @@ class Directory(str):
         :returns: Attribute or Directory object
 
         """
-
-        try:
-            if attr in self.__dict__:
-                return self.__dict__[attr]
-            return self.subdir(attr)
-        except Exception as exception:
-            raise AttributeError(str(exception))
+        if attr in self.__dict__:
+            return self.__dict__[attr]
+        return self.subdir(attr)
