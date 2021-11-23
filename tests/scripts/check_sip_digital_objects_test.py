@@ -203,7 +203,6 @@ def test_testcases_stdout():
 
 @pytest.mark.parametrize(
     'case', TEST_CASES, ids=[x['testcase'] for x in TEST_CASES])
-@pytest.mark.usefixtures('monkeypatch_Popen')
 def test_check_sip_digital_objects(case, tmpdir, monkeypatch):
     """
     Test for check_sip_digital_objects
