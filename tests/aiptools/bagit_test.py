@@ -81,12 +81,9 @@ def test_bagit_missing_files(bagit_fx, filename):
         check_bagit_mandatory_files(str(bagit_fx))
 
 
-@pytest.mark.parametrize("filename", [
-    "data",
-])
-def test_bagit_missing_datadir(bagit_fx, filename):
+def test_bagit_missing_datadir(bagit_fx):
     """Test that bagit util raises exception if any of the mandatory files are
     missing"""
-    (bagit_fx / filename).remove(rec=1)
+    (bagit_fx / "data").remove(rec=1)
     with pytest.raises(BagitError):
         check_directory_is_bagit(str(bagit_fx))
