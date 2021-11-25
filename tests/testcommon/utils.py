@@ -26,7 +26,7 @@ class Directory(str):
         return Directory(os.path.join(self, directory))
 
     def __getattr__(self, attr):
-        """Return original class attribute ethods or self.subdir(attr) if
+        """Return original class attribute methods or self.subdir(attr) if
         attribute does not exist.
 
         :attr: Attribute
