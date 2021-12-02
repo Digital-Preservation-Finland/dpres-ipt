@@ -24,7 +24,7 @@ from ipt.aiptools.bagit import make_manifest, write_manifest, \
     write_bagit_txt, check_directory_is_bagit, check_bagit_mandatory_files
 
 
-def main(argv=None):
+def main(arguments=None):
     """Parse command line arguments and run application.
     :arguments: Commandline parameters.
     :returns: 0 if all ok, otherwise BagitError(or other exception) is risen"""
@@ -35,7 +35,7 @@ def main(argv=None):
     parser.add_argument("make_manifest", help="Write manifest file for bagit")
     parser.add_argument("sip_path", help="Path to SIP directory")
 
-    args = parser.parse_args(argv)
+    args = parser.parse_args(arguments)
 
     if not args.make_manifest == "make_manifest":
         sys.stderr.write("Must provide make_manifest command and SIP directory"
