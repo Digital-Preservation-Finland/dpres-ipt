@@ -1,6 +1,12 @@
 Release notes
 =============
 
+Version 0.96
+------------
+
+Added file-scraper's grading support in METS validation.
+Terminology prefix change to fi-dpres.
+
 Version 0.95
 ------------
 
