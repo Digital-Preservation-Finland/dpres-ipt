@@ -7,7 +7,7 @@ import os
 import pytest
 
 from ipt.aiptools.bagit import make_manifest, calculate_md5, \
-    write_manifest, write_bagit_txt, BagitError, check_directory_is_bagit,\
+    write_manifest, write_bagit_txt, BagitError, check_directory_is_bagit, \
     check_bagit_mandatory_files
 
 
@@ -35,8 +35,8 @@ def test_make_manifest(testpath):
     assert calculate_md5(file_1_path) == 'e2fc714c4727ee9395f324cd2e7f331f'
 
     assert manifest == [
-        ['e2fc714c4727ee9395f324cd2e7f331f', 'data/file_1.txt'],
-        ['e80b5017098950fc58aad83c8c14978e', 'data/kuvat/image1.jpg']]
+        [b'e2fc714c4727ee9395f324cd2e7f331f', b'data/file_1.txt'],
+        [b'e80b5017098950fc58aad83c8c14978e', b'data/kuvat/image1.jpg']]
 
 
 def test_write_manifest(testpath):

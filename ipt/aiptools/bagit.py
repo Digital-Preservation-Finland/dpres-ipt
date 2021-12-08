@@ -52,6 +52,8 @@ import io
 
 from file_scraper.utils import hexdigest
 
+from ipt.six_utils import ensure_binary
+
 
 class BagitError(Exception):
     """Raised when plugin encounters unrecoverable error"""
@@ -61,13 +63,14 @@ def make_manifest(bagit_dir):
     """This function creates bagit manifest.
     :bagit_dir: base directory of bagit."""
     manifest = []
-    for dir_name, _, file_list in os.walk(bagit_dir):
+    bagit_dir_bytes = ensure_binary(bagit_dir)
+    for dir_name, _, file_list in os.walk(bagit_dir_bytes):
         for file_name in file_list:
             path = os.path.join(dir_name, file_name)
             # Manifest should be updated, not re-icluded in new manifest
-            if file_name not in ['manifest-md5.txt', 'bagit.txt']:
-                digest = calculate_md5(path)
-                file_path_in_manifest = path.split(bagit_dir + '/')[1]
+            if file_name not in [b'manifest-md5.txt', b'bagit.txt']:
+                digest = ensure_binary(calculate_md5(path))
+                file_path_in_manifest = path.split(bagit_dir_bytes + b'/')[1]
                 manifest.append([digest, file_path_in_manifest])
     return manifest
 
@@ -87,9 +90,10 @@ def write_manifest(manifest, path):
     :path: bagit path where manifest file should be written.
     :returns: None"""
     manifest_path = os.path.join(path, 'manifest-md5.txt')
-    with io.open(manifest_path, 'tw', encoding='utf-8') as outfile:
+    with io.open(manifest_path, 'wb') as outfile:
         for line in manifest:
-            outfile.write(u"%s %s\n" % (line[0], line[1]))
+            outfile.write(
+                b"%s %s\n" % (ensure_binary(line[0]), ensure_binary(line[1])))
 
 
 def write_bagit_txt(path):
