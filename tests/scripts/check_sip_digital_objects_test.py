@@ -131,6 +131,11 @@ TEST_CASES = [
      'expected_result': {
          'returncode': 0,
          'stdout': []}},
+    {'testcase': 'SIP with filename diacritics.',
+     'filename': 'valid_1.7.1_filename_diacritics',
+     'expected_result': {
+         'returncode': 0,
+         'stdout': []}},
     {'testcase': 'SIP with local schema that is not well-formed.',
      'filename': 'invalid_1.7.1_xml_local_schema_not_wellformed',
      'expected_result': {

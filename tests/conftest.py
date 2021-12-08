@@ -66,6 +66,15 @@ def temp_sip(testpath):
     return _temp_sip
 
 
+@pytest.fixture(scope='function')
+def diacritic_bagit_path(temp_sip):
+    """Setup a test bagit dir that contains sip with special character in mets
+    and filename.
+    """
+    bagit_root_path = temp_sip('valid_1.7.1_filename_diacritics')
+    return bagit_root_path
+
+
 @pytest.fixture
 def bagit_fx(tmpdir):
     """Create test bagit."""
