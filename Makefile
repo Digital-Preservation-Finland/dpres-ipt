@@ -1,4 +1,3 @@
-MOCK_CONFIG=stable-7-x86_64
 ROOT=/
 PREFIX=/usr
 PYTHONDIR=${PREFIX}/lib/python2.7/site-packages
@@ -53,5 +52,3 @@ rpm-sources:
 	create-archive.sh
 	preprocess-spec-m4-macros.sh include/rhel7
 
-rpm: clean-rpm rpm-sources
-	build-rpm.sh ${MOCK_CONFIG}
