@@ -1,3 +1,4 @@
+# coding=utf-8
 """Common configuration and fixtures for all tests"""
 # pylint does not understand pytest fixtures
 # pylint: disable=redefined-outer-name
@@ -72,6 +73,11 @@ def diacritic_bagit_path(temp_sip):
     and filename.
     """
     bagit_root_path = temp_sip('valid_1.7.1_filename_diacritics')
+    # Just to make this fixture more complex, we'll rename the file as
+    # different encoding
+    target_name = u'%s/data/työselostus.txt' % bagit_root_path
+    encoded_name = target_name.encode('cp1252')
+    os.rename(target_name, encoded_name)
     return bagit_root_path
 
 
