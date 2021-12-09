@@ -62,28 +62,28 @@ def test_write_bagit_txt(testpath):
         assert lines[1] == 'Tag-File-Character-Encoding: UTF-8\n'
 
 
-def test_bagit_structure(bagit_fx):
+def test_bagit_structure(bagit_with_manifest_fx):
     """Test bagit the created bagit structure"""
-    assert (bagit_fx / 'data').isdir()
-    assert check_directory_is_bagit(str(bagit_fx)) == 0
-    assert check_bagit_mandatory_files(str(bagit_fx)) == 0
+    assert (bagit_with_manifest_fx / 'data').isdir()
+    assert check_directory_is_bagit(str(bagit_with_manifest_fx)) == 0
+    assert check_bagit_mandatory_files(str(bagit_with_manifest_fx)) == 0
 
 
 @pytest.mark.parametrize("filename", [
     "bagit.txt",
     "manifest-md5.txt"
 ])
-def test_bagit_missing_files(bagit_fx, filename):
+def test_bagit_missing_files(bagit_with_manifest_fx, filename):
     """Test that bagit util raises exception if any of the mandatory files are
     missing"""
-    (bagit_fx / filename).remove(rec=1)
+    (bagit_with_manifest_fx / filename).remove(rec=1)
     with pytest.raises(BagitError):
-        check_bagit_mandatory_files(str(bagit_fx))
+        check_bagit_mandatory_files(str(bagit_with_manifest_fx))
 
 
-def test_bagit_missing_datadir(bagit_fx):
+def test_bagit_missing_datadir(bagit_with_manifest_fx):
     """Test that bagit util raises exception if any of the mandatory files are
     missing"""
-    (bagit_fx / "data").remove(rec=1)
+    (bagit_with_manifest_fx / "data").remove(rec=1)
     with pytest.raises(BagitError):
-        check_directory_is_bagit(str(bagit_fx))
+        check_directory_is_bagit(str(bagit_with_manifest_fx))

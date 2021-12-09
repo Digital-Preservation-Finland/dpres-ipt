@@ -3,13 +3,18 @@
 # pylint does not understand pytest fixtures
 # pylint: disable=redefined-outer-name
 
+from ipt.six_utils import ensure_binary
+
 import logging
 import tempfile
 import subprocess
 import shutil
 import os
+import io
 
+import six
 import pytest
+
 
 from tests.testcommon.utils import Directory
 
@@ -67,43 +72,62 @@ def temp_sip(testpath):
     return _temp_sip
 
 
-@pytest.fixture(scope='function')
-def diacritic_bagit_path(temp_sip):
-    """Setup a test bagit dir that contains sip with special character in mets
-    and filename.
-    """
-    bagit_root_path = temp_sip('valid_1.7.1_filename_diacritics')
-    # Just to make this fixture more complex, we'll rename the file as
-    # different encoding
-    target_name = u'%s/data/työselostus.txt' % bagit_root_path
-    encoded_name = target_name.encode('cp1252')
-    os.rename(target_name, encoded_name)
-    return bagit_root_path
+@pytest.fixture(params=[b'utf8_\xc3\xa4', b'latin1_\xe4'])
+def chars_fx(request):
+    """Return characters in various encodings as bytes"""
+    return request.param
 
 
 @pytest.fixture
-def bagit_fx(tmpdir):
-    """Create test bagit."""
-    bagit_path = tmpdir / "bagit_fx"
-    sip_path = bagit_path / "data" / "transfers" / "sippi"
+def bagit_no_manifest_fx(tmpdir, chars_fx):
+    """Generate Bagit directory structure without manifest file
+
+    :returns: Path to bagit directory
+
+    """
+
+    bagit_path = tmpdir / chars_fx
+
+    sip_path = bagit_path / 'data' / 'transfers' / "sip_" + chars_fx
     sip_path.ensure(dir=True)
 
-    mets_path = sip_path / "mets.xml"
-    mets_path.write('asfasdfasdfsda')
+    mets_path = sip_path / 'mets.xml'
+    mets_path.write('<mets:mets></mets:mets>')
 
-    image_path = sip_path / "images" / "image.jpg"
-    text_path = sip_path / "file_1.txt"
-
-    image_path.ensure().write('abcd')
-    text_path.ensure().write('abcdef')
-
-    manifest = bagit_path / "manifest-md5.txt"
-    manifest.write("\n".join([
-        'e2fc714c4727ee9395f324cd2e7f331f data/file.txt',
-        'e80b5017098950fc58aad83c8c14978e file2.txt'
-    ]))
+    payload = sip_path / 'files' / "file_" + chars_fx
+    payload.write('abcdef', ensure=True)
 
     bagit_meta = bagit_path / 'bagit.txt'
     bagit_meta.write('foo')
 
     return bagit_path
+
+
+@pytest.fixture
+def manifest_fx(chars_fx):
+    """Return manifest file contents as bytes"""
+    return b"\n".join([
+        b"84a37a4d5bd4b36db0da5379aa6fbde3 "
+        b"data/transfers/sip_X/mets.xml",
+
+        b"e80b5017098950fc58aad83c8c14978e "
+        b"data/transfers/sip_X/files/file_X\n"
+    ]).replace(b'X', chars_fx)
+
+
+@pytest.fixture
+def bagit_with_manifest_fx(bagit_no_manifest_fx, manifest_fx):
+    """Generate Bagit directory with manifest file included
+
+    :returns: Path to bagit directory
+
+    """
+
+    manifest = bagit_no_manifest_fx / 'manifest-md5.txt'
+    manifest.ensure()
+
+    # LocalPath support binary writes only after Python3.5
+    with io.open(six.binary_type(manifest), 'wb') as outfile:
+        outfile.write(manifest_fx)
+
+    return bagit_no_manifest_fx
