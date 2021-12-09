@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Version 0.97
+------------
+
+Fixed character encoding issue in bagit manifest.
+
 Version 0.96
 ------------
 
