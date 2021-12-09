@@ -1,6 +1,7 @@
 # coding=utf-8
 """tests for bagit_util-commandline interface."""
 import io
+import shutil
 
 import six
 import pytest
@@ -21,7 +22,7 @@ def test_main(bagit_no_manifest_fx, manifest_fx):
 
 def test_main_missing_datadir(bagit_no_manifest_fx):
     """Test command line utility with missing data directory"""
-    (bagit_no_manifest_fx / "data").remove(rec=1)
+    shutil.rmtree(six.binary_type(bagit_no_manifest_fx / "data"))
     with pytest.raises(BagitError):
         main(['make_manifest', str(bagit_no_manifest_fx)])
 

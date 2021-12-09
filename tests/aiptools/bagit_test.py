@@ -3,9 +3,11 @@ This is a test module for bagit.py
 """
 
 import os
+import shutil
 
 import pytest
 
+import six
 from ipt.aiptools.bagit import make_manifest, calculate_md5, \
     write_manifest, write_bagit_txt, BagitError, check_directory_is_bagit, \
     check_bagit_mandatory_files
@@ -64,7 +66,7 @@ def test_write_bagit_txt(testpath):
 
 def test_bagit_structure(bagit_with_manifest_fx):
     """Test bagit the created bagit structure"""
-    assert (bagit_with_manifest_fx / 'data').isdir()
+    assert (bagit_with_manifest_fx / 'data').is_dir()
     assert check_directory_is_bagit(str(bagit_with_manifest_fx)) == 0
     assert check_bagit_mandatory_files(str(bagit_with_manifest_fx)) == 0
 
@@ -76,7 +78,7 @@ def test_bagit_structure(bagit_with_manifest_fx):
 def test_bagit_missing_files(bagit_with_manifest_fx, filename):
     """Test that bagit util raises exception if any of the mandatory files are
     missing"""
-    (bagit_with_manifest_fx / filename).remove(rec=1)
+    (bagit_with_manifest_fx / filename).unlink()
     with pytest.raises(BagitError):
         check_bagit_mandatory_files(str(bagit_with_manifest_fx))
 
@@ -84,6 +86,6 @@ def test_bagit_missing_files(bagit_with_manifest_fx, filename):
 def test_bagit_missing_datadir(bagit_with_manifest_fx):
     """Test that bagit util raises exception if any of the mandatory files are
     missing"""
-    (bagit_with_manifest_fx / "data").remove(rec=1)
+    shutil.rmtree(six.binary_type(bagit_with_manifest_fx / "data"))
     with pytest.raises(BagitError):
         check_directory_is_bagit(str(bagit_with_manifest_fx))
