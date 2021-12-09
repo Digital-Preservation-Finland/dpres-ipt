@@ -1,7 +1,6 @@
 # coding=utf-8
 """tests for bagit_util-commandline interface."""
 import io
-import os
 
 import six
 import pytest
@@ -25,3 +24,6 @@ def test_main_missing_datadir(bagit_no_manifest_fx):
     (bagit_no_manifest_fx / "data").remove(rec=1)
     with pytest.raises(BagitError):
         main(['make_manifest', str(bagit_no_manifest_fx)])
+
+    manifest_path = bagit_no_manifest_fx / 'manifest-md5.txt'
+    assert not manifest_path.exists()
