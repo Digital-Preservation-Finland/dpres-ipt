@@ -11,19 +11,8 @@ for the digital preservation service can be found in: http://digitalpreservation
 Installation
 ------------
 
-The software is tested with Python 2.7 with Centos 7.x / RHEL 7.x releases.
-For running in a tested and isolated environment, get python-virtualenv
-software:
-
-        pip install virtualenv
-
-Run the following to activate the virtual environment:
-
-        virtualenv .venv
-        source ./.venv/bin/activate
-
-Additional requirements
-+++++++++++++++++++++++
+Installation and usage requires Python 2.7, or 3.6 or newer.
+The software is tested with Python 3.6 on Centos 7.x release. Python 2.7 support will be removed in the future.
 
 The following software is required for validation tools.
 
@@ -40,13 +29,30 @@ The following software is required for validation tools.
         * xml-common
         * Gzip
 
-You can install the software listed in requirements_github.txt with the following command::
+You can install the software listed in requirements_github.txt by following these instructions. Other software listed above needs to be installed separately.
 
-        pip install -r requirements_github.txt
+For Python 3.6 or newer, create a virtual environment::
+    
+    python3 -m venv venv
 
-This may require that gcc is installed in your system.
+For Python 2.7, get python-virtualenv software and create a virtual environment::
 
-Other software listed above needs to be installed separately.
+    sudo yum install python-virtualenv
+    virtualenv venv
+
+Run the following to activate the virtual environment::
+
+    source venv/bin/activate
+
+Install the required software with commands::
+
+    pip install --upgrade pip==20.2.4 setuptools  # Only for Python 3.6 or newer
+    pip install --upgrade pip setuptools          # Only for Python 2.7
+    pip install -r requirements_github.txt         # This may require that gcc is installed in your system.
+    pip install .
+
+To deactivate the virtual environment, run ``deactivate``.
+To reactivate it, run the ``source`` command above.
 
 NOTE: Running unit tests requires the full installation of file-scraper with all its requirements.
 
