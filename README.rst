@@ -48,7 +48,7 @@ Install the required software with commands::
 
     pip install --upgrade pip==20.2.4 setuptools  # Only for Python 3.6 or newer
     pip install --upgrade pip setuptools          # Only for Python 2.7
-    pip install -r requirements_github.txt         # This may require that gcc is installed in your system.
+    pip install -r requirements_github.txt
     pip install .
 
 To deactivate the virtual environment, run ``deactivate``.
