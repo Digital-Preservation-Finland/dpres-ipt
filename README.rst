@@ -12,24 +12,14 @@ Installation
 ------------
 
 Installation and usage requires Python 2.7, or 3.6 or newer.
-The software is tested with Python 3.6 on Centos 7.x release. Python 2.7 support will be removed in the future.
+The software is tested with Python 3.6 on Centos 7.x release.
+Python 2.7 support will be removed in the future.
 
 The following software is required for validation tools.
 
         * dpres-xml-schemas, see https://github.com/Digital-Preservation-Finland/dpres-xml-schemas
-        * xml-helpers, see https://github.com/Digital-Preservation-Finland/xml-helpers
-        * mets, see https://github.com/Digital-Preservation-Finland/mets
-        * premis, see https://github.com/Digital-Preservation-Finland/premis
-        * file-scraper, see https://github.com/Digital-Preservation-Finland/file-scraper
-                * see file-scraper installation instructions for installing validators for individual file formats
-        * libxml2 & libxslt / xmllint & xsltproc ( with exslt and Saxon line number extensions )
-        * gcc
-        * lxml
-        * python-mimeparse
-        * xml-common
-        * Gzip
-
-You can install the software listed in requirements_github.txt by following these instructions. Other software listed above needs to be installed separately.
+        * See the README from file-scraper repository for additional installation requirements:
+          https://github.com/Digital-Preservation-Finland/file-scraper/blob/master/README.rst
 
 For Python 3.6 or newer, create a virtual environment::
     

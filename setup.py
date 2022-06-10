@@ -28,7 +28,15 @@ def main():
         install_requires=[
             'python-mimeparse',
             'scandir; python_version == "2.7"',
-            'six'
+            'six',
+            'xml_helpers@git+https://gitlab.ci.csc.fi/dpres/xml-helpers.git'
+            '@develop#egg=xml_helpers',
+            'mets@git+https://gitlab.ci.csc.fi/dpres/mets.git'
+            '@develop#egg=mets',
+            'premis@git+https://gitlab.ci.csc.fi/dpres/premis.git'
+            '@develop#egg=premis',
+            'file_scraper@git+https://gitlab.ci.csc.fi/dpres/file-scraper.git'
+            '@develop#egg=file_scraper'
         ]
     )
 
