@@ -4,7 +4,8 @@ Release notes
 Version 0.98
 ------------
 
-Update installation guide for Python 3.6 in README.rst.
+Update installation guide for Python 3.6 in README.rst and requirements in
+setup files.
 
 Version 0.97
 ------------
