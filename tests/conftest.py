@@ -9,9 +9,14 @@ import subprocess
 import shutil
 import os
 import io
-from pathlib import Path
 
 import six
+
+if six.PY2:
+    from pathlib2 import Path
+else:
+    from pathlib import Path
+
 import pytest
 from packaging import version
 from ipt.six_utils import ensure_binary
