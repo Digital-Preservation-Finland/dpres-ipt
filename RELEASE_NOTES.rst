@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Version 0.99
+------------
+
+Update requirements.
+
 Version 0.98
 ------------
 
