@@ -383,7 +383,7 @@ def create_report_object(metadata_info, linking_sip_type, linking_sip_id):
     related = premis.relationship(
         relationship_type='structural',
         relationship_subtype='is included in',
-        related_object=related_id)
+        related_objects=[related_id])
 
     object_id = premis.identifier('preservation-object-id',
                                   str(uuid.uuid4()))
