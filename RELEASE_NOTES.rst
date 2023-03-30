@@ -1,6 +1,13 @@
 Release notes
 =============
 
+Version 0.100
+-------------
+
+Python 2.7 support officially removed.
+
+Adapt to API change of PREMIS library.
+
 Version 0.99
 ------------
 

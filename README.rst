@@ -11,9 +11,8 @@ for the digital preservation service can be found in: http://digitalpreservation
 Installation
 ------------
 
-Installation and usage requires Python 2.7, or 3.6 or newer.
+Installation and usage requires Python 3.6 or newer.
 The software is tested with Python 3.6 on Centos 7.x release.
-Python 2.7 support will be removed in the future.
 
 The following software is required for validation tools.
 
@@ -21,14 +20,9 @@ The following software is required for validation tools.
         * See the README from file-scraper repository for additional installation requirements:
           https://github.com/Digital-Preservation-Finland/file-scraper/blob/master/README.rst
 
-For Python 3.6 or newer, create a virtual environment::
+Create a virtual environment::
     
     python3 -m venv venv
-
-For Python 2.7, get python-virtualenv software and create a virtual environment::
-
-    sudo yum install python-virtualenv
-    virtualenv venv
 
 Run the following to activate the virtual environment::
 
@@ -36,8 +30,7 @@ Run the following to activate the virtual environment::
 
 Install the required software with commands::
 
-    pip install --upgrade pip==20.2.4 setuptools  # Only for Python 3.6 or newer
-    pip install --upgrade pip setuptools          # Only for Python 2.7
+    pip install --upgrade pip==20.2.4 setuptools
     pip install -r requirements_github.txt
     pip install .
 
