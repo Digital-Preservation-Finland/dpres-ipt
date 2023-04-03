@@ -34,6 +34,7 @@ BuildRequires:  %{py3_dist setuptools}
 BuildRequires:  %{py3_dist wheel}
 BuildRequires:  %{py3_dist pytest}
 
+%py_provides python3-dpres-ipt
 
 %description
 Tools for KDKPAS SIP/AIP/DIP-handling.
