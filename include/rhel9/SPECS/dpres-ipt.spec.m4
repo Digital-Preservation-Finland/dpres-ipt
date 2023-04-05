@@ -20,12 +20,19 @@ Source0:        %{file_prefix}-v%{file_version}%{?file_release_tag}-%{file_build
 BuildArch:      noarch
 
 Requires: xml-common
-Requires: libxslt unzip
-# ClamAV installation requires these to work
-Requires: clamav libtool-ltdl
-# Do we need the following Requires, they are all our own Python packages?
-Requires: dpres-xml-schemas python3-xml-helpers python3-mets python3-premis
+Requires: libxslt
+Requires: unzip
+Requires: %{py3_dist xml-helpers}
+Requires: %{py3_dist mets}
+Requires: %{py3_dist premis}
+Requires: %{py3_dist file-scraper}
+Requires: dpres-xml-schemas
+# Require the full version of file-scraper manually just in case dnf would
+# install the minimal version automatically.
 Requires: python3-file-scraper-full
+# ClamAV installation requires these two
+Requires: clamav
+Requires: libtool-ltdl
 
 BuildRequires:  python3-devel
 BuildRequires:  pyproject-rpm-macros
