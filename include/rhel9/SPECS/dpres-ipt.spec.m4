@@ -50,9 +50,24 @@ find %{_sourcedir}
 %pyproject_install
 %pyproject_save_files ipt
 
+cp -a %{buildroot}%{_bindir}/bagit-util %{buildroot}%{_bindir}/bagit-util-3
+cp -a %{buildroot}%{_bindir}/check-sip-digital-objects %{buildroot}%{_bindir}/check-sip-digital-objects-3
+cp -a %{buildroot}%{_bindir}/check-sip-file-checksums %{buildroot}%{_bindir}/check-sip-file-checksums-3
+cp -a %{buildroot}%{_bindir}/check-xml-schema-features %{buildroot}%{_bindir}/check-xml-schema-features-3
+cp -a %{buildroot}%{_bindir}/check-xml-schematron-features %{buildroot}%{_bindir}/check-xml-schematron-features-3
+cp -a %{buildroot}%{_bindir}/create-schema-catalog %{buildroot}%{_bindir}/create-schema-catalog-3
+cp -a %{buildroot}%{_bindir}/premis2html %{buildroot}%{_bindir}/premis2html-3
+
 %files -f %{pyproject_files}
 %license LICENSE
 %doc README.rst
+%{_bindir}/bagit-util*
+%{_bindir}/check-sip-digital-objects*
+%{_bindir}/check-sip-file-checksums*
+%{_bindir}/check-xml-schema-features*
+%{_bindir}/check-xml-schematron-features*
+%{_bindir}/create-schema-catalog*
+%{_bindir}/premis2html*
 
 # TODO: For now changelot must be last, because it is generated automatically
 # from git log command. Appending should be fixed to happen only after %changelog macro
