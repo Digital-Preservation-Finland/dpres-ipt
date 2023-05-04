@@ -6,7 +6,7 @@ variables:
 
 include:
   - project: 'dpres/gitlab-ci-pipeline'
-    ref: TPASPKT-1053
+    ref: master
     file:
       - '/pipeline/common.yml'
       - '/pipeline/kppas.yml'
