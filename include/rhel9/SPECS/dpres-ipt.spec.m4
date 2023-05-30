@@ -13,12 +13,26 @@ Name:           dpres-ipt
 Version:        %{file_version}
 Release:        %{file_release_number}%{file_release_tag}.%{file_build_number}.git%{file_commit_ref}%{?dist}
 Summary:        Tools for KDKPAS SIP/AIP/DIP-handling
-Group:          System Environment/Library
 License:        LGPLv3+
 URL:            https://www.digitalpreservation.fi
 Source0:        %{file_prefix}-v%{file_version}%{?file_release_tag}-%{file_build_number}-g%{file_commit_ref}.%{file_ext}
 BuildArch:      noarch
 
+BuildRequires:  python3-devel
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  %{py3_dist pip}
+BuildRequires:  %{py3_dist setuptools}
+BuildRequires:  %{py3_dist wheel}
+BuildRequires:  %{py3_dist pytest}
+
+%global _description %{expand:
+Tools for KDKPAS SIP/AIP/DIP-handling.
+}
+
+%description %_description
+
+%package -n python3-dpres-ipt
+Summary: %{summary}
 Requires: xml-common
 Requires: libxslt
 Requires: unzip
@@ -34,17 +48,8 @@ Requires: python3-file-scraper-full
 Requires: clamav
 Requires: libtool-ltdl
 
-BuildRequires:  python3-devel
-BuildRequires:  pyproject-rpm-macros
-BuildRequires:  %{py3_dist pip}
-BuildRequires:  %{py3_dist setuptools}
-BuildRequires:  %{py3_dist wheel}
-BuildRequires:  %{py3_dist pytest}
 
-%py_provides python3-dpres-ipt
-
-%description
-Tools for KDKPAS SIP/AIP/DIP-handling.
+%description -n python3-dpres-ipt %_description
 
 %prep
 find %{_sourcedir}
@@ -65,7 +70,7 @@ cp -a %{buildroot}%{_bindir}/check-xml-schematron-features %{buildroot}%{_bindir
 cp -a %{buildroot}%{_bindir}/create-schema-catalog %{buildroot}%{_bindir}/create-schema-catalog-3
 cp -a %{buildroot}%{_bindir}/premis2html %{buildroot}%{_bindir}/premis2html-3
 
-%files -f %{pyproject_files}
+%files -n python3-dpres-ipt -f %{pyproject_files}
 %license LICENSE
 %doc README.rst
 %{_bindir}/bagit-util*
