@@ -16,7 +16,8 @@ from file_scraper.defaults import (
     RECOMMENDED,
     ACCEPTABLE,
     BIT_LEVEL_WITH_RECOMMENDED,
-    BIT_LEVEL
+    BIT_LEVEL,
+    UNACCEPTABLE
 )
 
 from ipt.comparator.utils import iter_metadata_info
@@ -236,7 +237,7 @@ def check_grade(metadata_info, grade):
     if use == "":
         valid = grade in [RECOMMENDED, ACCEPTABLE]
     elif use == METS_USE_NO_VALIDATION:
-        valid = grade == BIT_LEVEL_WITH_RECOMMENDED
+        valid = grade in [BIT_LEVEL_WITH_RECOMMENDED, BIT_LEVEL, UNACCEPTABLE]
     elif use == METS_USE_IDENTIFICATION:
         valid = grade == BIT_LEVEL
 
