@@ -1,6 +1,13 @@
 Release notes
 =============
 
+Version 0.101
+-------------
+
+Add RHEL9 RPM spec file
+
+Fix Python package build
+
 Version 0.100
 -------------
 
@@ -86,7 +93,7 @@ The following file formats are handled differently with new tools:
 DPX files, UTF-8 text files, XHTML documents, PDFs, PDF/A-1 files, CSV files
 Character encoding validation has been updated.
 Separate text validation for files reported as text/plain in the SIP metadata.
-Updates to MPEG audio and video validation. 
+Updates to MPEG audio and video validation.
 
 
 Version 0.53
