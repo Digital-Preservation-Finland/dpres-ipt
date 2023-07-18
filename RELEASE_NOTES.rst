@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Version 0.102
+-------------
+
+Accept unsupported formats for bit-level preservation when submitted with supported formats.
+
 Version 0.101
 -------------
 
