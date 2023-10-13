@@ -21,7 +21,6 @@ def main():
         },
         install_requires=[
             'python-mimeparse',
-            'six',
             'lxml'
         ]
     )

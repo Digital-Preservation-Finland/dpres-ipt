@@ -10,12 +10,7 @@ import shutil
 import os
 import io
 
-import six
-
-if six.PY2:
-    from pathlib2 import Path
-else:
-    from pathlib import Path
+from pathlib import Path
 
 import pytest
 from packaging import version
@@ -149,7 +144,7 @@ def bagit_with_manifest_fx(bagit_no_manifest_fx, manifest_fx):
     manifest = bagit_no_manifest_fx / 'manifest-md5.txt'
 
     # LocalPath support binary writes only after Python3.5
-    with io.open(six.binary_type(manifest), 'wb') as outfile:
+    with io.open(bytes(manifest), 'wb') as outfile:
         outfile.write(manifest_fx)
 
     return bagit_no_manifest_fx

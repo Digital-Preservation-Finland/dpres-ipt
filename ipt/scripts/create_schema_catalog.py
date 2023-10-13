@@ -5,7 +5,7 @@ from __future__ import print_function, unicode_literals
 import argparse
 import os
 import sys
-from six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 
 import mets
 import premis

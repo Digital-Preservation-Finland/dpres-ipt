@@ -3,7 +3,6 @@
 import io
 import shutil
 
-import six
 import pytest
 
 from ipt.aiptools.bagit import BagitError
@@ -16,13 +15,13 @@ def test_main(bagit_no_manifest_fx, manifest_fx):
 
     manifest_path = bagit_no_manifest_fx / 'manifest-md5.txt'
 
-    with io.open(six.binary_type(manifest_path), 'rb') as infile:
+    with io.open(bytes(manifest_path), 'rb') as infile:
         assert manifest_fx == infile.read()
 
 
 def test_main_missing_datadir(bagit_no_manifest_fx):
     """Test command line utility with missing data directory"""
-    shutil.rmtree(six.binary_type(bagit_no_manifest_fx / "data"))
+    shutil.rmtree(bytes(bagit_no_manifest_fx / "data"))
     with pytest.raises(BagitError):
         main(['make_manifest', str(bagit_no_manifest_fx)])
 

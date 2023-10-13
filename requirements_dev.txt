@@ -2,7 +2,6 @@
 lxml
 python-mimeparse
 pathlib2 ; python_version == '2.7'
-six
 
 # Unit test tools
 coverage

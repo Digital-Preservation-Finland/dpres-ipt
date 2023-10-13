@@ -9,8 +9,7 @@ import mimeparse
 
 import lxml.etree as ET
 
-import six
-from six.moves.urllib.parse import unquote_plus, urlparse
+from urllib.parse import unquote_plus, urlparse
 from ipt.six_utils import ensure_binary
 
 
@@ -120,10 +119,7 @@ def uri_to_path(uri):
     :returns: Relative path as string
 
     """
-    uri = uri.encode("utf-8") if six.PY2 else uri
-    path = six.moves.urllib_parse.unquote_plus(uri).replace('file://', '')
-    if six.PY2:
-        return path.lstrip('./')
+    path = unquote_plus(uri).replace('file://', '')
     return path.lstrip('./').encode("utf-8")
 
 
@@ -339,7 +335,7 @@ def synonymize_stream_keys(stream):
     """
 
     new_stream = {}
-    for key, value in six.iteritems(stream):
+    for key, value in dict.items(stream):
         # Get the equivalent METS key if one exists, otherwise use old key
         new_key = _FFMPEG_FILE_SCRAPER_KEY_SYNONYMS.get(key, key)
         if new_key in new_stream:
@@ -391,7 +387,7 @@ def get_scraper_info(scraper):
     info = {'messages': [],
             'errors': [],
             'extensions': []}
-    for scraper_info in six.itervalues(scraper.info):
+    for scraper_info in dict.values(scraper.info):
         scraper_prefix = '[' + scraper_info['class'] + '] '
         _add_text_xml(scraper_info, 'messages', scraper_prefix)
         _add_text_xml(scraper_info, 'errors', scraper_prefix + 'ERROR: ')

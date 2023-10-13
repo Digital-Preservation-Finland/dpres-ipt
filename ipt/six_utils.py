@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import six
 
 # pylint: disable=invalid-name
 
@@ -42,9 +41,9 @@ def ensure_binary(s, encoding='utf-8', errors='strict'):
 
         https://github.com/benjaminp/six/blob/master/six.py#L853
     """
-    if isinstance(s, six.text_type):
+    if isinstance(s, str):
         return s.encode(encoding, errors)
-    if isinstance(s, six.binary_type):
+    if isinstance(s, bytes):
         return s
     raise TypeError("not expecting type '%s'" % type(s))
 
@@ -64,8 +63,8 @@ def ensure_text(s, encoding='utf-8', errors='strict'):
 
         https://github.com/benjaminp/six/blob/master/six.py#892
     """
-    if isinstance(s, six.binary_type):
+    if isinstance(s, bytes):
         return s.decode(encoding, errors)
-    if isinstance(s, six.text_type):
+    if isinstance(s, str):
         return s
     raise TypeError("not expecting type '%s'" % type(s))

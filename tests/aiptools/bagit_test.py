@@ -7,7 +7,6 @@ import shutil
 
 import pytest
 
-import six
 from ipt.aiptools.bagit import make_manifest, calculate_md5, \
     write_manifest, write_bagit_txt, BagitError, check_directory_is_bagit, \
     check_bagit_mandatory_files
@@ -86,6 +85,6 @@ def test_bagit_missing_files(bagit_with_manifest_fx, filename):
 def test_bagit_missing_datadir(bagit_with_manifest_fx):
     """Test that bagit util raises exception if any of the mandatory files are
     missing"""
-    shutil.rmtree(six.binary_type(bagit_with_manifest_fx / "data"))
+    shutil.rmtree(bytes(bagit_with_manifest_fx / "data"))
     with pytest.raises(BagitError):
         check_directory_is_bagit(str(bagit_with_manifest_fx))
