@@ -253,7 +253,8 @@ def _harmonized_versions(scraper_format):
     # If scraper finds a version which is a subset of the version given METS,
     # the more general METS value is allowed (e.g, METS: 1.4, scraper: A-1b)
     if scraper_format['mimetype'] == 'application/pdf':
-        for super_version, sub_versions in iter(dict.items(_PDF_VERSION_SUBSETS)):
+        for super_version, sub_versions in iter(dict.items(
+                                                _PDF_VERSION_SUBSETS)):
             if scraper_format['version'] in sub_versions:
                 harmonized_versions.add(super_version)
     return harmonized_versions
