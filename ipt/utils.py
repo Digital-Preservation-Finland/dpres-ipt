@@ -414,6 +414,7 @@ def parse_uri_filepath(uri_path, accepted_schemes):
     return unquote_plus(os.path.join(parsed_result.netloc,
                                      parsed_result.path.lstrip('/')))
 
+
 def ensure_binary(s, encoding='utf-8', errors='strict'):
     """Coerce **s** to six.binary_type.
     """
