@@ -193,7 +193,7 @@ class MetadataComparator(object):
             md_info_style_dict['format'] = \
                 self._get_stream_format(stream['index'])
             _stream = {}
-            for key, value in dict.items(stream):
+            for key, value in iter(dict.items(stream)):
                 decimals = 2  # Round values to two decimals by default
                 if stream_type == 'audio' and \
                         key in _AUDIOMD_INTEGER_VALUE_KEYS:
@@ -306,7 +306,7 @@ def _match_streams(mets_streams, scraper_streams, stream_type):
                 mets_stream['format'], scraper_stream['format']):
             return False
 
-        for key, mets_value in dict.items(mets_stream[stream_type]):
+        for key, mets_value in iter(dict.items(mets_stream[stream_type])):
             try:
                 scraper_value = scraper_stream[stream_type][key]
                 if mets_value == scraper_value:
@@ -334,7 +334,7 @@ def _match_streams(mets_streams, scraper_streams, stream_type):
         for mets_idx, scraper_idx in index_pairs:
             scraper_stream = scraper_streams[scraper_idx][stream_type]
             for key, mets_value in \
-                    dict.items(mets_streams[mets_idx][stream_type]):
+                    iter(dict.items(mets_streams[mets_idx][stream_type])):
                 try:
                     scraper_value = scraper_stream[key]
                     if mets_value != scraper_value and \

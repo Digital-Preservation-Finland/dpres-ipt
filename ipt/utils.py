@@ -386,7 +386,7 @@ def get_scraper_info(scraper):
     info = {'messages': [],
             'errors': [],
             'extensions': []}
-    for scraper_info in dict.values(scraper.info):
+    for scraper_info in iter(dict.values(scraper.info)):
         scraper_prefix = '[' + scraper_info['class'] + '] '
         _add_text_xml(scraper_info, 'messages', scraper_prefix)
         _add_text_xml(scraper_info, 'errors', scraper_prefix + 'ERROR: ')
@@ -416,7 +416,7 @@ def parse_uri_filepath(uri_path, accepted_schemes):
 
 
 def ensure_binary(s, encoding='utf-8', errors='strict'):
-    """Coerce **s** to six.binary_type.
+    """Coerce **s** to binary.
     """
     if isinstance(s, str):
         return s.encode(encoding, errors)
@@ -426,7 +426,7 @@ def ensure_binary(s, encoding='utf-8', errors='strict'):
 
 
 def ensure_text(s, encoding='utf-8', errors='strict'):
-    """Coerce *s* to six.text_type.
+    """Coerce *s* to string.
     """
     if isinstance(s, bytes):
         return s.decode(encoding, errors)
