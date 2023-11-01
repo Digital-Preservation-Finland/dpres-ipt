@@ -11,8 +11,7 @@ import optparse
 
 from file_scraper.scraper import Scraper
 
-from ipt.utils import concat, get_scraper_info
-from ipt.six_utils import ensure_text
+from ipt.utils import concat, get_scraper_info, ensure_text
 
 
 def main(arguments=None):

@@ -4,7 +4,7 @@
 
 import os
 
-from ipt.six_utils import ensure_text
+from ipt.utils import ensure_text
 
 from ipt.scripts.check_sip_file_checksums import main
 import tests.testcommon.shell

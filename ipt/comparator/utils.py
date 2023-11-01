@@ -10,7 +10,7 @@ import ipt.addml.addml
 import ipt.videomd.videomd
 import ipt.audiomd.audiomd
 from ipt.xml.mets import parse_spec_version
-from ipt.six_utils import ensure_text
+from ipt.utils import ensure_text
 
 
 def mdwrap_to_metadata_info(mdwrap_element):

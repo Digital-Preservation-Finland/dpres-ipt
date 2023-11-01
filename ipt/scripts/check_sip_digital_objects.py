@@ -23,8 +23,12 @@ from file_scraper.defaults import (
 from ipt.comparator.utils import iter_metadata_info
 from ipt.comparator.comparator import MetadataComparator
 from ipt.constants import METS_USE_NO_VALIDATION, METS_USE_IDENTIFICATION
-from ipt.utils import merge_dicts, create_scraper_params, get_scraper_info
-from ipt.six_utils import ensure_text
+from ipt.utils import (
+    merge_dicts,
+    create_scraper_params,
+    get_scraper_info,
+    ensure_text
+)
 
 _UNAVAILABLE_VERSION_VALUES = ('', '(:unav)', '(:unap)')
 

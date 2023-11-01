@@ -12,7 +12,7 @@ import xml_helpers.utils as u
 from file_scraper.utils import hexdigest
 
 from ipt.comparator.utils import iter_metadata_info
-from ipt.six_utils import ensure_text
+from ipt.utils import ensure_text
 
 
 def iter_files(path):

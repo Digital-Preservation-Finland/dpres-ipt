@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 from packaging import version
-from ipt.six_utils import ensure_binary
+from ipt.utils import ensure_binary
 
 
 from tests.testcommon.utils import Directory

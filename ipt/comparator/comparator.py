@@ -186,7 +186,7 @@ class MetadataComparator(object):
         if stream_type not in ('audio', 'video'):
             raise ValueError('Invalid stream type {}'.format(stream_type))
         prepared_dicts = []
-        for stream in dict.values(self._scraper_streams):
+        for stream in iter(dict.values(self._scraper_streams)):
             if stream['stream_type'] != stream_type:
                 continue
             md_info_style_dict = {}

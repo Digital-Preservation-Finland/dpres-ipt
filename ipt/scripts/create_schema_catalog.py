@@ -11,8 +11,7 @@ import mets
 import premis
 import xml_helpers.utils
 from xml_helpers.schema_catalog import construct_catalog_xml
-from ipt.six_utils import ensure_text
-from ipt.utils import parse_uri_filepath
+from ipt.utils import parse_uri_filepath, ensure_text
 
 
 def main(arguments=None):

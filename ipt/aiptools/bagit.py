@@ -52,7 +52,7 @@ import io
 
 from file_scraper.utils import hexdigest
 
-from ipt.six_utils import ensure_binary
+from ipt.utils import ensure_binary
 
 
 class BagitError(Exception):

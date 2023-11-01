@@ -10,7 +10,6 @@ import mimeparse
 import lxml.etree as ET
 
 from urllib.parse import unquote_plus, urlparse
-from ipt.six_utils import ensure_binary
 
 
 _SCRAPER_PARAM_ADDML_KEY_RELATION = (('fields', 'header_fields'),
@@ -335,7 +334,7 @@ def synonymize_stream_keys(stream):
     """
 
     new_stream = {}
-    for key, value in dict.items(stream):
+    for key, value in iter(dict.items(stream)):
         # Get the equivalent METS key if one exists, otherwise use old key
         new_key = _FFMPEG_FILE_SCRAPER_KEY_SYNONYMS.get(key, key)
         if new_key in new_stream:
@@ -414,3 +413,22 @@ def parse_uri_filepath(uri_path, accepted_schemes):
     # usage can vary between one to even four slashes.
     return unquote_plus(os.path.join(parsed_result.netloc,
                                      parsed_result.path.lstrip('/')))
+
+def ensure_binary(s, encoding='utf-8', errors='strict'):
+    """Coerce **s** to six.binary_type.
+    """
+    if isinstance(s, str):
+        return s.encode(encoding, errors)
+    if isinstance(s, bytes):
+        return s
+    raise TypeError("not expecting type '%s'" % type(s))
+
+
+def ensure_text(s, encoding='utf-8', errors='strict'):
+    """Coerce *s* to six.text_type.
+    """
+    if isinstance(s, bytes):
+        return s.decode(encoding, errors)
+    if isinstance(s, str):
+        return s
+    raise TypeError("not expecting type '%s'" % type(s))
