@@ -7,10 +7,6 @@ import argparse
 import errno
 import sys
 import os
-try:
-    from os import walk
-except ImportError:
-    from scandir import walk
 
 import xml_helpers.utils as u
 from file_scraper.utils import hexdigest
@@ -30,7 +26,7 @@ def iter_files(path):
 
     ignored_files = ['mets.xml', 'varmiste.sig', 'signature.sig']
 
-    for root, _, files in walk(path):
+    for root, _, files in os.walk(path):
         for filename in files:
             if root == path and filename in ignored_files:
                 continue

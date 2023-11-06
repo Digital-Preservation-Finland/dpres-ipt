@@ -1,6 +1,5 @@
 lxml
 python-mimeparse
-scandir ; python_version == '2.7'
 six
 
 git+https://github.com/Digital-Preservation-Finland/xml-helpers.git#egg=xml_helpers
