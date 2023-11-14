@@ -334,7 +334,7 @@ def synonymize_stream_keys(stream):
     """
 
     new_stream = {}
-    for key, value in iter(dict.items(stream)):
+    for key, value in stream.items():
         # Get the equivalent METS key if one exists, otherwise use old key
         new_key = _FFMPEG_FILE_SCRAPER_KEY_SYNONYMS.get(key, key)
         if new_key in new_stream:
@@ -386,7 +386,7 @@ def get_scraper_info(scraper):
     info = {'messages': [],
             'errors': [],
             'extensions': []}
-    for scraper_info in iter(dict.values(scraper.info)):
+    for scraper_info in scraper.info.values():
         scraper_prefix = '[' + scraper_info['class'] + '] '
         _add_text_xml(scraper_info, 'messages', scraper_prefix)
         _add_text_xml(scraper_info, 'errors', scraper_prefix + 'ERROR: ')
@@ -415,21 +415,21 @@ def parse_uri_filepath(uri_path, accepted_schemes):
                                      parsed_result.path.lstrip('/')))
 
 
-def ensure_binary(s, encoding='utf-8', errors='strict'):
-    """Coerce **s** to binary.
+def ensure_binary(string, encoding='utf-8', errors='strict'):
+    """Coerce string to binary.
     """
-    if isinstance(s, str):
-        return s.encode(encoding, errors)
-    if isinstance(s, bytes):
-        return s
-    raise TypeError("not expecting type '%s'" % type(s))
+    if isinstance(string, str):
+        return string.encode(encoding, errors)
+    if isinstance(string, bytes):
+        return string
+    raise TypeError("not expecting type '%s'" % type(string))
 
 
-def ensure_text(s, encoding='utf-8', errors='strict'):
-    """Coerce *s* to string.
+def ensure_text(string, encoding='utf-8', errors='strict'):
+    """Coerce string to string.
     """
-    if isinstance(s, bytes):
-        return s.decode(encoding, errors)
-    if isinstance(s, str):
-        return s
-    raise TypeError("not expecting type '%s'" % type(s))
+    if isinstance(string, bytes):
+        return string.decode(encoding, errors)
+    if isinstance(string, str):
+        return string
+    raise TypeError("not expecting type '%s'" % type(string))
