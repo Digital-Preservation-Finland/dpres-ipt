@@ -306,7 +306,7 @@ def _match_streams(mets_streams, scraper_streams, stream_type):
                 mets_stream['format'], scraper_stream['format']):
             return False
 
-        for key, mets_value in (mets_stream[stream_type]).items():
+        for key, mets_value in mets_stream[stream_type].items():
             try:
                 scraper_value = scraper_stream[stream_type][key]
                 if mets_value == scraper_value:
@@ -334,7 +334,7 @@ def _match_streams(mets_streams, scraper_streams, stream_type):
         for mets_idx, scraper_idx in index_pairs:
             scraper_stream = scraper_streams[scraper_idx][stream_type]
             for key, mets_value in \
-                    (mets_streams[mets_idx][stream_type]).items():
+                    mets_streams[mets_idx][stream_type].items():
                 try:
                     scraper_value = scraper_stream[key]
                     if mets_value != scraper_value and \

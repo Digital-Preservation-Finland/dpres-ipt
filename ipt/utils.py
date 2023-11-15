@@ -426,7 +426,7 @@ def ensure_binary(string, encoding='utf-8', errors='strict'):
 
 
 def ensure_text(string, encoding='utf-8', errors='strict'):
-    """Coerce string to string.
+    """Coerce string to str.
     """
     if isinstance(string, bytes):
         return string.decode(encoding, errors)
