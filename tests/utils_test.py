@@ -1,4 +1,3 @@
-# coding=utf-8
 """Test for utils.py."""
 
 import random
@@ -79,9 +78,9 @@ def test_serialize_dict():
 
 def test_uri_to_path():
     """Test converting XML URI path to filesystem path"""
-    result = uri_to_path(u"file://files/f%C3%B5le.txt")
+    result = uri_to_path("file://files/f%C3%B5le.txt")
     assert result == b"files/f\xc3\xb5le.txt"
-    assert result.decode("utf-8") == u"files/fõle.txt"
+    assert result.decode("utf-8") == "files/fõle.txt"
 
 
 def test_find_max_complete():

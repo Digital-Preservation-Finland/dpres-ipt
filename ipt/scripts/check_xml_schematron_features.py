@@ -1,10 +1,8 @@
 #!/usr/bin/python
-# -*- encoding:utf-8 -*-
 # vim:ft=python
 
 """Validate XML file using Schematron."""
 
-from __future__ import print_function, unicode_literals
 import os
 import sys
 import optparse

@@ -1,10 +1,8 @@
 #!/usr/bin/python
-# -*- encoding:utf-8 -*-
 # vim:ft=python
 
 """Check well-formedness of XML file and validate against an XML schema."""
 
-from __future__ import print_function, unicode_literals
 import os
 import sys
 import optparse

@@ -13,7 +13,6 @@ Usage ::
     report is created to same directory as premis-xml-report is.
 
 """
-from __future__ import print_function, unicode_literals
 
 import optparse
 import os
@@ -49,7 +48,7 @@ def main(arguments=None):
     cmd = ['xsltproc', XSLT_PATH, args[0]]
     print(cmd)
 
-    with io.open(html_path, "w", encoding="utf-8") as html_file:
+    with open(html_path, "w", encoding="utf-8") as html_file:
         proc = subprocess.Popen(
             cmd, stdin=subprocess.PIPE,
             stderr=subprocess.PIPE, stdout=html_file,

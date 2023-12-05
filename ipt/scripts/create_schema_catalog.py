@@ -1,6 +1,5 @@
 """Create a schema catalog from given parameters."""
 
-from __future__ import print_function, unicode_literals
 
 import argparse
 import os
@@ -61,7 +60,7 @@ def _create_schema_catalog(mets_path, sip, output_path, catalog):
     """
     try:
         mets_tree = xml_helpers.utils.readfile(mets_path)
-    except IOError as err:
+    except OSError as err:
         print(ensure_text(str(err)), file=sys.stderr)
         return 117
 

@@ -1,5 +1,3 @@
-# coding: utf-8
-
 """Test the `ipt.scripts.test_sip_file_checksums` module"""
 
 import os

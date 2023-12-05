@@ -48,7 +48,7 @@ def test_write_manifest(testpath):
         ['ab123', os.path.join(sip_dir, 'file.txt')],
         ['ab232', os.path.join(sip_dir, 'file2.txt')]]
     write_manifest(manifest, sip_dir)
-    with open(os.path.join(sip_dir, 'manifest-md5.txt'), 'r') as infile:
+    with open(os.path.join(sip_dir, 'manifest-md5.txt')) as infile:
         lines = infile.readlines()
         assert lines[0] == 'ab123 ' + os.path.join(sip_dir, 'file.txt') + '\n'
         assert lines[1] == 'ab232 ' + os.path.join(sip_dir, 'file2.txt') + '\n'
@@ -57,7 +57,7 @@ def test_write_manifest(testpath):
 def test_write_bagit_txt(testpath):
     """Test for writing bagit.txt"""
     write_bagit_txt(testpath)
-    with open(os.path.join(testpath, 'bagit.txt'), 'r') as infile:
+    with open(os.path.join(testpath, 'bagit.txt')) as infile:
         lines = infile.readlines()
         assert lines[0] == 'BagIt-Version: 0.97\n'
         assert lines[1] == 'Tag-File-Character-Encoding: UTF-8\n'

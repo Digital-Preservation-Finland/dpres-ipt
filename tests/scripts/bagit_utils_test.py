@@ -1,4 +1,3 @@
-# coding=utf-8
 """tests for bagit_util-commandline interface."""
 import io
 import shutil
@@ -15,7 +14,7 @@ def test_main(bagit_no_manifest_fx, manifest_fx):
 
     manifest_path = bagit_no_manifest_fx / 'manifest-md5.txt'
 
-    with io.open(bytes(manifest_path), 'rb') as infile:
+    with open(bytes(manifest_path), 'rb') as infile:
         assert manifest_fx == infile.read()
 
 

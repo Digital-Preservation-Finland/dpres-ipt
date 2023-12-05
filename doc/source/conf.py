@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # information-package-tools documentation build configuration file, created by
 # sphinx-quickstart on Fri Sep 20 15:21:28 2013.
@@ -45,8 +44,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'information-package-tools'
-copyright = u'2013, CSC - IT Center for Science'
+project = 'information-package-tools'
+copyright = '2013, CSC - IT Center for Science'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -183,8 +182,8 @@ htmlhelp_basename = 'information-package-toolsdoc'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'information-package-tools.tex',
-    u'information-package-tools\\\\ Technical Documentation',
-   u'CSC - IT Center for Science', 'manual'),
+    'information-package-tools\\\\ Technical Documentation',
+   'CSC - IT Center for Science', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

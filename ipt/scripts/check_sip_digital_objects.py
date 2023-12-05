@@ -1,7 +1,6 @@
 #!/usr/bin/python
 """Validate all digital objects in a given METS document"""
 
-from __future__ import print_function, unicode_literals
 
 import argparse
 import datetime
@@ -142,9 +141,9 @@ def append_format_info(message, mimetype, version=''):
 
     :returns: <prefix>mimetype: <mimetype>[, version: <version>]
     """
-    message += 'mimetype: {}'.format(mimetype)
+    message += f'mimetype: {mimetype}'
     if version not in _UNAVAILABLE_VERSION_VALUES:
-        message += ', version: {}'.format(version)
+        message += f', version: {version}'
     return message
 
 

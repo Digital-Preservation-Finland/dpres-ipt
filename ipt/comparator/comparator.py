@@ -2,7 +2,6 @@
 Module to compare metadata found in mets to metadata scraped by file-scraper.
 """
 
-from __future__ import unicode_literals
 import json
 
 from ipt.utils import (handle_div, synonymize_stream_keys,
@@ -26,7 +25,7 @@ _KNOWN_UNAV_VERSIONS = {
 }
 
 
-class MetadataComparator(object):
+class MetadataComparator:
     """
     This class checks that mets metadata matches scraper metadata.
     First call to the result() method calls the _check_mets_matches_scraper()
@@ -184,7 +183,7 @@ class MetadataComparator(object):
         :returns: List of metadata dictionaries prepared for comparison.
         """
         if stream_type not in ('audio', 'video'):
-            raise ValueError('Invalid stream type {}'.format(stream_type))
+            raise ValueError(f'Invalid stream type {stream_type}')
         prepared_dicts = []
         for stream in self._scraper_streams.values():
             if stream['stream_type'] != stream_type:
@@ -219,7 +218,7 @@ class MetadataComparator(object):
             return self._metadata_info[stream_type]
         if stream_type in ('audio', 'video'):
             return [self._metadata_info]
-        raise ValueError('Invalid stream type {}'.format(stream_type))
+        raise ValueError(f'Invalid stream type {stream_type}')
 
 
 def _harmonized_versions(scraper_format):
@@ -291,7 +290,7 @@ def _match_streams(mets_streams, scraper_streams, stream_type):
               (:unav) or 0 in mets but for which scraper found actual values.
     """
     if stream_type not in ('audio', 'video'):
-        raise ValueError('Invalid stream type {}'.format(stream_type))
+        raise ValueError(f'Invalid stream type {stream_type}')
 
     def _compare_stream_dicts(mets_stream, scraper_stream):
         """

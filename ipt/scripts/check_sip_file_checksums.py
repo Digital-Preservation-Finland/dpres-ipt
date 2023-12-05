@@ -1,7 +1,6 @@
 #!/usr/bin/python
 """Check fixity for SIP digital objects"""
 
-from __future__ import print_function, unicode_literals
 
 import argparse
 import errno
@@ -46,7 +45,7 @@ def check_checksums(sip_path):
 
     def _message(metadata_info, message):
         """Format error message"""
-        return ensure_text("%s: %s" % (
+        return ensure_text("{}: {}".format(
             message, os.path.relpath(metadata_info["filename"], sip_path)))
 
     mets_tree = u.readfile(mets_path)
@@ -61,7 +60,7 @@ def check_checksums(sip_path):
             try:
                 hex_digest = hexdigest(metadata_info['filename'],
                                        metadata_info['algorithm'])
-            except IOError as exception:
+            except OSError as exception:
                 if exception.errno == errno.ENOENT:
                     yield _message(metadata_info, "File does not exist")
                 continue

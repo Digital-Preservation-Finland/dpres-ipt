@@ -105,7 +105,7 @@ def serialize_dict(data):
     serialized_dict = ""
     if data:
         for key in sorted(list(data)):
-            serialized_dict = serialized_dict + "%s=%s  " % (key, data[key])
+            serialized_dict = serialized_dict + "{}={}  ".format(key, data[key])
     return serialized_dict.strip("  ")
 
 
@@ -208,7 +208,7 @@ def _find_keys(list1, list2, included_keys, parent_key):
         elif list2:
             included_keys[parent_key] = set(list2[0].keys())
         else:
-            included_keys[parent_key] = set([])
+            included_keys[parent_key] = set()
 
     for dictionary in list1 + list2:
         if not isinstance(dictionary, dict):
@@ -352,7 +352,7 @@ def concat(lines, prefix=''):
     :returns: Joined lines as string
 
     """
-    return '\n'.join(['%s%s' % (prefix, line) for line in lines])
+    return '\n'.join(['{}{}'.format(prefix, line) for line in lines])
 
 
 def get_scraper_info(scraper):

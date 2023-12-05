@@ -1,4 +1,3 @@
-# coding=utf-8
 """Common configuration and fixtures for all tests"""
 # pylint does not understand pytest fixtures
 # pylint: disable=redefined-outer-name
@@ -144,7 +143,7 @@ def bagit_with_manifest_fx(bagit_no_manifest_fx, manifest_fx):
     manifest = bagit_no_manifest_fx / 'manifest-md5.txt'
 
     # LocalPath support binary writes only after Python3.5
-    with io.open(bytes(manifest), 'wb') as outfile:
+    with open(bytes(manifest), 'wb') as outfile:
         outfile.write(manifest_fx)
 
     return bagit_no_manifest_fx
