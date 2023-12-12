@@ -16,7 +16,6 @@ Usage ::
 
 import optparse
 import os
-import io
 import subprocess
 
 XSLT_PATH = "/usr/share/dpres-xml-schemas/preservation_schemas/stylesheet.xml"

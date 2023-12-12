@@ -48,7 +48,6 @@ creates a manifest file manifest-md5.txt with lines:
 """
 
 import os
-import io
 
 from file_scraper.utils import hexdigest
 
