@@ -105,7 +105,7 @@ def serialize_dict(data):
     serialized_dict = ""
     if data:
         for key in sorted(list(data)):
-            serialized_dict = f'{serialized_dict} + {key}={data[key]}  '
+            serialized_dict = f'{serialized_dict}{key}={data[key]}  '
     return serialized_dict.strip("  ")
 
 
