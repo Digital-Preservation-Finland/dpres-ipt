@@ -92,8 +92,8 @@ def write_manifest(manifest, path):
     with open(manifest_path, 'wb') as outfile:
         for line in manifest:
             outfile.write(
-                f"{ensure_binary(line[0])},
-                {ensure_binary(line[1])}\n".encode("utf-8"))
+                f"{ensure_binary(line[0])}, {ensure_binary(line[1])}\n"\
+                .encode("utf-8"))
 
 
 def write_bagit_txt(path):
