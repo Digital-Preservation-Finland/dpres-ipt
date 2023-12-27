@@ -406,8 +406,8 @@ def parse_uri_filepath(uri_path, accepted_schemes):
     elements = ', '.join(accepted_schemes)
     parsed_result = urlparse(uri_path)
     if parsed_result.scheme not in accepted_schemes:
-        raise ValueError((f'Scheme [{parsed_result.scheme}]
-                          is not among the accepted schemes '
+        raise ValueError((f'Scheme [{parsed_result.scheme}]'
+                          'is not among the accepted schemes '
                           f'[{elements}]'))
     # Joining by netlock and stripping special characters from path is for the
     # cases with ambigious number of slashes... Like file-URI scheme where
