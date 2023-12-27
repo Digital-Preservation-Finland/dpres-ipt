@@ -54,5 +54,5 @@ def parse_element(element, audiomd_xml):
     """
     Wrapper for xpath query.
     """
-    query = ".//amd:%s" % element
+    query = f".//amd:{element}"
     return audiomd_xml.xpath(query, namespaces=NAMESPACES)[0].text

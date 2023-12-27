@@ -117,8 +117,8 @@ def create_metadata_info(mets_tree, element, object_filename, relpath, use,
                 metadata_info["errors"] = (str(exception) + ' Duplicate or '
                                            'conflicting values detected when '
                                            'merging metadata from '
-                                           'techMD sections %s.' % ', '.join(
-                                               mets.parse_admid(element)))
+                                           f"techMD sections {', '.join(
+                                               mets.parse_admid(element))}")
 
     return metadata_info
 
@@ -183,7 +183,7 @@ def premis_to_dict(premis_xml):
     """
     if premis_xml is None:
         return {}
-    if premis_xml.tag != '{%s}object' % premis.PREMIS_NS:
+    if premis_xml.tag != f'{premis.PREMIS_NS}object':
         return {}
     try:
         object_type = premis.parse_object_type(premis_xml).strip()

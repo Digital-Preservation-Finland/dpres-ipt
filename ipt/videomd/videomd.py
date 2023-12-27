@@ -63,5 +63,5 @@ def parse_element(element, videomd_xml):
     """
     Wrapper for xpath query.
     """
-    query = ".//vmd:%s" % element
+    query = f".//vmd:{element}"
     return videomd_xml.xpath(query, namespaces=NAMESPACES)[0].text

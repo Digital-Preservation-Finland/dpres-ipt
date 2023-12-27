@@ -12,10 +12,10 @@ def parse_spec_version(mets_root):
     :returns: National specification version
     """
     attr = mets_root.attrib
-    specification = attr.get("{%s}CATALOG" % FI_NS) \
-        or attr.get("{%s}SPECIFICATION" % FI_NS) \
-        or attr.get("{%s}CATALOG" % FI_NS_KDK) \
-        or attr.get("{%s}SPECIFICATION" % FI_NS_KDK)
+    specification = attr.get(f"{FI_NS}CATALOG") \
+        or attr.get(f"{FI_NS}SPECIFICATION") \
+        or attr.get(f"{FI_NS_KDK}CATALOG") \
+        or attr.get(f"{FI_NS_KDK}SPECIFICATION")
     if specification is None:
         return None
     return specification.strip()

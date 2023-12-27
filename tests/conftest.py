@@ -42,14 +42,12 @@ def testpath(request):
     temp_path = tempfile.mkdtemp(prefix="tests.testpath.")
 
     LOGGER.debug(
-        'testpath:%s:create temp_path:%s', request,
-        temp_path)
+        f'testpath:{request}:create temp_path:{temp_path}')
 
     def fin():
         """remove temporary path"""
         LOGGER.debug(
-            'testpath:%s:delete temp_path:%s', request,
-            temp_path)
+            f'testpath:{request}:delete temp_path:{temp_path}')
         subprocess.call(['find', temp_path, '-ls'])
         shutil.rmtree(temp_path)
 
@@ -99,14 +97,14 @@ def bagit_no_manifest_fx(tmp_path, chars_fx):
 
     """
 
-    bagit_name = "bagit_%s" % chars_fx
+    bagit_name = f"bagit_{chars_fx}"
 
     bagit_path = tmp_path / bagit_name
 
-    sip_name = "sip_%s" % chars_fx
+    sip_name = f"sip_{chars_fx}"
     sip_path = bagit_path / 'data' / 'transfers' / sip_name
 
-    filename = "file_%s" % chars_fx
+    filename = f"file_{chars_fx}"
     payload = sip_path / 'files' / filename
     payload.parent.mkdir(parents=True)
     payload.open('wb').write(b'abcdef')
