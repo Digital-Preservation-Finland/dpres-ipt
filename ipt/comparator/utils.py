@@ -104,7 +104,7 @@ def create_metadata_info(mets_tree, element, object_filename, relpath, use,
             'format': {'mimetype': None,
                        'version': None}
         }
-
+    elements = ', '.join(mets.parse_admid(element))
     for section in mets.iter_elements_with_id(mets_tree,
                                               mets.parse_admid(element),
                                               "amdSec"):
@@ -117,8 +117,7 @@ def create_metadata_info(mets_tree, element, object_filename, relpath, use,
                 metadata_info["errors"] = (str(exception) + ' Duplicate or '
                                            'conflicting values detected when '
                                            'merging metadata from '
-                                           f"techMD sections {', '.join(
-                                               mets.parse_admid(element))}")
+                                           f'techMD sections {elements}')
 
     return metadata_info
 
