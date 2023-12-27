@@ -118,7 +118,8 @@ def _collect_xml_schemas(sip_path, mets_tree):
                                                                schema_path))
                 abs_sip_path = os.path.abspath(sip_path)
                 if not abs_schema_path.startswith(abs_sip_path):
-                    raise ValueError((f'Schema {schema_path} must not point outside '
+                    raise ValueError((f'Schema {schema_path}'
+                                      'must not point outside '
                                       'of SIP directory'))
 
                 (_, id_value) = premis.parse_identifier_type_value(

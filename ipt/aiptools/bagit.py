@@ -92,7 +92,8 @@ def write_manifest(manifest, path):
     with open(manifest_path, 'wb') as outfile:
         for line in manifest:
             outfile.write(
-                f"{ensure_binary(line[0])}, {ensure_binary(line[1])}\n".encode("utf-8"))
+                f"{ensure_binary(line[0])},
+                {ensure_binary(line[1])}\n".encode("utf-8"))
 
 
 def write_bagit_txt(path):
@@ -124,6 +125,7 @@ def check_bagit_mandatory_files(bagit_dir):
     :returns: 0 if ok, raise BagitError otherwise."""
     dirs_list = os.listdir(bagit_dir)
     if not {'manifest-md5.txt', 'bagit.txt'}.issubset(set(dirs_list)):
-        raise BagitError(f"Directory {bagit_dir} is not bagit format compilant. "
+        raise BagitError(f"Directory {bagit_dir} "
+                         "is not bagit format compilant. "
                          "manifest-md5.txt and bagit.txt should exist.")
     return 0
