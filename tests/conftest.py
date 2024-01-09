@@ -7,7 +7,6 @@ import tempfile
 import subprocess
 import shutil
 import os
-import io
 
 from pathlib import Path
 

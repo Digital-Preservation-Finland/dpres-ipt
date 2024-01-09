@@ -1,5 +1,4 @@
 """tests for bagit_util-commandline interface."""
-import io
 import shutil
 
 import pytest
