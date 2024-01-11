@@ -104,7 +104,7 @@ def create_metadata_info(mets_tree, element, object_filename, relpath, use,
             'format': {'mimetype': None,
                        'version': None}
         }
-    elements = ', '.join(mets.parse_admid(element))
+    sections = ', '.join(mets.parse_admid(element))
     for section in mets.iter_elements_with_id(mets_tree,
                                               mets.parse_admid(element),
                                               "amdSec"):
@@ -117,8 +117,7 @@ def create_metadata_info(mets_tree, element, object_filename, relpath, use,
                 metadata_info["errors"] = (str(exception) + ' Duplicate or '
                                            'conflicting values detected when '
                                            'merging metadata from '
-                                           f'techMD sections {elements}')
-
+                                           f'techMD sections {sections}.')
     return metadata_info
 
 
@@ -182,7 +181,7 @@ def premis_to_dict(premis_xml):
     """
     if premis_xml is None:
         return {}
-    if premis_xml.tag != f'{premis.PREMIS_NS}object':
+    if premis_xml.tag != f'{{{premis.PREMIS_NS}}}object':
         return {}
     try:
         object_type = premis.parse_object_type(premis_xml).strip()

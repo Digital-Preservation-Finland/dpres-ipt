@@ -338,7 +338,7 @@ def synonymize_stream_keys(stream):
         # Get the equivalent METS key if one exists, otherwise use old key
         new_key = _FFMPEG_FILE_SCRAPER_KEY_SYNONYMS.get(key, key)
         if new_key in new_stream:
-            raise RuntimeError(f'Stream {new_key} key already exists')
+            raise RuntimeError(f'Stream {{{new_key}}} key already exists')
         new_stream[new_key] = value
 
     return new_stream
@@ -403,12 +403,12 @@ def parse_uri_filepath(uri_path, accepted_schemes):
     """
     # Schema_path as unquoted file path with leading slashes
     # removed since schema_path should always be a relative path
-    elements = ', '.join(accepted_schemes)
+    schemes = ', '.join(accepted_schemes)
     parsed_result = urlparse(uri_path)
     if parsed_result.scheme not in accepted_schemes:
         raise ValueError((f'Scheme [{parsed_result.scheme}]'
                           'is not among the accepted schemes '
-                          f'[{elements}]'))
+                          f'[{schemes}]'))
     # Joining by netlock and stripping special characters from path is for the
     # cases with ambigious number of slashes... Like file-URI scheme where
     # usage can vary between one to even four slashes.
