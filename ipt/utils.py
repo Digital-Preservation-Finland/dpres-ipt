@@ -338,7 +338,7 @@ def synonymize_stream_keys(stream):
         # Get the equivalent METS key if one exists, otherwise use old key
         new_key = _FFMPEG_FILE_SCRAPER_KEY_SYNONYMS.get(key, key)
         if new_key in new_stream:
-            raise RuntimeError(f'Stream {[new_key]} key already exists')
+            raise RuntimeError(f'Stream [{new_key}] key already exists')
         new_stream[new_key] = value
 
     return new_stream
