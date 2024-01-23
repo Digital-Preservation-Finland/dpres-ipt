@@ -8,17 +8,64 @@ The aim is to provide digital preservation services for culture and research to 
 the access and use of materials long in the future. Documentation and specifications
 for the digital preservation service can be found in: http://digitalpreservation.fi
 
-Installation
+Requirements
 ------------
 
-Installation and usage requires Python 3.6 or newer.
-The software is tested with Python 3.6 on Centos 7.x release.
+Installation and usage requires Python 3.9 or newer.
+The software is tested with Python 3.9 on AlmaLinux 9 release.
+
+Installation using RPM packages (preferred)
+-------------------------------------------
+
+Installation on Linux distributions is done by using the RPM Package Manager.
+See how to `configure the PAS-jakelu RPM repositories`_ to setup necessary software sources.
+
+.. _configure the PAS-jakelu RPM repositories: https://www.digitalpreservation.fi/user_guide/installation_of_tools 
+
+After the repository has been added, the package can be installed by running the following command::
+
+    sudo dnf install python3-dpres-ipt
+
+Usage
+-----
+
+To validate a METS document::
+
+    check-xml-schema-features <METS document>
+    check-xml-schematron-features -s <schematron_file> <METS document>
+
+See the schematron files from: https://github.com/Digital-Preservation-Finland/dpres-xml-schemas
+
+To validate digital objects in an information package::
+
+    check-sip-digital-objects <package directory> <linking_type> <linking_value> [-c <catalog_path>]
+
+Parameters <linking_type> and <linking_value> give values to PREMIS <relatedObjectIdentifierType> and
+<relatedObjectIdentifierValues> elements in the output. If you are not planning to use these, you
+may give random strings.
+
+The option <catalog_path> can be given if local XML catalog files are to be used in the validation of
+XML files.
+
+To check fixity of digital objects in an information package::
+
+    check-sip-file-checksums <package directory>
+
+To create local XML catalog file::
+
+    create-schema-catalog <mets_filepath> <sip_dirpath> <output_catalog_path> [-c <existing_catalog_path>]
+
+The created local XML catalog file can be used together with
+``check-sip-digital-objects``.
+
+Installation using Python Virtualenv for development purposes
+-------------------------------------------------------------
 
 The following software is required for validation tools.
 
-        * dpres-xml-schemas, see https://github.com/Digital-Preservation-Finland/dpres-xml-schemas
-        * See the README from file-scraper repository for additional installation requirements:
-          https://github.com/Digital-Preservation-Finland/file-scraper/blob/master/README.rst
+* dpres-xml-schemas, see https://github.com/Digital-Preservation-Finland/dpres-xml-schemas
+* See the README from file-scraper repository for additional installation requirements:
+  https://github.com/Digital-Preservation-Finland/file-scraper/blob/master/README.rst
 
 Create a virtual environment::
     
@@ -38,38 +85,6 @@ To deactivate the virtual environment, run ``deactivate``.
 To reactivate it, run the ``source`` command above.
 
 NOTE: Running unit tests requires the full installation of file-scraper with all its requirements.
-
-Usage
------
-
-To validate a METS document::
-
-        python ipt/scripts/check_xml_schema_features.py <METS document>
-        python ipt/scripts/check_xml_schematron_features.py -s <schematron_file> <METS document>
-
-See the schematron files from: https://github.com/Digital-Preservation-Finland/dpres-xml-schemas
-
-To validate digital objects in an information package::
-
-        python ipt/scripts/check_sip_digital_objects.py <package directory> <linking_type> <linking_value> [-c <catalog_path>]
-
-Parameters <linking_type> and <linking_value> give values to PREMIS <relatedObjectIdentifierType> and
-<relatedObjectIdentifierValues> elements in the output. If you are not planning to use these, you
-may give random strings.
-
-The option <catalog_path> can be given if local XML catalog files are to be used in the validation of
-XML files.
-
-To check fixity of digital objects in an information package::
-
-        python ipt/scripts/check_sip_file_checksums.py <package directory>
-
-To create local XML catalog file::
-
-        python -m ipt/scripts/create_schema_catalog <mets_filepath> <sip_dirpath> <output_catalog_path> [-c <existing_catalog_path>]
-
-The created local XML catalog file can be used together with
-*check_sip_digital_objects*.
 
 Copyright
 ---------
