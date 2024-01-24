@@ -77,7 +77,7 @@ def format_directive(module, package=None):
 def create_module_file(package, module, opts):
     """Build the text of the file and write the file."""
     text = format_heading(1, f'{module} Module')
-    text += format_heading(2, f':mod:{module} Module')
+    text += format_heading(2, f':mod:`{module}` Module')
     text += format_directive(module, package)
     write_file(makename(package, module), text, opts)
 
@@ -93,9 +93,9 @@ def create_package_file(root, master_package, subroot, py_files, opts, subs):
         py_file = os.path.splitext(py_file)[0]
         py_path = makename(subroot, py_file)
         if is_package:
-            heading = f':mod:{package} Package'
+            heading = f':mod:`{package}` Package'
         else:
-            heading = f':mod:{py_file} Module'
+            heading = f':mod:`{py_file}` Module'
         text += format_heading(2, heading)
         text += format_directive(is_package and subroot or py_path, master_package)
         text += '\n'
