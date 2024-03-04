@@ -64,7 +64,7 @@
               <premis:compositionLevel>0</premis:compositionLevel>
               <premis:format>
                 <premis:formatDesignation>
-                  <premis:formatName>video/mp4</premis:formatName>
+                  <premis:formatName>video/h264</premis:formatName>
                 </premis:formatDesignation>
               </premis:format>
             </premis:objectCharacteristics>
@@ -84,7 +84,7 @@
               <premis:compositionLevel>0</premis:compositionLevel>
               <premis:format>
                 <premis:formatDesignation>
-                  <premis:formatName>audio/mp4</premis:formatName>
+                  <premis:formatName>audio/aac</premis:formatName>
                 </premis:formatDesignation>
               </premis:format>
             </premis:objectCharacteristics>
