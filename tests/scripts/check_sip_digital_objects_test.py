@@ -22,8 +22,8 @@ from file_scraper.defaults import (
     UNAP
 )
 
-from tests import testcommon
 from tests.testcommon import shell
+from tests.testcommon.settings import TESTDATADIR
 
 # Module to test
 from ipt.scripts.check_sip_digital_objects import (main,
@@ -35,7 +35,7 @@ import ipt.scripts.check_sip_digital_objects
 from ipt.scripts.create_schema_catalog import main as schema_main
 
 METSDIR = os.path.abspath(
-    os.path.join(testcommon.settings.TESTDATADIR, 'mets'))
+    os.path.join(TESTDATADIR, 'mets'))
 
 TEST_CASES = [
     {'testcase': 'Invalid digital object.',
@@ -54,8 +54,7 @@ TEST_CASES = [
          'returncode': 117,
          'stdout': [
              'ERROR: File {}/sips/invalid_1.7.1_missing_object/'
-             'data/valid_1.2.png does not exist.'.format(
-                 testcommon.settings.TESTDATADIR)]}},
+             'data/valid_1.2.png does not exist.'.format(TESTDATADIR)]}},
     {'testcase': 'Unsupported mimetype, with version.',
      'filename': 'invalid_1.7.1_unsupported_mimetype',
      'patch': {'mimetype': 'application/kissa',
@@ -219,8 +218,7 @@ def test_check_sip_digital_objects(case, tmpdir, monkeypatch):
         # Nothing to patch.
         pass
 
-    filename = os.path.join(
-        testcommon.settings.TESTDATADIR, 'sips', case['filename'])
+    filename = os.path.join(TESTDATADIR, 'sips', case['filename'])
 
     arguments = [filename, 'preservation-sip-id', str(uuid.uuid4())]
     # Schema cases need their own catalogs created by another script.
@@ -413,7 +411,7 @@ def patch_scraper_identify(mimetype='', version=''):
         for detector in iter_detectors():
             tool = detector(obj.filename)
             tool.detect()
-            obj.info[len(obj.info)] = tool.info
+            obj.info[len(obj.info)] = tool.info()
             obj.mimetype = mimetype
             obj.version = version
 
