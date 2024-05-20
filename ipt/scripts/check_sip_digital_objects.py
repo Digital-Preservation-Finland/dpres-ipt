@@ -418,7 +418,8 @@ def create_report_event(result, report_object, report_agent):
 
     report_event = premis.event(
         event_id=event_id, event_type="validation",
-        event_date_time=datetime.datetime.now().isoformat(),
+        event_date_time=datetime.datetime.now(
+            datetime.timezone.utc).isoformat(),
         event_detail="Digital object validation",
         child_elements=[outcome],
         linking_objects=[report_object], linking_agents=[report_agent])
