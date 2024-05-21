@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Unreleased
+----------
+
+Update deprecated timezone calls.
+
 Version 0.104
 -------------
 
