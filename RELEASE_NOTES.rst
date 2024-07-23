@@ -1,8 +1,8 @@
 Release notes
 =============
 
-Unreleased
-----------
+Version 0.105
+-------------
 
 Update deprecated timezone calls.
 
