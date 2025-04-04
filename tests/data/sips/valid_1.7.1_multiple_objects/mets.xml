@@ -192,7 +192,7 @@
               <premis:format>
                 <premis:formatDesignation>
                   <premis:formatName>text/html; charset=UTF-8</premis:formatName>
-                  <premis:formatVersion>5.0</premis:formatVersion>
+                  <premis:formatVersion>5</premis:formatVersion>
                 </premis:formatDesignation>
               </premis:format>
               <premis:creatingApplication>
@@ -252,7 +252,7 @@
         <mets:FLocat LOCTYPE="URL" xlink:href="file://data/valid_1987a.gif" xlink:type="simple"/>
       </mets:file>
       <mets:file ID="_e9ed2d16-67e1-459f-8294-ebf5c3440fb0" ADMID="_57d7d03779ea7843ec5a9800aa8011b2">
-        <mets:FLocat LOCTYPE="URL" xlink:href="file://data/valid_5.0.html" xlink:type="simple"/>
+        <mets:FLocat LOCTYPE="URL" xlink:href="file://data/valid_5.html" xlink:type="simple"/>
       </mets:file>
       <mets:file ID="_7b0b7879-4144-4e99-a9c5-124cfc532740" ADMID="_d24be94f722af7fd93d87cfd76e6ca18">
         <mets:FLocat LOCTYPE="URL" xlink:href="file://data/valid__ascii.txt" xlink:type="simple"/>
