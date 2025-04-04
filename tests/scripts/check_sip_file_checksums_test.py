@@ -121,3 +121,17 @@ def test_checksum_utf8(temp_sip):
     assert ensure_text('Checksum OK: data/valid_äö.txt') in stdout
     assert 'tmp' not in stdout
     assert returncode == 0
+
+
+def test_uppercase_checksum(temp_sip):
+    """Test valid METS that has checksum in uppercase
+       with uncorrupted digital objects"""
+
+    (returncode, stdout, stderr) = run_main(
+        temp_sip('valid_1.7.1_checksum_in_uppercase'))
+    assert stderr == ''
+    for line in stdout.splitlines():
+        assert 'Checksum OK' in line
+    assert 'Checksum OK: data/valid__iso8859.txt' in stdout
+    assert 'tmp' not in stdout
+    assert returncode == 0
