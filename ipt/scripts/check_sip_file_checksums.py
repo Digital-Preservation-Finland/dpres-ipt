@@ -65,7 +65,7 @@ def check_checksums(sip_path):
                     yield _message(metadata_info, "File does not exist")
                 continue
 
-            if hex_digest == metadata_info["digest"]:
+            if hex_digest.lower() == metadata_info["digest"].lower():
                 print(_message(metadata_info, "Checksum OK"))
             else:
                 yield _message(metadata_info, "Invalid Checksum")
