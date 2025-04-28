@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Version 0.106
+-------------
+
+Change checksum comparison to be character size independent
+
 Version 0.105
 -------------
 
