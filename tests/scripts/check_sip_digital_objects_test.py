@@ -150,6 +150,11 @@ TEST_CASES = [
      'expected_result': {
          'returncode': 117,
          'stdout': ['ERROR: Character decoding error: Illegal character']}},
+    {'testcase': 'Acceptable file for bit-level preservation',
+     'filename': 'valid_1.7.1_invalid_xml_as_bit_level',
+     'expected_result': {
+         'returncode': 0,
+         'stdout': []}},
 ]
 """
 This list contains the following cases:
