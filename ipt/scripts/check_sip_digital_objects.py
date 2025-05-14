@@ -21,7 +21,11 @@ from file_scraper.defaults import (
 
 from ipt.comparator.utils import iter_metadata_info
 from ipt.comparator.comparator import MetadataComparator
-from ipt.constants import METS_USE_NO_VALIDATION, METS_USE_IDENTIFICATION
+from ipt.constants import (
+    METS_USE_NO_VALIDATION,
+    METS_USE_IDENTIFICATION,
+    METS_USE_IGNORE_ERRORS,
+)
 from ipt.utils import (
     merge_dicts,
     create_scraper_params,
@@ -237,14 +241,17 @@ def check_grade(metadata_info, grade):
     errors = []
     valid = False
 
-    if use == "":
+    if use in ["", METS_USE_IGNORE_ERRORS]:
         valid = grade in [RECOMMENDED, ACCEPTABLE]
     elif use == METS_USE_NO_VALIDATION:
         valid = grade in [BIT_LEVEL_WITH_RECOMMENDED, BIT_LEVEL, UNACCEPTABLE]
     elif use == METS_USE_IDENTIFICATION:
         valid = grade == BIT_LEVEL
 
-    if grade in [BIT_LEVEL_WITH_RECOMMENDED, BIT_LEVEL] and valid:
+    if (
+        grade in [BIT_LEVEL_WITH_RECOMMENDED, BIT_LEVEL]
+        or use == METS_USE_IGNORE_ERRORS
+    ) and valid:
         messages.append(
             "File {} has been accepted to bit-level preservation only.".format(
                 metadata_info["relpath"]
@@ -319,31 +326,44 @@ def validation(mets_path, catalog_path):
         """
         results = []
 
-        # 1. Check for mets errors
+        # 1. Check metadata_info for errors and notes;
+        #    if there are errors, skip other steps.
         mets_result = check_mets_errors(metadata_info)
         results.append(mets_result)
         if not mets_result['is_valid'][0]:
             return join_validation_results(metadata_info, results)
 
+        # 2. Perform validation using scraper and get the grade.
         scraper_result, streams, grade = check_well_formed(
             metadata_info,
             catalog_path=catalog_path
         )
 
-        # 2. Check if user has specified to skip validation
+        # 3. Check if file validation is required; if not, do not append the
+        #    validation results to the output and skip other steps.
         if skip_validation(metadata_info):
             # Check the scraper grade before allowing to skip validation
             results.append(check_grade(metadata_info, grade))
             return join_validation_results(metadata_info, results)
 
-        # 3. Check if the file is well-formed
+        # 4. Check if user has specified to ignore validation for cases where
+        #    file is not deemed well-formed, but is still eligible for
+        #    bit-level preservation; if yes change scraper "is_valid" result.
+        if (
+            scraper_result['is_valid'][0] is False
+            and metadata_info['use'] == METS_USE_IGNORE_ERRORS
+            and grade in [RECOMMENDED, ACCEPTABLE]
+        ):
+            scraper_result['is_valid'][0] = True
+
+        # 5. Append scraper results to final output.
         results.append(scraper_result)
 
-        # 4. Check that user provided metadata matches with scraper metadata
+        # 6. Check that mets metadata matches scraper metadata.
         if scraper_result['is_valid'][0]:
             results.append(check_metadata_match(metadata_info, streams))
 
-        # 5. Check scraper grade
+        # 7. Check that mets use attribute and scraper grading match.
         grade_result = check_grade(metadata_info, grade)
         results.append(grade_result)
 
