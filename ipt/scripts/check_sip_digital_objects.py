@@ -349,12 +349,27 @@ def validation(mets_path, catalog_path):
         # 4. Check if user has specified to ignore validation for cases where
         #    file is not deemed well-formed, but is still eligible for
         #    bit-level preservation; if yes change scraper "is_valid" result.
-        if (
-            scraper_result['is_valid'][0] is False
-            and metadata_info['use'] == METS_USE_IGNORE_ERRORS
-            and grade in [RECOMMENDED, ACCEPTABLE]
-        ):
-            scraper_result['is_valid'][0] = True
+        if metadata_info['use'] == METS_USE_IGNORE_ERRORS:
+            # Scraper result has to be invalid for this case, or it must not
+            # pass validation.
+            if scraper_result['is_valid'][0] is True:
+                results.append(
+                    make_result_dict(
+                        is_valid=False,
+                        errors=[
+                            (
+                                "ERROR: File {} with the given USE attribute "
+                                "{} cannot be a valid file that passes file "
+                                "format validation."
+                            ).format(
+                                metadata_info["relpath"],
+                                METS_USE_IGNORE_ERRORS,
+                            )
+                        ],
+                    )
+                )
+            elif grade in [RECOMMENDED, ACCEPTABLE]:
+                scraper_result['is_valid'][0] = True
 
         # 5. Append scraper results to final output.
         results.append(scraper_result)

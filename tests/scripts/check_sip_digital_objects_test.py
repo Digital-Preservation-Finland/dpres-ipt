@@ -155,6 +155,13 @@ TEST_CASES = [
      'expected_result': {
          'returncode': 0,
          'stdout': []}},
+    {'testcase': 'Not acceptable file for bit-level preservation',
+     'filename': 'invalid_1.7.1_plaintext_as_bit_level',
+     'expected_result': {
+         'returncode': 117,
+         'stdout': ['ERROR: File data/valid__iso8859.txt with the given '
+                    'USE attribute fi-dpres-ignore-validation-errors cannot '
+                    'be a valid file that passes file format validation.']}},
 ]
 """
 This list contains the following cases:
