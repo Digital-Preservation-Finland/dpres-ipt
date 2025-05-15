@@ -317,10 +317,15 @@ def validation(mets_path, catalog_path):
         Perform validation operations in the following order:
         1. Check metadata_info for errors and notes; if there are errors,
            skip other steps.
-        2. Check if file needs to be validated; if not, skip other steps.
-        3. Check if file is well formed using scraper; if not, skip comparison.
-        4. Check that mets metadata matches scraper metadata.
-        5. Check that mets use attribute and scraper grading match.
+        2. Perform validation using scraper and get the grade.
+        3. Check if file validation is required using the grade; if not, do not
+           append the validation results to the output and skip other steps.
+        4. Check if user has specified to ignore validation for cases where
+           file is not deemed well-formed, but is still eligible for bit-level
+           preservation; if yes change scraper's "is_valid" result.
+        5. Append scraper results to final output.
+        6. Check that mets metadata matches scraper metadata.
+        7. Check that mets use attribute and scraper grading match.
 
         :returns: Dictionary containing joined results from the above steps.
         """
