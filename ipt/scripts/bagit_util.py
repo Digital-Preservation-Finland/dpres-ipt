@@ -37,7 +37,7 @@ def main(arguments=None):
 
     args = parser.parse_args(arguments)
 
-    if not args.make_manifest == "make_manifest":
+    if args.make_manifest != "make_manifest":
         sys.stderr.write("Must provide make_manifest command and SIP directory"
                          " name as parameter\n")
         parser.print_help()
