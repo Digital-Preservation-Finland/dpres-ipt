@@ -23,6 +23,7 @@ ANALOGDIGITALFLAG="FileDigital">
 </amd:AUDIOMD>
 """
 
+from ipt.constants import UNAV
 from ipt.utils import handle_div
 
 AUDIOMD_URI = "http://www.loc.gov/audioMD/"
@@ -45,7 +46,7 @@ def to_dict(audiomd_xml):
         parse_element("samplingFrequency", audiomd_xml))
     audio["audio"]["channels"] = parse_element("numChannels", audiomd_xml)
     for key in ['bits_per_sample', 'bit_rate', 'sample_rate', 'channels']:
-        if audio["audio"][key] in ['0', '(:unav)']:
+        if audio["audio"][key] in ['0', UNAV]:
             audio["audio"].pop(key)
     return audio
 

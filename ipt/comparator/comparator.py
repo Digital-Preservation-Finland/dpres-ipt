@@ -6,11 +6,12 @@ import json
 
 from ipt.utils import (handle_div, synonymize_stream_keys,
                        pair_compatible_list_elements)
+from ipt.constants import UNAV, UNAP, ETAL
 
 
 _ETAL_ALLOWED_KEYS = ('display_aspect_ratio',)
 _AUDIOMD_INTEGER_VALUE_KEYS = ('data_rate',)
-_METS_UNAVAILABLE_VALUES = ('(:unav)', '0')
+_METS_UNAVAILABLE_VALUES = (UNAV, '0')
 _PDF_VERSION_SUBSETS = {'1.4': ('A-1a', 'A-1b'),
                         '1.7': ('A-2a', 'A-2b', 'A-2u',
                                 'A-3a', 'A-3b', 'A-3u')}
@@ -233,11 +234,11 @@ def _harmonized_versions(scraper_format):
     harmonized_versions = set()
     # If scraper denotes version as unapplicable, empty string in METS is
     # expected.
-    if scraper_format['version'] == '(:unap)':
+    if scraper_format['version'] == UNAP:
         harmonized_versions.add('')
     # If scraper is unable to resolve version, we expect only values from
     # some file formats in a list.
-    elif scraper_format['version'] in ['(:unav)', None]:
+    elif scraper_format['version'] in [UNAV, None]:
         # We handle (:unav) version result from Scraper only in known cases.
         # For other cases we leave harmonized_versions empty, which results
         # error.
@@ -313,9 +314,9 @@ def _match_streams(mets_streams, scraper_streams, stream_type):
                 # Check special cases where value mismatch is allowed
                 if mets_value in _METS_UNAVAILABLE_VALUES:
                     continue
-                if scraper_value == '(:unav)':
+                if scraper_value == UNAV:
                     continue
-                if mets_value == '(:etal)' and key in _ETAL_ALLOWED_KEYS:
+                if mets_value == ETAL and key in _ETAL_ALLOWED_KEYS:
                     continue
                 return False
             except KeyError:

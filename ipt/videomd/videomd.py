@@ -31,6 +31,7 @@ ANALOGDIGITALFLAG="FileDigital">
 """
 
 from ipt.utils import handle_div
+from ipt.constants import UNAV, ETAL
 
 VIDEOMD_URI = "http://www.loc.gov/videoMD/"
 NAMESPACES = {"vmd": VIDEOMD_URI}
@@ -54,7 +55,7 @@ def to_dict(videomd_xml):
         parse_element("DAR", videomd_xml))
     for key in ['avg_frame_rate', 'bit_rate', 'width', 'height',
                 'display_aspect_ratio']:
-        if video["video"][key] in ['0', '(:unav)', '(:etal)']:
+        if video["video"][key] in ['0', UNAV, ETAL]:
             video["video"].pop(key)
     return video
 

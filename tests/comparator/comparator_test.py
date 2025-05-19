@@ -21,6 +21,7 @@ import pytest
 from file_scraper.scraper import Scraper
 from ipt.comparator.comparator import MetadataComparator
 from ipt.utils import concat
+from ipt.constants import UNAV, UNAP, ETAL
 
 METADATA_INFO = {
     'valid_text': {
@@ -73,12 +74,12 @@ SCRAPER_STREAMS = {
             'index': 0,
             'mimetype': 'text/plain',
             'stream_type': 'text',
-            'version': '(:unap)'}},
+            'version': UNAP}},
     'valid_office': {
         0: {'index': 0,
             'mimetype': 'application/vnd.oasis.opendocument.text',
             'stream_type': 'binary',
-            'version': '(:unav)'}},
+            'version': UNAV}},
     'valid_image': {
         0: {'bps_unit': 'integer',
             'bps_value': '8',
@@ -106,7 +107,7 @@ SCRAPER_STREAMS = {
             'num_channels': '2',
             'sampling_frequency': '44.1',
             'stream_type': 'audio',
-            'version': '(:unap)'}},
+            'version': UNAP}},
     'valid_video': {
         0: {'codec_creator_app': 'Lavf56.40.101',
             'codec_creator_app_version': '56.40.101',
@@ -114,7 +115,7 @@ SCRAPER_STREAMS = {
             'index': 0,
             'mimetype': 'video/mp4',
             'stream_type': 'videocontainer',
-            'version': '(:unap)'},
+            'version': UNAP},
         1: {'bits_per_sample': '8',
             'codec_creator_app': 'Lavf56.40.101',
             'codec_creator_app_version': '56.40.101',
@@ -131,13 +132,13 @@ SCRAPER_STREAMS = {
             'mimetype': 'video/h264',
             'par': '1',
             'sampling': '4:2:0',
-            'signal_format': '(:unap)',
+            'signal_format': UNAP,
             'sound': 'Yes',
             'stream_type': 'video',
-            'version': '(:unap)',
+            'version': UNAP,
             'width': '320'},
         2: {'audio_data_encoding': 'AAC',
-            'bits_per_sample': '(:unav)',
+            'bits_per_sample': UNAV,
             'codec_creator_app': 'Lavf56.40.101',
             'codec_creator_app_version': '56.40.101',
             'codec_name': 'AAC',
@@ -150,9 +151,9 @@ SCRAPER_STREAMS = {
             'num_channels': '4',
             'sampling_frequency': '48',
             'stream_type': 'audio',
-            'version': '(:unap)'},
+            'version': UNAP},
         3: {'audio_data_encoding': 'AAC',
-            'bits_per_sample': '(:unav)',
+            'bits_per_sample': UNAV,
             'codec_creator_app': 'Lavf56.40.101',
             'codec_creator_app_version': '56.40.101',
             'codec_name': 'AAC',
@@ -165,7 +166,7 @@ SCRAPER_STREAMS = {
             'num_channels': '2',
             'sampling_frequency': '44.1',
             'stream_type': 'audio',
-            'version': '(:unap)'}},
+            'version': UNAP}},
 }
 
 # The default result message if comparison does not find any errors.
@@ -174,7 +175,7 @@ DEFAULT_VALID_MESSAGE = 'METS metadata matches scraper metadata.'
 VALID_TEST_CASES = [
     {'reason': 'Valid plaintext must pass.',
      'base': 'valid_text'},
-    {'reason': 'Valid office must pass even with scraper (:unav) version.',
+    {'reason': f'Valid office must pass even with scraper {UNAV} version.',
      'base': 'valid_office'},
     {'reason': 'Valid non-plaintext must pass.',
      'base': 'valid_image'},
@@ -182,14 +183,14 @@ VALID_TEST_CASES = [
      'base': 'valid_audio'},
     {'reason': 'Valid video container with multiple streams must pass.',
      'base': 'valid_video'},
-    {'reason': 'Check that (:etal) value in allowed key is accepted.',
+    {'reason': f'Check that {ETAL} value in allowed key is accepted.',
      'base': 'valid_video',
      'md_patch': [
-         ['video_streams', 0, 'video', 'display_aspect_ratio', '(:etal)']]},
-    {'reason': 'If scraper finds value for mets (:unav), it must be reported.',
+         ['video_streams', 0, 'video', 'display_aspect_ratio', ETAL]]},
+    {'reason': f'If scraper finds value for mets {UNAV}, it must be reported.',
      'base': 'valid_audio',
-     'md_patch': [['audio', 'channels', '(:unav)']],
-     'expected_message': "Found value for {'channels': '(:unav)'} "
+     'md_patch': [['audio', 'channels', UNAV]],
+     'expected_message': f"Found value for {{'channels': '{UNAV}'}} "
                          "-- {'channels': '2'}."},
     {'reason': 'Check that mismatching character sets are reported.',
      'base': 'valid_text',
@@ -202,7 +203,7 @@ INVALID_TEST_CASES = [
      'base': 'valid_text',
      'md_patch': [['format', {'mimetype': None, 'version': None}]],
      'expected_error': 'Missing or incorrect mimetype/version.'},
-    {'reason': 'Version is required except when scraper results (:unap).',
+    {'reason': f'Version is required except when scraper results {UNAP}.',
      'base': 'valid_image',
      'md_patch': [['format', 'version', '']],
      'expected_error': 'Missing or incorrect mimetype/version.'},
@@ -212,9 +213,9 @@ INVALID_TEST_CASES = [
      'expected_error': ('audio streams in {} are not what is described '
                         'in metadata'.format(
                             METADATA_INFO['valid_video']['filename']))},
-    {'reason': 'File format version is not allowed to be (:unav) in METS',
+    {'reason': f'File format version is not allowed to be {UNAV} in METS',
      'base': 'valid_office',
-     'md_patch': [['format', 'version', '(:unav)']],
+     'md_patch': [['format', 'version', UNAV]],
      'expected_error': 'Missing or incorrect mimetype/version'}
 ]
 

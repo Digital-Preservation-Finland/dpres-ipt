@@ -25,6 +25,8 @@ from ipt.constants import (
     METS_USE_NO_VALIDATION,
     METS_USE_IDENTIFICATION,
     METS_USE_IGNORE_ERRORS,
+    UNAV,
+    UNAP
 )
 from ipt.utils import (
     merge_dicts,
@@ -33,7 +35,7 @@ from ipt.utils import (
     ensure_text
 )
 
-_UNAVAILABLE_VERSION_VALUES = ('', '(:unav)', '(:unap)')
+_UNAVAILABLE_VERSION_VALUES = ('', UNAV, UNAP)
 
 
 def main(arguments=None):
