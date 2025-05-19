@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Version X.XX
+------------
+
+- Add support for mets:file USE="fi-dpres-ignore-validation-errors" case
+
 Version 0.106
 -------------
 
