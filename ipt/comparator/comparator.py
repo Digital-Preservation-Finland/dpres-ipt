@@ -1,9 +1,11 @@
 """
 Module to compare metadata found in mets to metadata scraped by file-scraper.
 """
+from __future__ import annotations
 
 import json
 
+from typing import Literal
 from ipt.utils import (handle_div, synonymize_stream_keys,
                        pair_compatible_list_elements)
 from ipt.constants import UNAV, UNAP, ETAL
@@ -277,73 +279,100 @@ def _compare_mimetype_version(mets_format, scraper_format, is_textfile=False):
                 _harmonized_versions(scraper_format)))
 
 
-def _match_streams(mets_streams, scraper_streams, stream_type):
+def _match_streams(
+        mets_streams: list[dict[str, str | dict[str, str]]],
+        scraper_streams: list[dict[str, str | dict[str, str]]],
+        stream_type: Literal["audio", "video"]) -> tuple[bool, list[str]]:
     """
     Check that mets_streams can be paired perfectly with scraper_streams,
     so that each mets_stream and scraper_stream has a pair, and no stream
     is paired more than once.
 
-    :mets_streams: List of prepared audio or video streams parsed from mets.
-    :scraper_streams: List of prepared audio or video streams from scraper.
-    :stream_type: Either 'audio' or 'video'.
-    :returns: (is_match, notes); is_match = True iff all streams were paired
+    :param mets_streams: List of prepared audio or video streams parsed from
+    mets.
+    :param scraper_streams: List of prepared audio or video streams from
+    scraper.
+    :param stream_type: Either 'audio' or 'video'.
+    :returns: (is_match, notes); is_match = True if all streams were paired
               successfully. Notes is a list of info about values listed as
               (:unav) or 0 in mets but for which scraper found actual values.
     """
     if stream_type not in ('audio', 'video'):
         raise ValueError(f'Invalid stream type {stream_type}')
 
-    def _compare_stream_dicts(mets_stream, scraper_stream):
-        """
-        Helper to check if all key-value pairs in mets_stream can be found in
-        scraper_stream, excluding some special cases.
-
-        mets_stream: A prepared mets stream dictionary.
-        scraper_stream: A prepared scraper stream dictionary.
-        :returns: True iff mets_stream matches scraper_stream.
-        """
-        if not _compare_mimetype_version(
-                mets_stream['format'], scraper_stream['format']):
-            return False
-
-        for key, mets_value in mets_stream[stream_type].items():
-            try:
-                scraper_value = scraper_stream[stream_type][key]
-                if mets_value == scraper_value:
-                    continue
-                # Check special cases where value mismatch is allowed
-                if mets_value in _METS_UNAVAILABLE_VALUES:
-                    continue
-                if scraper_value == UNAV:
-                    continue
-                if mets_value == ETAL and key in _ETAL_ALLOWED_KEYS:
-                    continue
-                return False
-            except KeyError:
-                # Mets may contain keys that scraper does not find, this is ok
-                pass
-        return True
-
-    index_pairs = pair_compatible_list_elements(mets_streams, scraper_streams,
-                                                _compare_stream_dicts)
+    index_pairs = pair_compatible_list_elements(
+        mets_streams,
+        scraper_streams,
+        _compare_stream_dicts,
+        stream_type=stream_type
+    )
 
     if index_pairs:
         # Streams were matched successfully; add message for all cases where
         # mets had an unavailable value, but scraper found an actual value
-        notes = []
-        for mets_idx, scraper_idx in index_pairs:
-            scraper_stream = scraper_streams[scraper_idx][stream_type]
-            for key, mets_value in \
-                    mets_streams[mets_idx][stream_type].items():
-                try:
-                    scraper_value = scraper_stream[key]
-                    if mets_value != scraper_value and \
-                            mets_value in _METS_UNAVAILABLE_VALUES:
-                        notes.append('Found value for {} -- {}.'.format(
-                            {key: mets_value}, {key: scraper_value}))
-                except KeyError:
-                    pass
+        notes = __generate_notes(
+            index_pairs, mets_streams, scraper_streams, stream_type
+        )
         return (True, notes)
     # Streams could not be matched (or there were no streams, in which case
     # this function should not have been called at all)
     return (False, [])
+
+
+def __generate_notes(
+    index_pairs: list[tuple[int, int]],
+    mets_streams: list[dict[str, dict[str, str]]],
+    scraper_streams: list[dict[str, dict[str, str]]],
+    stream_type: str
+) -> list[str]:
+    notes = []
+    for mets_idx, scraper_idx in index_pairs:
+        mets_data = mets_streams[mets_idx][stream_type]
+        scraper_data = scraper_streams[scraper_idx][stream_type]
+
+        for key, mets_value in mets_data.items():
+            scraper_value = scraper_data.get(key)
+            if (
+                scraper_value is not None and
+                mets_value != scraper_value and
+                mets_value in _METS_UNAVAILABLE_VALUES
+            ):
+                notes.append(
+                    f"Found value for {{'{key}': '{mets_value}'}} -- "
+                    f"{{'{key}': '{scraper_value}'}}."
+                )
+    return notes
+
+
+def _compare_stream_dicts(mets_stream: dict[str, str | dict[str, str]],
+                          scraper_stream: dict[str, str | dict[str, str]],
+                          stream_type: str) -> bool:
+    """
+    Helper to check if all key-value pairs in mets_stream can be found in
+    scraper_stream, excluding some special cases.
+
+    :param mets_stream: A prepared mets stream dictionary.
+    :param scraper_stream: A prepared scraper stream dictionary.
+    :returns: True iff mets_stream matches scraper_stream.
+    """
+    if not _compare_mimetype_version(
+            mets_stream['format'], scraper_stream['format']):
+        return False
+
+    for key, mets_value in mets_stream[stream_type].items():
+        try:
+            scraper_value = scraper_stream[stream_type][key]
+            if mets_value == scraper_value:
+                continue
+            # Check special cases where value mismatch is allowed
+            if mets_value in _METS_UNAVAILABLE_VALUES:
+                continue
+            if scraper_value == UNAV:
+                continue
+            if mets_value == ETAL and key in _ETAL_ALLOWED_KEYS:
+                continue
+            return False
+        except KeyError:
+            # Mets may contain keys that scraper does not find, this is ok
+            pass
+    return True

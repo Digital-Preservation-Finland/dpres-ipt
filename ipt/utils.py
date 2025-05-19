@@ -5,11 +5,11 @@ import os
 from collections import defaultdict
 from copy import deepcopy
 from fractions import Fraction
-import mimeparse
-
-import lxml.etree as ET
-
 from urllib.parse import unquote_plus, urlparse
+from typing import Any, Callable
+
+import mimeparse
+import lxml.etree as ET
 
 
 _SCRAPER_PARAM_ADDML_KEY_RELATION = (('fields', 'header_fields'),
@@ -265,29 +265,37 @@ def _filter_dicts(list1, list2, included_keys, parent_key, forcekeys):
     return (list1, list2)
 
 
-def pair_compatible_list_elements(list_a, list_b, check_compatible):
+def pair_compatible_list_elements(
+        list_a: list[Any],
+        list_b: list[Any],
+        check_compatible: Callable[[list[Any], list[Any]], bool],
+        **check_compatible_kwargs: Any) -> set:
     """
     Check if the elements of two lists can be matched perfectly so that every
     element in list_a has a pair in list_b and vice versa, and no element
     gets more than one pair. Elements p and q can be paired iff
     check_compatible(p, q) returns True.
 
-    :list_a: List of elements to pair
-    :list_b: List of elements to pair
-    :check_compatible: Function to test if some element in list_a can be paired
-                       with some element in list_b
+    :param list_a: List of elements to pair
+    :param list_b: List of elements to pair
+    :param check_compatible: Function to test if some element in list_a can be
+    paired with some element in list_b
+    :param check_compatible_kwargs: Keyword arguments to pass into
+    check_compatible
+
     :returns: Set of (idx_a, idx_b) tuples, where idx_a is the index of element
               in list_a which was paired with list_b[idx_b], or empty set if
               pairing is not possible.
     """
 
-    def _match(indices_a, indices_b):
+    def _match(indices_a: Any, indices_b: Any) -> set:
         if not indices_a:
             # Nothing left to pair
             return set()
         idx_a = next(iter(indices_a))
         for idx_b in indices_b:
-            if check_compatible(list_a[idx_a], list_b[idx_b]):
+            if check_compatible(list_a[idx_a], list_b[idx_b],
+                                **check_compatible_kwargs):
                 # Found matching elements, remove matched indices and pair
                 # the rest recursively
                 matched_indices = _match(indices_a - {idx_a},
