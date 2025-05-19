@@ -95,18 +95,18 @@ def count_items_in_dict(expected):
     return count
 
 
-def serialize_dict(data):
+def serialize_dict(data: dict[Any, Any]):
     """
-    serialize dict to string
-    :data: a dict.
-    :returns: a list of strings containing dict values
-    in format <key value>__<key value>
+    Serialize a dictionary to a string.
+
+    :param data: A dictionary.
+    :return: A string in the format "<key=value>  <key=value>"
     """
-    serialized_dict = ""
-    if data:
-        for key in sorted(list(data)):
-            serialized_dict = f'{serialized_dict}{key}={data[key]}  '
-    return serialized_dict.strip("  ")
+    if not data:
+        return ""
+
+    parts = [f"{key}={data[key]}" for key in sorted(data)]
+    return "  ".join(parts)
 
 
 def uri_to_path(uri):
