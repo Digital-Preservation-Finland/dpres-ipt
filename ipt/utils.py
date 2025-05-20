@@ -5,11 +5,12 @@ from __future__ import annotations
 
 import os
 from collections import defaultdict
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from copy import deepcopy
 from fractions import Fraction
 from urllib.parse import unquote_plus, urlparse
 from typing import Any
+from file_scraper.scraper import Scraper
 
 import mimeparse
 import lxml.etree as ET
@@ -34,21 +35,27 @@ class ValidationException(Exception):
     """Validator error."""
 
 
-def merge_dicts(*dicts: dict[Any, dict | list | None]
-                ) -> dict[Any, dict | list | None]:
+def matching_types(a: Any, b: Any, t: type) -> bool:
+    """Determine whether both input objects are instances of a specified type.
+
+    :param a: First object
+    :param b: Second object
+    :param t: The type to compare
+    :return: True if both a and b are instances of type t, otherwise False.
     """
-    Merge multiple dictionaries. Lists and dicts with the same key are merged.
-    None values are overwritten by non-None values.
+    return isinstance(a, t) and isinstance(b, t)
+
+
+def merge_dicts(*dicts: dict[str, dict | list | None]
+                ) -> dict[str, dict | list | None]:
+    """Merge multiple dictionaries. Lists and dicts with the same key are
+    merged. None values are overwritten by non-None values.
 
     Other types cannot be merged.
 
     :param dicts: Dictionaries to merge.
     :return: A single merged dictionary.
     """
-
-    def matching_types(a: Any, b: Any, t: type) -> bool:
-        return isinstance(a, t) and isinstance(b, t)
-
     result = {}
     for dictionary in dicts:
         if not dictionary:
@@ -70,40 +77,38 @@ def merge_dicts(*dicts: dict[Any, dict | list | None]
     return result
 
 
-def compare_lists_of_dicts(expected, found):
+def compare_lists_of_dicts(expected: list[dict], found: list[dict]) -> bool:
+    """Compares two lists of dictionaries.
+
+    :param expected: list of dicts that should be present
+    :param found: list of dicts that are actually present
+    :return: True if both lists contain the same dicts with the same frequency,
+    False otherwise
     """
-    :excpected: a list of dicts that should be in second 'found' parameter
-    :found: a list of dicts that really exist
-    :returns: a tuple describing missing and extraneus dicts
-    """
-    expected_count = dict(count_items_in_dict(expected))
-    found_count = dict(count_items_in_dict(found))
-    if found_count != expected_count:
-        return False
-    return True
+    expected_count = count_items_in_dict(expected)
+    found_count = count_items_in_dict(found)
+    return expected_count == found_count
 
 
-def count_items_in_dict(expected):
+def count_items_in_dict(dicts: list[dict]) -> dict[str, int]:
+    """Counts occurrences of serialized dictionaries in a list.
+
+    :param dicts: list of dictionaries
+    :return: dict with serialized dicts as keys and their counts
     """
-    :excpected: a list of dicts that should be in second 'found' paramater
-    :returns: a dict that contains a count of each item
-    """
-    serialized_dicts = []
-    if not expected:
+    if not dicts:
         return {}
-    for item in expected:
-        serialized_dicts.append(serialize_dict(item))
 
     count = defaultdict(int)
-    for item in serialized_dicts:
-        count[item] += 1
+    for item in dicts:
+        serialized = serialize_dict(item)
+        count[serialized] += 1
 
     return count
 
 
 def serialize_dict(data: dict[Any, Any]) -> str:
-    """
-    Serialize a dictionary to a string.
+    """Serialize a dictionary to a string.
 
     :param data: A dictionary.
     :return: A string in the format "<key=value>  <key=value>"
@@ -115,28 +120,32 @@ def serialize_dict(data: dict[Any, Any]) -> str:
     return "  ".join(parts)
 
 
-def uri_to_path(uri):
+def uri_to_path(uri: str) -> bytes:
     """Remove URI scheme from given `URI`:
 
     file://kuvat/PICT0081.JPG -> kuvat/PICT0081.JPG
 
-    :uri: URI as string
-    :returns: Relative path as string
-
+    :param uri: URI as string
+    :returns: Relative path as UTF-8 encoded bytes
     """
     path = unquote_plus(uri).replace('file://', '')
     return path.lstrip('./').encode("utf-8")
 
 
-def parse_mimetype(mimetype):
-    """Parse mimetype information from Content-type string.
+def parse_mimetype(mimetype: str) -> dict[str, dict[str, Any]]:
+    """Parse MIME type information from a Content-Type string.
 
-    ..seealso:: https://www.ietf.org/rfc/rfc2045.txt
+    Attempts to extract the MIME type, charset, and alternative format
+    from the given Content-Type string. If parsing fails, marks the
+    mimetype as erroneous.
+
+    See also: https://www.ietf.org/rfc/rfc2045.txt
+
+    :param mimetype: The Content-Type string to parse.
+    :return: A dictionary with parsed format information.
     """
     result = {"format": {}}
-    # If the mime type can't be parsed, add the erroneous-mimetype item, which
-    # can be checked when selecting validators. We need the original mimetype
-    # for the error message printed by the UnknownFileformat validator.
+
     try:
         result_mimetype = mimeparse.parse_mime_type(mimetype)
     except mimeparse.MimeTypeParseException:
@@ -147,8 +156,7 @@ def parse_mimetype(mimetype):
     params = result_mimetype[2]
     charset = params.get('charset')
     alt_format = params.get('alt-format')
-    result["format"]["mimetype"] = (result_mimetype[0] + "/" +
-                                    result_mimetype[1])
+    result["format"]["mimetype"] = f"{result_mimetype[0]}/{result_mimetype[1]}"
     if charset:
         result["format"]["charset"] = charset
     if alt_format:
@@ -157,55 +165,63 @@ def parse_mimetype(mimetype):
     return result
 
 
-def handle_div(div, decimals=2):
-    """
-    Change a string containing a division or a decimal number to a
-    string containing a decimal number with max <decimals> decimals.
-    Returns original string if ValueError of ZeroDivisionError raised.
-    :div: e.g. "16/9" or "1.7777778"
-    :returns: e.g. "1.78"
+def handle_div(div: str, decimals: int = 2) -> str:
+    """Converts a string representing a division or a decimal number into a
+    formatted string with a maximum of <decimals> decimal places.
+
+    Returns the original string if conversion fails due to ValueError or
+    ZeroDivisionError.
+
+    :param div: A string like "16/9" or "1.7777778"
+    :param decimals: Number of decimal places to round to (default is 2)
+    :return: A string like "1.78"
     """
     try:
-        div = float(Fraction(div))
-        return ("%.2f" % round(div, decimals)).rstrip('0').rstrip('.')
+        value = float(Fraction(div))
+        return f"{round(value, decimals):.{decimals}f}".rstrip('0').rstrip('.')
     except (ValueError, ZeroDivisionError):
         return div
 
 
-def find_max_complete(list1, list2, forcekeys=None):
-    """
-    Finds such version in two lists of dicts, where all the elements in all
+def find_max_complete(list1: list[dict],
+                      list2: list[dict],
+                      forcekeys: list[str] = None) -> tuple:
+    """Finds such version in two lists of dicts, where all the elements in all
     dicts exists. Handles also sublists inside dicts and subdicts inside dicts
     and sublists recursively. In other words, removes such elements that do not
     exist in one or more of the given dicts.
-    :list1: List of dicts
-    :list2: List of dicts
-    :forcekeys: List of those keys which will not be changed or removed, if
-                exists
+
+    :param list1: List of dicts
+    :param list2: List of dicts
+    :param forcekeys: List of those keys which will not be changed or removed,
+    if exists
     :returns: Filtered list1 and list2
     """
     included_keys = {}
+
     if list1 is None:
         list1 = []
     if list2 is None:
         list2 = []
+
     if list1:
         included_keys['root_key'] = set(list1[0])
     elif list2:
         included_keys['root_key'] = set(list2[0])
     else:
         return (list1, list2)
-    included_keys = _find_keys(list1=list1, list2=list2,
-                               included_keys=included_keys,
-                               parent_key='root_key')
-    return _filter_dicts(list1=deepcopy(list1), list2=deepcopy(list2),
-                         included_keys=included_keys, parent_key='root_key',
-                         forcekeys=forcekeys)
+
+    included_keys = _find_keys(list1, list2, included_keys, 'root_key')
+
+    return _filter_dicts(deepcopy(list1), deepcopy(list2), included_keys,
+                         'root_key', forcekeys)
 
 
-def _find_keys(list1, list2, included_keys, parent_key):
-    """
-    Recursive function for find_max_complete.
+def _find_keys(list1: list[dict],
+               list2: list[dict],
+               included_keys: dict[str, Any],
+               parent_key: str) -> dict[str, Any]:
+    """Recursive function for find_max_complete.
     Finds keys for each dicts and subdicts.
     """
     if parent_key not in included_keys:
@@ -236,9 +252,12 @@ def _find_keys(list1, list2, included_keys, parent_key):
     return included_keys
 
 
-def _filter_dicts(list1, list2, included_keys, parent_key, forcekeys):
-    """
-    Recursive function for find_max_complete.
+def _filter_dicts(list1: list[dict],
+                  list2: list[dict],
+                  included_keys: list[str],
+                  parent_key: str,
+                  forcekeys: list[str]) -> tuple[list[dict], list[dict]]:
+    """Recursive function for find_max_complete.
     Filters lists according to given keys.
     """
     for listx in [list1, list2]:
@@ -276,14 +295,13 @@ def pair_compatible_list_elements(
         list_b: list[Any],
         check_compatible: Callable[[list[Any], list[Any]], bool],
         **check_compatible_kwargs: Any) -> set:
-    """
-    Check if the elements of two lists can be matched perfectly so that every
-    element in list_a has a pair in list_b and vice versa, and no element
-    gets more than one pair. Elements p and q can be paired iff
+    """Check if the elements of two lists can be matched perfectly so that
+    every element in list_a has a pair in list_b and vice versa, and no element
+    gets more than one pair. Elements p and q can be paired if
     check_compatible(p, q) returns True.
 
-    :param list_a: List of elements to pair
-    :param list_b: List of elements to pair
+    :param list_a: First list of elements to pair
+    :param list_b: Second list of elements to pair
     :param check_compatible: Function to test if some element in list_a can be
     paired with some element in list_b
     :param check_compatible_kwargs: Keyword arguments to pass into
@@ -319,10 +337,10 @@ def pair_compatible_list_elements(
     return _match(set(range(len(list_a))), set(range(len(list_b))))
 
 
-def create_scraper_params(metadata_info):
+def create_scraper_params(metadata_info: dict[str, Any]) -> dict[str, Any]:
     """Creates a suitable dictionary for keyword arguments for Scraper.
 
-    :metadata_info: Discovered metadata information in dictionary.
+    :param metadata_info: Discovered metadata information in dictionary.
     :returns: Dictionary of the parameters that can be passed to Scraper.
     """
     params = {}
@@ -340,11 +358,16 @@ def create_scraper_params(metadata_info):
     return params
 
 
-def synonymize_stream_keys(stream):
-    """Synonymizes the stream keys that is more appropriate for the mets
-    validation.
+def synonymize_stream_keys(stream: dict[str, Any]) -> dict[str, Any]:
+    """Synonymizes the stream keys to be more appropriate for METS validation.
+
     The stream keys are defined as is by file-scraper. Will throw
     RuntimeException if the key that is being named to already exists.
+
+    :param stream: A dictionary representing the original stream with keys from
+    file-scraper.
+    :returns: A new dictionary with synonymized keys suitable for METS
+    validation.
     """
 
     new_stream = {}
@@ -358,25 +381,24 @@ def synonymize_stream_keys(stream):
     return new_stream
 
 
-def concat(lines, prefix=''):
+def concat(lines: list[str], prefix: str = '') -> str:
     """Join given list of strings to single string separated with newlines.
 
-    :lines: List of string to join
-    :prefix: Prefix to prepend each line with
+    :param lines: List of string to join
+    :param prefix: Prefix to prepend each line with
     :returns: Joined lines as string
 
     """
     return '\n'.join(['{}{}'.format(prefix, line) for line in lines])
 
 
-def get_scraper_info(scraper):
-    """
-    Gather messages and errors from scraper.info dictionary.
+def get_scraper_info(scraper: Scraper) -> dict[str, list]:
+    """Gather messages and errors from scraper.info dictionary.
     Prepend each message with the name of the scraper class which
     produced it, and any plain text errors with 'ERROR: '. If a message
     or error can be parsed as XML, return it as lxml.etree element instead.
 
-    :scraper: The scraper object which has conducted scraping.
+    :param scraper: The scraper object which has conducted scraping.
     :returns: {'messages': ['[MyScraper] Message', ...],
                'errors': ['[MyScraper] ERROR: Failed', ...],
                'extensions': [ET._Element, ...]}
@@ -407,7 +429,7 @@ def get_scraper_info(scraper):
     return info
 
 
-def parse_uri_filepath(uri_path, accepted_schemes):
+def parse_uri_filepath(uri_path: str, accepted_schemes: Iterable[str]) -> str:
     """Parses and return the filepath from uri path by omitting the scheme and
     unquoting the path.
 
@@ -430,21 +452,35 @@ def parse_uri_filepath(uri_path, accepted_schemes):
                                      parsed_result.path.lstrip('/')))
 
 
-def ensure_binary(string, encoding='utf-8', errors='strict'):
-    """Coerce string to binary.
+def ensure_binary(string: str | bytes,
+                  encoding: str = 'utf-8',
+                  errors: str = 'strict') -> bytes:
+    """Coerce a string or bytes object to a binary (bytes) object.
+
+    :param string: Input string or bytes
+    :param encoding: Encoding to use when converting to bytes, default is UTF-8
+    :param errors: Error mode for encoding, default is 'strict'. Other values
+    include 'ignore', 'replace', and other UnicodeEncodeErrors.
     """
     if isinstance(string, str):
         return string.encode(encoding, errors)
     if isinstance(string, bytes):
         return string
-    raise TypeError(f"not expecting type '{type(string)}'")
+    raise TypeError(f"Not expecting type '{type(string)}'")
 
 
-def ensure_text(string, encoding='utf-8', errors='strict'):
-    """Coerce string to str.
+def ensure_text(string: str | bytes,
+                encoding: str = 'utf-8',
+                errors: str = 'strict') -> str:
+    """Coerce a string or bytes object to a text (str) object.
+
+    :param string: Input string or bytes
+    :param encoding: Decoding to use when converting to bytes, default is UTF-8
+    :param errors: Error mode for decoding, default is 'strict'. Other values
+    include 'ignore', 'replace', and other UnicodeDecodeErrors.
     """
     if isinstance(string, bytes):
         return string.decode(encoding, errors)
     if isinstance(string, str):
         return string
-    raise TypeError(f"not expecting type '{type(string)}'")
+    raise TypeError(f"Not expecting type '{type(string)}'")
