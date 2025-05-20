@@ -41,7 +41,7 @@ def matching_types(a: Any, b: Any, t: type) -> bool:
     :param a: First object
     :param b: Second object
     :param t: The type to compare
-    :return: True if both a and b are instances of type t, otherwise False.
+    :returns: True if both a and b are instances of type t, otherwise False.
     """
     return isinstance(a, t) and isinstance(b, t)
 
@@ -54,7 +54,7 @@ def merge_dicts(*dicts: dict[str, dict | list | None]
     Other types cannot be merged.
 
     :param dicts: Dictionaries to merge.
-    :return: A single merged dictionary.
+    :returns: A single merged dictionary.
     """
     result = {}
     for dictionary in dicts:
@@ -82,8 +82,8 @@ def compare_lists_of_dicts(expected: list[dict], found: list[dict]) -> bool:
 
     :param expected: list of dicts that should be present
     :param found: list of dicts that are actually present
-    :return: True if both lists contain the same dicts with the same frequency,
-    False otherwise
+    :returns: True if both lists contain the same dicts with the same
+    frequency, False otherwise
     """
     expected_count = count_items_in_dict(expected)
     found_count = count_items_in_dict(found)
@@ -94,7 +94,7 @@ def count_items_in_dict(dicts: list[dict]) -> dict[str, int]:
     """Counts occurrences of serialized dictionaries in a list.
 
     :param dicts: list of dictionaries
-    :return: dict with serialized dicts as keys and their counts
+    :returns: dict with serialized dicts as keys and their counts
     """
     if not dicts:
         return {}
@@ -111,7 +111,7 @@ def serialize_dict(data: dict[Any, Any]) -> str:
     """Serialize a dictionary to a string.
 
     :param data: A dictionary.
-    :return: A string in the format "<key=value>  <key=value>"
+    :returns: A string in the format "<key=value>  <key=value>"
     """
     if not data:
         return ""
@@ -142,7 +142,7 @@ def parse_mimetype(mimetype: str) -> dict[str, dict[str, Any]]:
     See also: https://www.ietf.org/rfc/rfc2045.txt
 
     :param mimetype: The Content-Type string to parse.
-    :return: A dictionary with parsed format information.
+    :returns: A dictionary with parsed format information.
     """
     result = {"format": {}}
 
@@ -174,7 +174,7 @@ def handle_div(div: str, decimals: int = 2) -> str:
 
     :param div: A string like "16/9" or "1.7777778"
     :param decimals: Number of decimal places to round to (default is 2)
-    :return: A string like "1.78"
+    :returns: A string like "1.78"
     """
     try:
         value = float(Fraction(div))
@@ -183,38 +183,45 @@ def handle_div(div: str, decimals: int = 2) -> str:
         return div
 
 
-def find_max_complete(list1: list[dict],
-                      list2: list[dict],
-                      forcekeys: list[str] = None) -> tuple:
-    """Finds such version in two lists of dicts, where all the elements in all
-    dicts exists. Handles also sublists inside dicts and subdicts inside dicts
-    and sublists recursively. In other words, removes such elements that do not
-    exist in one or more of the given dicts.
+def find_max_complete(list1: list[dict] | None,
+                      list2: list[dict] | None,
+                      forcekeys: list[str] = None
+                      ) -> tuple[list[dict], list[dict]]:
+    """Filters two lists of dictionaries to retain only keys that are common
+    across all dictionaries in both lists, recursively.
 
-    :param list1: List of dicts
-    :param list2: List of dicts
+    Keys in `forcekeys` are preserved.
+
+    :param list1: First list of dicts
+    :param list2: Second list of dicts
     :param forcekeys: List of those keys which will not be changed or removed,
     if exists
     :returns: Filtered list1 and list2
     """
-    included_keys = {}
+    list1 = list1 or []
+    list2 = list2 or []
+    forcekeys = forcekeys or []
 
-    if list1 is None:
-        list1 = []
-    if list2 is None:
-        list2 = []
+    if not list1 and not list2:
+        return [], []
 
-    if list1:
-        included_keys['root_key'] = set(list1[0])
-    elif list2:
-        included_keys['root_key'] = set(list2[0])
-    else:
-        return (list1, list2)
+    root_key_test = _get_first_dict(list1) or _get_first_dict(list2)
+    if root_key_test is None:
+        return list1, list2
 
-    included_keys = _find_keys(list1, list2, included_keys, 'root_key')
+    included_keys = _find_keys(list1, list2, {}, 'root_key')
 
     return _filter_dicts(deepcopy(list1), deepcopy(list2), included_keys,
                          'root_key', forcekeys)
+
+
+def _get_first_dict(lst: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """Returns the first dictionary in the list, or None if not found.
+
+    :param lst: A list potentially containing dictionaries.
+    :returns: The first dictionary found, or None if none exist.
+    """
+    return next(item for item in lst if isinstance(item, dict)), None
 
 
 def _find_keys(list1: list[dict],
@@ -435,7 +442,7 @@ def parse_uri_filepath(uri_path: str, accepted_schemes: Iterable[str]) -> str:
 
     :param uri_path: URI path that is being parsed.
     :param accepted_schemes: Iterable of accepted URI schemes.
-    :return: Relative path of the given uri path in string.
+    :returns: Relative path of the given uri path in string.
     """
     # Schema_path as unquoted file path with leading slashes
     # removed since schema_path should always be a relative path
