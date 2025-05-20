@@ -1,12 +1,15 @@
 """
 Utility functions.
 """
+from __future__ import annotations
+
 import os
 from collections import defaultdict
+from collections.abc import Callable
 from copy import deepcopy
 from fractions import Fraction
 from urllib.parse import unquote_plus, urlparse
-from typing import Any, Callable
+from typing import Any
 
 import mimeparse
 import lxml.etree as ET
@@ -31,36 +34,39 @@ class ValidationException(Exception):
     """Validator error."""
 
 
-def merge_dicts(*dicts):
+def merge_dicts(*dicts: dict[Any, dict | list | None]
+                ) -> dict[Any, dict | list | None]:
     """
-    Merge N dictionaries. List and dict type elements with same key will be
-    merged. Elements of other type cannot be merged. If value of an element is
-    None, it will be overwritten by value from other dictionary with the same
-    key.
-    :dicts: a list of dicts.
-    :returns: one merged dict
+    Merge multiple dictionaries. Lists and dicts with the same key are merged.
+    None values are overwritten by non-None values.
+
+    Other types cannot be merged.
+
+    :param dicts: Dictionaries to merge.
+    :return: A single merged dictionary.
     """
+
+    def matching_types(a: Any, b: Any, t: type) -> bool:
+        return isinstance(a, t) and isinstance(b, t)
+
     result = {}
     for dictionary in dicts:
         if not dictionary:
             continue
-        for key in dictionary.keys():
-            if key in result:
-                if isinstance(result[key], dict) and \
-                        isinstance(dictionary[key], dict):
-                    result[key] = merge_dicts(result[key], dictionary[key])
-                elif isinstance(result[key], list) and \
-                        isinstance(dictionary[key], list):
-                    result[key] = result[key] + dictionary[key]
-                elif result[key] is None:
-                    result[key] = dictionary[key]
-                elif dictionary[key] is None:
-                    continue
-                else:
-                    raise TypeError(
-                        'Only lists and dictionaries can be merged.')
+        for key, value in dictionary.items():
+            if key not in result:
+                result[key] = value
+            elif result[key] is None:
+                result[key] = value
+            elif value is None:
+                continue
+            elif matching_types(result[key], value, dict):
+                result[key] = merge_dicts(result[key], value)
+            elif matching_types(result[key], value, list):
+                result[key] = result[key] + value
             else:
-                result[key] = dictionary[key]
+                raise TypeError('Only lists and dictionaries can be merged.')
+
     return result
 
 
@@ -95,7 +101,7 @@ def count_items_in_dict(expected):
     return count
 
 
-def serialize_dict(data: dict[Any, Any]):
+def serialize_dict(data: dict[Any, Any]) -> str:
     """
     Serialize a dictionary to a string.
 
