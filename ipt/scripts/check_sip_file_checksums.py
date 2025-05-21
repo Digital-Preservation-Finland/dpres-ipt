@@ -48,7 +48,7 @@ def check_checksums(sip_path: os.PathLike) -> Generator[str, None, None]:
         filename = metadata_info.get("filename")
         checked_files[filename] = None
 
-        error = __validate_checksum(metadata_info, sip_path)
+        error = _validate_checksum(metadata_info, sip_path)
         if error:
             yield error
 
@@ -56,45 +56,61 @@ def check_checksums(sip_path: os.PathLike) -> Generator[str, None, None]:
         if path.endswith("ignore_validation_errors"):
             continue
         if path not in checked_files:
-            yield __format_message({'filename': path}, "Nonlisted file",
-                                   sip_path)
+            yield _format_message({'filename': path}, "Nonlisted file",
+                                  sip_path)
 
 
-def __format_message(metadata_info: dict[str, Any],
-                     message: str,
-                     sip_path: os.PathLike) -> str:
+def _format_message(metadata_info: dict[str, Any],
+                    message: str,
+                    sip_path: os.PathLike) -> str:
+    """Formats a validation message with a relative file path.
+
+    :param metadata_info: Dictionary containing file metadata
+    :param message: Message to include in the output
+    :param sip_path: Base path to calculate relative file path
+    :returns: Formatted message string
+    """
     filename = metadata_info.get("filename")
     relative_path = os.path.relpath(filename, sip_path)
     return f"{message}: {relative_path}"
 
 
-def __validate_checksum(metadata_info: dict[str, Any],
-                        sip_path: os.PathLike) -> str | None:
+def _validate_checksum(metadata_info: dict[str, Any],
+                       sip_path: os.PathLike) -> str | None:
+    """Validates the checksum of a file against its expected digest
+
+    :param metadata_info: Dictionary containing file metadata
+    :param sip_path: Path to the SIP
+    :returns: Error message if validation fails, otherwise None
+    """
     filename = metadata_info.get("filename")
     algorithm = metadata_info.get("algorithm")
     expected_digest = metadata_info.get("digest")
 
     if algorithm is None:
-        return __format_message(metadata_info,
-                                "Could not find checksum algorithm", sip_path)
+        return _format_message(metadata_info,
+                               "Could not find checksum algorithm", sip_path)
 
     try:
         hex_digest = hexdigest(filename, algorithm)
     except OSError as e:
         if e.errno == errno.ENOENT:
-            return __format_message(metadata_info,
-                                    "File does not exist", sip_path)
+            return _format_message(metadata_info,
+                                   "File does not exist", sip_path)
         return None
 
     if hex_digest.lower() != expected_digest.lower():
-        return __format_message(metadata_info, "Invalid Checksum", sip_path)
-    print(__format_message(metadata_info, "Checksum OK", sip_path))
+        return _format_message(metadata_info, "Invalid Checksum", sip_path)
+    print(_format_message(metadata_info, "Checksum OK", sip_path))
     return None
 
 
 def main(arguments: Sequence[str] | None = None) -> int:
-    """Main loop"""
+    """Entry point for the checksum validation script.
 
+    :param arguments: Optional command-line arguments
+    :returns: Exit code (0 for success, 117 for checksum errors)
+    """
     args = parse_arguments(arguments)
 
     returncode = 0
@@ -107,7 +123,11 @@ def main(arguments: Sequence[str] | None = None) -> int:
 
 def parse_arguments(
         arguments: Sequence[str] | None = None) -> argparse.Namespace:
-    """ Create arguments parser and return parsed command line argumets"""
+    """Parses command-line arguments.
+
+    :param arguments: Optional list of arguments to parse
+    :returns: Parsed arguments namespace
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('sip_path')
     return parser.parse_args(arguments)

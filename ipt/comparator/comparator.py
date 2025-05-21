@@ -310,7 +310,7 @@ def _match_streams(
     if index_pairs:
         # Streams were matched successfully; add message for all cases where
         # mets had an unavailable value, but scraper found an actual value
-        notes = __generate_notes(
+        notes = _generate_notes(
             index_pairs, mets_streams, scraper_streams, stream_type
         )
         return (True, notes)
@@ -319,7 +319,7 @@ def _match_streams(
     return (False, [])
 
 
-def __generate_notes(
+def _generate_notes(
     index_pairs: list[tuple[int, int]],
     mets_streams: list[dict[str, dict[str, str]]],
     scraper_streams: list[dict[str, dict[str, str]]],
