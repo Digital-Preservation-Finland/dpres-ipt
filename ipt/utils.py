@@ -77,7 +77,8 @@ def merge_dicts(*dicts: dict[str, dict | list | None]
     return result
 
 
-def compare_lists_of_dicts(expected: list[dict], found: list[dict]) -> bool:
+def compare_lists_of_dicts(expected: list[dict[str, Any]],
+                           found: list[dict[str, Any]]) -> bool:
     """Compares two lists of dictionaries.
 
     :param expected: list of dicts that should be present
@@ -90,7 +91,7 @@ def compare_lists_of_dicts(expected: list[dict], found: list[dict]) -> bool:
     return expected_count == found_count
 
 
-def count_items_in_dict(dicts: list[dict]) -> dict[str, int]:
+def count_items_in_dict(dicts: list[dict[str, Any]]) -> dict[str, int]:
     """Counts occurrences of serialized dictionaries in a list.
 
     :param dicts: list of dictionaries
@@ -107,7 +108,7 @@ def count_items_in_dict(dicts: list[dict]) -> dict[str, int]:
     return count
 
 
-def serialize_dict(data: dict[Any, Any]) -> str:
+def serialize_dict(data: dict[str, Any]) -> str:
     """Serialize a dictionary to a string.
 
     :param data: A dictionary.
@@ -215,7 +216,7 @@ def find_max_complete(list1: list[dict] | None,
                          'root_key', forcekeys)
 
 
-def _get_first_dict(lst: list[dict[str, Any]]) -> dict[str, Any] | None:
+def _get_first_dict(lst: list[Any]) -> dict[str, Any] | None:
     """Returns the first dictionary in a list, or None if none exists.
 
     :param lst: A list potentially containing dictionaries
@@ -227,7 +228,7 @@ def _get_first_dict(lst: list[dict[str, Any]]) -> dict[str, Any] | None:
 def _find_keys(list1: list[dict],
                list2: list[dict],
                included_keys: dict[str, set[str]] | None = None,
-               parent_key: str = 'root_key') -> dict[str, str]:
+               parent_key: str = 'root_key') -> dict[str, set[str]]:
     """Recursively finds keys common to all dictionaries in both lists.
 
     :param list1: First list of dictionaries
@@ -262,7 +263,7 @@ def _find_keys(list1: list[dict],
 
 def _find_keys_recurse_nested(dict1: dict[str, Any],
                               dict2: dict[str, Any],
-                              included_keys: dict[str, str],
+                              included_keys: dict[str, set[str]],
                               parent_key: str) -> None:
     """Recursively finds keys common in both dictionaries
 
@@ -270,8 +271,6 @@ def _find_keys_recurse_nested(dict1: dict[str, Any],
     :param dict2: Second dictionary
     :param included_keys: Dictionary tracking included keys by parent key.
     :param parent_key: Current parent key is recursion
-
-    :returns: Updated dictionary of included keys
     """
     for key in included_keys[parent_key]:
         val1 = dict1[key]
@@ -285,7 +284,7 @@ def _find_keys_recurse_nested(dict1: dict[str, Any],
 
 def _filter_dicts(list1: list[dict],
                   list2: list[dict],
-                  included_keys: dict[str, str],
+                  included_keys: dict[str, set[str]],
                   parent_key: str,
                   forcekeys: list[str]) -> tuple[list[dict], list[dict]]:
     """Recursively filters dictionaries to retain only specified keys.
@@ -312,7 +311,7 @@ def _filter_dicts(list1: list[dict],
 
 def _filter_dicts_recurse_nested(dict1: dict,
                                  dict2: dict,
-                                 included_keys: dict[str, str],
+                                 included_keys: dict[str, set[str]],
                                  parent_key: str,
                                  forcekeys: list[str]) -> None:
     """Recursively filters nested dictionaries and lists within two
@@ -322,7 +321,7 @@ def _filter_dicts_recurse_nested(dict1: dict,
     :param dict2: Second dictionary to process
     :param included_keys: Dictionary of keys to retain, grouped by parent key
     :param parent_key: Current parent key in recursion
-    :param forcekeys: Keys to preserve regarless of filtering
+    :param forcekeys: Keys to preserve regardless of filtering
     """
     for key in included_keys[parent_key]:
         if key not in dict1 or key not in dict2:
@@ -342,9 +341,9 @@ def _filter_dicts_recurse_nested(dict1: dict,
                 dict2[key] = sublist2[0]
 
 
-def _filter_single_dict(d: dict,
-                        keys_to_keep: set,
-                        forcekeys: list[str]) -> dict:
+def _filter_single_dict(d: dict[str, Any],
+                        keys_to_keep: set[str],
+                        forcekeys: list[str]) -> dict[str, Any]:
     """Filters a single dictionary based on keys to keep and forcekeys.
 
     :param d: Dictionary to filter
@@ -363,7 +362,7 @@ def pair_compatible_list_elements(
         list_a: list[Any],
         list_b: list[Any],
         check_compatible: Callable[[list[Any], list[Any]], bool],
-        **check_compatible_kwargs: Any) -> set:
+        **check_compatible_kwargs: Any) -> set[tuple[int, int]]:
     """Check if the elements of two lists can be matched perfectly so that
     every element in list_a has a pair in list_b and vice versa, and no element
     gets more than one pair. Elements p and q can be paired if
@@ -461,7 +460,7 @@ def concat(lines: list[str], prefix: str = '') -> str:
     return '\n'.join(['{}{}'.format(prefix, line) for line in lines])
 
 
-def get_scraper_info(scraper: Scraper) -> dict[str, list]:
+def get_scraper_info(scraper: Scraper) -> dict[str, list[str | ET._Element]]:
     """Gather messages and errors from scraper.info dictionary.
     Prepend each message with the name of the scraper class which
     produced it, and any plain text errors with 'ERROR: '. If a message
@@ -473,7 +472,9 @@ def get_scraper_info(scraper: Scraper) -> dict[str, list]:
                'extensions': [ET._Element, ...]}
     """
 
-    def _add_text_xml(scraper_info, info_key, prefix):
+    def _add_text_xml(scraper_info: dict[str, Any],
+                      info_key: str,
+                      prefix: str) -> None:
         strings = scraper_info[info_key]
         text, extensions = [], []
         parser = ET.XMLParser(remove_blank_text=True)
@@ -502,7 +503,6 @@ def parse_uri_filepath(uri_path: str, accepted_schemes: Iterable[str]) -> str:
     """Parses and return the filepath from uri path by omitting the scheme and
     unquoting the path.
 
-    :param uri_path: URI path that is being parsed.
     :param accepted_schemes: Iterable of accepted URI schemes.
     :returns: Relative path of the given uri path in string.
     """
@@ -515,7 +515,7 @@ def parse_uri_filepath(uri_path: str, accepted_schemes: Iterable[str]) -> str:
                           'is not among the accepted schemes '
                           f'[{schemes}]'))
     # Joining by netlock and stripping special characters from path is for the
-    # cases with ambigious number of slashes... Like file-URI scheme where
+    # cases with ambiguous number of slashes... Like file-URI scheme where
     # usage can vary between one to even four slashes.
     return unquote_plus(os.path.join(parsed_result.netloc,
                                      parsed_result.path.lstrip('/')))
@@ -529,7 +529,7 @@ def ensure_binary(string: str | bytes,
     :param string: Input string or bytes
     :param encoding: Encoding to use when converting to bytes, default is UTF-8
     :param errors: Error mode for encoding, default is 'strict'. Other values
-    include 'ignore', 'replace', and other UnicodeEncodeErrors.
+    include 'ignore', 'replace', and other UnicodeEncodeErrors
     """
     if isinstance(string, str):
         return string.encode(encoding, errors)
@@ -544,9 +544,9 @@ def ensure_text(string: str | bytes,
     """Coerce a string or bytes object to a text (str) object.
 
     :param string: Input string or bytes
-    :param encoding: Decoding to use when converting to bytes, default is UTF-8
+    :param encoding: Decoding to use when converting to text, default is UTF-8
     :param errors: Error mode for decoding, default is 'strict'. Other values
-    include 'ignore', 'replace', and other UnicodeDecodeErrors.
+    include 'ignore', 'replace', and other UnicodeDecodeErrors
     """
     if isinstance(string, bytes):
         return string.decode(encoding, errors)
