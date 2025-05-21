@@ -209,28 +209,38 @@ def find_max_complete(list1: list[dict] | None,
     if root_key_test is None:
         return list1, list2
 
-    included_keys = _find_keys(list1, list2, {}, 'root_key')
+    included_keys = _find_keys(list1, list2)
 
     return _filter_dicts(deepcopy(list1), deepcopy(list2), included_keys,
                          'root_key', forcekeys)
 
 
 def _get_first_dict(lst: list[dict[str, Any]]) -> dict[str, Any] | None:
-    """Returns the first dictionary in the list, or None if not found.
+    """Returns the first dictionary in a list, or None if none exists.
 
-    :param lst: A list potentially containing dictionaries.
-    :returns: The first dictionary found, or None if none exist.
+    :param lst: A list potentially containing dictionaries
+    :returns: The first dictionary found, or None
     """
     return next(item for item in lst if isinstance(item, dict)), None
 
 
 def _find_keys(list1: list[dict],
                list2: list[dict],
-               included_keys: dict[str, Any],
-               parent_key: str) -> dict[str, Any]:
-    """Recursive function for find_max_complete.
-    Finds keys for each dicts and subdicts.
+               included_keys: dict[str, set[str]] | None = None,
+               parent_key: str = 'root_key') -> dict[str, str]:
+    """Recursively finds keys common to all dictionaries in both lists.
+
+    :param list1: First list of dictionaries
+    :param list2: Second list of dictionaries
+    :param included_keys: Dictionary tracking included keys by parent key.
+    Optional, defaults to an empty dictionary
+    :param parent_key: Current parent key in recursion. Optional, defaults to
+    'root_key'
+    :returns: Updated dictionary of included keys
     """
+    if included_keys is None:
+        included_keys = {}
+
     if parent_key not in included_keys:
         if list1:
             included_keys[parent_key] = set(list1[0].keys())
@@ -239,62 +249,114 @@ def _find_keys(list1: list[dict],
         else:
             included_keys[parent_key] = set()
 
-    for dictionary in list1 + list2:
-        if not isinstance(dictionary, dict):
-            continue
-        included_keys[parent_key] = included_keys[parent_key]. \
-            intersection(set(dictionary.keys()))
+    for d in list1 + list2:
+        if isinstance(d, dict):
+            included_keys[parent_key] &= set(d.keys())
 
-    for dict1 in list1:
-        for dict2 in list2:
-            for key in included_keys[parent_key]:
-                if isinstance(dict1[key], list) and \
-                        isinstance(dict2[key], list):
-                    included_keys = _find_keys(
-                        dict1[key], dict2[key], included_keys, key)
-                elif isinstance(dict1[key], dict) and \
-                        isinstance(dict2[key], dict):
-                    included_keys = _find_keys(
-                        [dict1[key]], [dict2[key]], included_keys, key)
+    for d1 in list1:
+        for d2 in list2:
+            _find_keys_recurse_nested(d1, d2, included_keys, parent_key)
+
     return included_keys
+
+
+def _find_keys_recurse_nested(dict1: dict[str, Any],
+                              dict2: dict[str, Any],
+                              included_keys: dict[str, str],
+                              parent_key: str) -> None:
+    """Recursively finds keys common in both dictionaries
+
+    :param dict1: First dictionary
+    :param dict2: Second dictionary
+    :param included_keys: Dictionary tracking included keys by parent key.
+    :param parent_key: Current parent key is recursion
+
+    :returns: Updated dictionary of included keys
+    """
+    for key in included_keys[parent_key]:
+        val1 = dict1[key]
+        val2 = dict2[key]
+
+        if matching_types(val1, val2, list):
+            included_keys = _find_keys(val1, val2, included_keys, key)
+        elif matching_types(val1, val2, dict):
+            included_keys = _find_keys([val1], [val2], included_keys, key)
 
 
 def _filter_dicts(list1: list[dict],
                   list2: list[dict],
-                  included_keys: list[str],
+                  included_keys: dict[str, str],
                   parent_key: str,
                   forcekeys: list[str]) -> tuple[list[dict], list[dict]]:
-    """Recursive function for find_max_complete.
-    Filters lists according to given keys.
+    """Recursively filters dictionaries to retain only specified keys.
+
+    :param list1: First list of dictionaries to filter
+    :param list2: Second list of dictionaries to filter
+    :param included_keys: Keys to retain, grouped by parent key
+    :param parent_key: Current parent key in recursion
+    :param forcekeys: Keys to preserve regardless of filtering
+    :returns: Tuple of filtered list1 and list2
     """
-    for listx in [list1, list2]:
-        for index, dictx in enumerate(listx):
-            tmpdict = {key: dictx[key]
-                       for key in included_keys[parent_key]}
-            if forcekeys:
-                for key in set(dictx.keys()). \
-                        intersection(set(forcekeys)):
-                    tmpdict[key] = dictx[key]
-            listx[index] = tmpdict
+    list1 = [_filter_single_dict(d, included_keys[parent_key], forcekeys)
+             for d in list1]
+    list2 = [_filter_single_dict(d, included_keys[parent_key], forcekeys)
+             for d in list2]
 
-    for dict1 in list1:
-        for dict2 in list2:
-            for key in included_keys[parent_key]:
-                if isinstance(dict1[key], list) and \
-                        isinstance(dict2[key], list):
-                    (dict1[key], dict2[key]) = \
-                        _filter_dicts(dict1[key], dict2[key],
-                                      included_keys, key, forcekeys)
-                elif isinstance(dict1[key], dict) and \
-                        isinstance(dict2[key], dict):
-                    (sublist1, sublist2) = \
-                        _filter_dicts([dict1[key]], [dict2[key]],
-                                      included_keys, key, forcekeys)
-                    if sublist1 and sublist2:
-                        dict1[key] = sublist1[0]
-                        dict2[key] = sublist2[0]
+    for d1 in list1:
+        for d2 in list2:
+            _filter_dicts_recurse_nested(d1, d2, included_keys, parent_key,
+                                         forcekeys)
 
-    return (list1, list2)
+    return list1, list2
+
+
+def _filter_dicts_recurse_nested(dict1: dict,
+                                 dict2: dict,
+                                 included_keys: dict[str, str],
+                                 parent_key: str,
+                                 forcekeys: list[str]) -> None:
+    """Recursively filters nested dictionaries and lists within two
+    dictionaries.
+
+    :param dict1: First dictionary to process
+    :param dict2: Second dictionary to process
+    :param included_keys: Dictionary of keys to retain, grouped by parent key
+    :param parent_key: Current parent key in recursion
+    :param forcekeys: Keys to preserve regarless of filtering
+    """
+    for key in included_keys[parent_key]:
+        if key not in dict1 or key not in dict2:
+            continue
+
+        val1 = dict1[key]
+        val2 = dict2[key]
+
+        if matching_types(val1, val2, list):
+            val1, val2 = _filter_dicts(val1, val2, included_keys,
+                                       key, forcekeys)
+        elif matching_types(val1, val2, dict):
+            sublist1, sublist2 = _filter_dicts([val1], [val2], included_keys,
+                                               key, forcekeys)
+            if sublist1 and sublist2:
+                dict1[key] = sublist1[0]
+                dict2[key] = sublist2[0]
+
+
+def _filter_single_dict(d: dict,
+                        keys_to_keep: set,
+                        forcekeys: list[str]) -> dict:
+    """Filters a single dictionary based on keys to keep and forcekeys.
+
+    :param d: Dictionary to filter
+    :param keys_to_keep: Set of keys to keep
+    :param forcekeys: Keys to preserve regardless of filtering
+    :returns: Filtered dictionary
+    """
+    filtered = {k: d[k] for k in keys_to_keep if k in d}
+    if forcekeys:
+        for k in set(d.keys()).intersection(forcekeys):
+            filtered[k] = d[k]
+    return filtered
 
 
 def pair_compatible_list_elements(
@@ -315,8 +377,8 @@ def pair_compatible_list_elements(
     check_compatible
 
     :returns: Set of (idx_a, idx_b) tuples, where idx_a is the index of element
-              in list_a which was paired with list_b[idx_b], or empty set if
-              pairing is not possible.
+    in list_a which was paired with list_b[idx_b], or empty set if pairing is
+    not possible.
     """
 
     def _match(indices_a: Any, indices_b: Any) -> set:
