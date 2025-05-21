@@ -400,7 +400,6 @@ def validation(mets_path, catalog_path):
 
 def create_report_agent():
     """Create premis agent describing who/what performed validation."""
-    # TODO: Agent could be the used validator instead of script file
     agent_name = "check_sip_digital_objects.py-v0.0"
     agent_id_value = 'preservation-agent-' + agent_name + '-' + \
                      str(uuid.uuid4())
