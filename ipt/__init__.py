@@ -1,2 +1,2 @@
 """dpres-ipt module."""
-__version__ = '0.106'
+__version__ = '1.0.0'
