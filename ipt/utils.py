@@ -460,7 +460,8 @@ def concat(lines: list[str], prefix: str = '') -> str:
     return '\n'.join(['{}{}'.format(prefix, line) for line in lines])
 
 
-def get_scraper_info(scraper: Scraper) -> dict[str, list[str | ET._Element]]:
+def get_scraper_info(scraper: Scraper
+                     ) -> dict[str, list[str | ET._Element]]:
     """Gather messages and errors from scraper.info dictionary.
     Prepend each message with the name of the scraper class which
     produced it, and any plain text errors with 'ERROR: '. If a message
@@ -503,6 +504,7 @@ def parse_uri_filepath(uri_path: str, accepted_schemes: Iterable[str]) -> str:
     """Parses and return the filepath from uri path by omitting the scheme and
     unquoting the path.
 
+    :param uri_path: URI path that is being parsed.
     :param accepted_schemes: Iterable of accepted URI schemes.
     :returns: Relative path of the given uri path in string.
     """
@@ -530,6 +532,7 @@ def ensure_binary(string: str | bytes,
     :param encoding: Encoding to use when converting to bytes, default is UTF-8
     :param errors: Error mode for encoding, default is 'strict'. Other values
     include 'ignore', 'replace', and other UnicodeEncodeErrors
+    :returns: Input as bytes
     """
     if isinstance(string, str):
         return string.encode(encoding, errors)
@@ -547,6 +550,7 @@ def ensure_text(string: str | bytes,
     :param encoding: Decoding to use when converting to text, default is UTF-8
     :param errors: Error mode for decoding, default is 'strict'. Other values
     include 'ignore', 'replace', and other UnicodeDecodeErrors
+    :returns: Input as string
     """
     if isinstance(string, bytes):
         return string.decode(encoding, errors)
