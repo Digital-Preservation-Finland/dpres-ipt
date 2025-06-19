@@ -421,7 +421,7 @@ def patch_scraper_identify(mimetype='', version=''):
     def _identify(obj):
         obj.info = {}
         for detector in iter_detectors():
-            tool = detector(obj.filename)
+            tool = detector(obj.path)
             tool.detect()
             obj.info[len(obj.info)] = tool.info()
             obj.mimetype = mimetype
