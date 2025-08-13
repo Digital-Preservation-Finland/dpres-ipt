@@ -243,7 +243,8 @@ def test_parse_uri_filepath_error():
         ("1189.517", 2, "1189.52"),
         ("1189.517", 1, "1189.5"),
         ("1189.517", 0, "1190"),
-        ("1/0", 1, "1/0")
+        ("1/0", 1, "1/0"),
+        ("a", 1, "a"),
     ],
 )
 def test_handle_div(case, decimals, correct):
