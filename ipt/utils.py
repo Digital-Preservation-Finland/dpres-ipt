@@ -46,8 +46,7 @@ def matching_types(a: Any, b: Any, t: type) -> bool:
     return isinstance(a, t) and isinstance(b, t)
 
 
-def merge_dicts(*dicts: dict[str, dict | list | None]
-                ) -> dict[str, dict | list | None]:
+def merge_dicts(*dicts: dict | None) -> dict[str, dict | None]:
     """Merge multiple dictionaries. Lists and dicts with the same key are
     merged. None values are overwritten by non-None values.
 
@@ -77,21 +76,22 @@ def merge_dicts(*dicts: dict[str, dict | list | None]
     return result
 
 
-def compare_lists_of_dicts(expected: list[dict[str, Any]],
-                           found: list[dict[str, Any]]) -> bool:
+def compare_lists_of_dicts(
+    expected: list[dict[str, Any]] | None, found: list[dict[str, Any]] | None
+) -> bool:
     """Compares two lists of dictionaries.
 
     :param expected: list of dicts that should be present
     :param found: list of dicts that are actually present
     :returns: True if both lists contain the same dicts with the same
-    frequency, False otherwise
+        frequency, False otherwise
     """
     expected_count = count_items_in_dict(expected)
     found_count = count_items_in_dict(found)
     return expected_count == found_count
 
 
-def count_items_in_dict(dicts: list[dict[str, Any]]) -> dict[str, int]:
+def count_items_in_dict(dicts: list[dict[str, Any]] | None) -> dict[str, int]:
     """Counts occurrences of serialized dictionaries in a list.
 
     :param dicts: list of dictionaries
@@ -225,7 +225,7 @@ def _get_first_dict(lst: list[Any]) -> dict[str, Any] | None:
     :param lst: A list potentially containing dictionaries
     :returns: The first dictionary found, or None
     """
-    return next(item for item in lst if isinstance(item, dict)), None
+    return next((item for item in lst if isinstance(item, dict)), None)
 
 
 def _find_keys(list1: list[dict],

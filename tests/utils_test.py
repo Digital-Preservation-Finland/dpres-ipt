@@ -3,9 +3,16 @@
 import random
 import pytest
 
-from ipt.utils import (compare_lists_of_dicts, find_max_complete, handle_div, merge_dicts,
-                       serialize_dict, uri_to_path,
-                       pair_compatible_list_elements, parse_uri_filepath)
+from ipt.utils import (
+    compare_lists_of_dicts,
+    find_max_complete,
+    handle_div,
+    merge_dicts,
+    serialize_dict,
+    uri_to_path,
+    pair_compatible_list_elements,
+    parse_uri_filepath,
+)
 
 CODEC1 = {"codec": "foo"}
 CODEC2 = {"codec": "bar"}
