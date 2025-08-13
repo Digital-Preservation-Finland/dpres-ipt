@@ -15,3 +15,5 @@ git+https://gitlab.ci.csc.fi/dpres/premis.git@develop#egg=premis
 git+https://gitlab.ci.csc.fi/dpres/ffmpeg-python.git#egg=ffmpeg_python
 git+https://gitlab.ci.csc.fi/dpres/fido.git@develop#egg=opf_fido
 git+https://gitlab.ci.csc.fi/dpres/file-scraper.git@develop#egg=file_scraper
+git+https://gitlab.ci.csc.fi/dpres/dpres-file-formats.git@develop#egg=dpres_file_formats
+git+https://gitlab.ci.csc.fi/dpres/dpx-validator.git@develop#egg=dpx_validator
