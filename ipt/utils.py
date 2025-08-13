@@ -179,14 +179,17 @@ def handle_div(div: str, decimals: int = 2) -> str:
     """
     try:
         value = float(Fraction(div))
-        return f"{round(value, decimals):.{decimals}f}".rstrip('0').rstrip('.')
+        rounded = round(value, decimals)
+        if decimals == 0:
+            return str(int(rounded))
+        return f"{rounded:.{decimals}f}".rstrip('0').rstrip('.')
     except (ValueError, ZeroDivisionError):
         return div
 
 
 def find_max_complete(list1: list[dict] | None,
                       list2: list[dict] | None,
-                      forcekeys: list[str] = None
+                      forcekeys: list[str] | None = None
                       ) -> tuple[list[dict], list[dict]]:
     """Filters two lists of dictionaries to retain only keys that are common
     across all dictionaries in both lists, recursively.

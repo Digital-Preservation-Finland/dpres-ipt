@@ -3,7 +3,7 @@
 import random
 import pytest
 
-from ipt.utils import (compare_lists_of_dicts, find_max_complete, merge_dicts,
+from ipt.utils import (compare_lists_of_dicts, find_max_complete, handle_div, merge_dicts,
                        serialize_dict, uri_to_path,
                        pair_compatible_list_elements, parse_uri_filepath)
 
@@ -228,3 +228,23 @@ def test_parse_uri_filepath_error():
     with pytest.raises(ValueError):
         parse_uri_filepath(uri_path='file:///does-not-exist.txt',
                            accepted_schemes=('http',))
+
+
+@pytest.mark.parametrize(
+    ["case", "decimals", "correct"],
+    [
+        ("100", 0, "100"),
+        ("101", 0, "101"),
+        ("100.0000", 4, "100"),
+        ("200/2", 3, "100"),
+        ("10/2", 0, "5"),
+        ("1/3", 5, "0.33333"),
+        ("1189.517", 3, "1189.517"),
+        ("1189.517", 2, "1189.52"),
+        ("1189.517", 1, "1189.5"),
+        ("1189.517", 0, "1190"),
+        ("1/0", 1, "1/0")
+    ],
+)
+def test_handle_div(case, decimals, correct):
+    assert handle_div(case, decimals) == correct
