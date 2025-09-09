@@ -61,6 +61,7 @@ TEST_CASES = [
                'version': '1.01'},
      'expected_result': {
          'returncode': 117,
+         # TODO Scraper mimetype error messages are changing with TPASPKT-1418
          'stdout': ['Proper scraper was not found. The file was not '
                     'analyzed.']}},
     {'testcase': 'Unsupported mimetype, without version.',
@@ -69,6 +70,7 @@ TEST_CASES = [
                'version': ''},
      'expected_result': {
          'returncode': 117,
+         # TODO Scraper mimetype error messages are changing with TPASPKT-1418
          'stdout': ['Proper scraper was not found. The file was not '
                     'analyzed.']}},
     {'testcase': 'Unsupported version with supported mimetype.',
@@ -77,6 +79,7 @@ TEST_CASES = [
                'version': '3.1415'},
      'expected_result': {
          'returncode': 117,
+         # TODO Scraper mimetype error messages are changing with TPASPKT-1418
          'stdout': [("Predefined version '3.1415' and "
                      "resulted version '1.01' mismatch.")]}},
     {'testcase': 'Report alt-format when validating as primary mimetype.',

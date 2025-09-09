@@ -11,6 +11,7 @@ import uuid
 import premis
 import xml_helpers.utils
 from file_scraper.scraper import Scraper
+from file_scraper.exceptions import FileIsNotScrapable
 from file_scraper.defaults import (
     RECOMMENDED,
     ACCEPTABLE,
@@ -341,10 +342,21 @@ def validation(mets_path, catalog_path):
             return join_validation_results(metadata_info, results)
 
         # 2. Perform validation using scraper and get the grade.
-        scraper_result, streams, grade = check_well_formed(
-            metadata_info,
-            catalog_path=catalog_path
-        )
+        try:
+            scraper_result, streams, grade = check_well_formed(
+                metadata_info,
+                catalog_path=catalog_path
+            )
+        except (FileIsNotScrapable, FileNotFoundError, IsADirectoryError):
+            scraper_result = {
+                "errors": [
+                        (f"ERROR: File {metadata_info['filename']} "
+                         f"does not exist.")
+                    ],
+                "is_valid": [False]
+            }
+            streams = None
+            grade = UNACCEPTABLE
 
         # 3. Check if file validation is required; if not, do not append the
         #    validation results to the output and skip other steps.
