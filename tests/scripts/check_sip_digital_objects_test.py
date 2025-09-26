@@ -62,8 +62,9 @@ TEST_CASES = [
      'expected_result': {
          'returncode': 117,
          # TODO Scraper mimetype error messages are changing with TPASPKT-1418
-         'stdout': ['Proper scraper was not found. The file was not '
-                    'analyzed.']}},
+         'stdout': ['File data/valid_1.01.jpg with the given file format '
+                    'application/kissa is unacceptable for digital '
+                    'preservation.']}},
     {'testcase': 'Unsupported mimetype, without version.',
      'filename': 'invalid_1.7.1_unsupported_mimetype_no_version',
      'patch': {'mimetype': 'application/kissa',
@@ -71,8 +72,7 @@ TEST_CASES = [
      'expected_result': {
          'returncode': 117,
          # TODO Scraper mimetype error messages are changing with TPASPKT-1418
-         'stdout': ['Proper scraper was not found. The file was not '
-                    'analyzed.']}},
+         'stdout': ['File format version is not supported.']}},
     {'testcase': 'Unsupported version with supported mimetype.',
      'filename': 'invalid_1.7.1_unsupported_version',
      'patch': {'mimetype': 'image/jpeg',
@@ -80,8 +80,7 @@ TEST_CASES = [
      'expected_result': {
          'returncode': 117,
          # TODO Scraper mimetype error messages are changing with TPASPKT-1418
-         'stdout': [("Predefined version '3.1415' and "
-                     "resulted version '1.01' mismatch.")]}},
+         'stdout': [("File format version is not supported")]}},
     {'testcase': 'Report alt-format when validating as primary mimetype.',
      'filename': 'valid_1.7.0_plaintext_alt_format',
      'expected_result': {
