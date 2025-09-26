@@ -357,16 +357,6 @@ def validation(mets_path, catalog_path):
             }
             streams = None
             grade = UNACCEPTABLE
-        # TODO specify raised Exception type with TPASPKT-1418
-        except Exception as e:
-            scraper_result = {
-                "errors": [
-                        (f"ERROR: {e}")
-                    ],
-                "is_valid": [False]
-            }
-            streams = None
-            grade = UNACCEPTABLE
 
         # 3. Check if file validation is required; if not, do not append the
         #    validation results to the output and skip other steps.
