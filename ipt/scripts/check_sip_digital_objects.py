@@ -11,7 +11,12 @@ import uuid
 import premis
 import xml_helpers.utils
 from file_scraper.scraper import Scraper
-from file_scraper.exceptions import FileIsNotScrapable
+from file_scraper.exceptions import (
+    FileIsNotScrapable,
+    FileNotFoundIsNotScrapable,
+    DirectoryIsNotScrapable,
+    InvalidMimetype,
+    InvalidVersionForMimetype)
 from file_scraper.defaults import (
     RECOMMENDED,
     ACCEPTABLE,
@@ -347,12 +352,21 @@ def validation(mets_path, catalog_path):
                 metadata_info,
                 catalog_path=catalog_path
             )
-        except (FileIsNotScrapable, FileNotFoundError, IsADirectoryError):
+        except (FileIsNotScrapable,
+                FileNotFoundIsNotScrapable,
+                DirectoryIsNotScrapable):
             scraper_result = {
                 "errors": [
                         (f"ERROR: File {metadata_info['filename']} "
                          f"does not exist.")
                     ],
+                "is_valid": [False]
+            }
+            streams = None
+            grade = UNACCEPTABLE
+        except (InvalidMimetype, InvalidVersionForMimetype) as err:
+            scraper_result = {
+                "errors": [f"ERROR: {err}"],
                 "is_valid": [False]
             }
             streams = None
