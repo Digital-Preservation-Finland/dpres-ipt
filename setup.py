@@ -1,13 +1,14 @@
 from setuptools import setup, find_packages
-from version import get_version
-
 
 def main():
     """Install dpres-ipt Python libraries"""
     setup(
         name='ipt',
         packages=find_packages(exclude=['tests', 'tests.*']),
-        version=get_version(),
+        setup_requires=["setuptools-scm"],
+        use_scm_version={
+            "write_to": "ipt/_version.py"
+        },
         entry_points={
             'console_scripts': [
                 'bagit-util = ipt.scripts.bagit_util:main',

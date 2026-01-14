@@ -6,6 +6,7 @@
 .cache
 __pycache__
 .pytest_cache/
+ipt/_version.py
 INSTALLED_FILES*
 PKG-INFO
 build/

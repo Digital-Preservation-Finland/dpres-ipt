@@ -22,6 +22,7 @@ BuildRequires:  python3-devel
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  %{py3_dist pip}
 BuildRequires:  %{py3_dist setuptools}
+BuildRequires:  %{py3_dist setuptools-scm}
 BuildRequires:  %{py3_dist wheel}
 BuildRequires:  %{py3_dist pytest}
 
@@ -56,6 +57,7 @@ find %{_sourcedir}
 %autosetup -n %{file_prefix}-v%{file_version}%{?file_release_tag}-%{file_build_number}-g%{file_commit_ref}
 
 %build
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{file_version}
 %pyproject_wheel
 
 %install
