@@ -155,8 +155,9 @@ TEST_CASES = [
      'expected_result': {
          'returncode': 0,
          'stdout': []}},
-    {'testcase': 'Invalid acceptable file for bit-level preservation',
-     'filename': 'invalid_1.7.1_plaintext_as_bit_level',
+    {'testcase': 'Valid and supported file that is acceptable for bit-level '
+    'preservation',
+     'filename': 'valid_1.7.1_valid_supported_plaintext_as_bit_level',
      'expected_result': {
          'returncode': 0,
          'stdout': []}},
