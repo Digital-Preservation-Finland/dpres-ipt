@@ -31,8 +31,7 @@ from tests.testcommon.settings import TESTDATADIR
         ('invalid__not_xml.txt',
          {'returncode': 117,
           'stdout_part': None,
-          'stderr_part': 'XML parsing failed: document information could not '
-                         'be gathered.'})
+          'stderr_part': "Start tag expected, '<' not found"})
     ])
 def test_check_xml_schema_features(filename, expected):
     """
