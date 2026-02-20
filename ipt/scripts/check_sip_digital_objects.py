@@ -174,6 +174,8 @@ def check_well_formed(metadata_info, catalog_path):
     valid_only_messages = []
     md_mimetype = metadata_info['format']['mimetype']
     md_version = metadata_info['format']['version']
+    if md_version == "":
+        md_version = None
     force_mimetype = False
 
     if 'alt-format' in metadata_info['format']:
