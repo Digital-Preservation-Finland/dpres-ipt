@@ -38,129 +38,168 @@ METSDIR = os.path.abspath(
     os.path.join(TESTDATADIR, 'mets'))
 
 TEST_CASES = [
-    {'testcase': 'Invalid digital object.',
-     'filename': 'invalid_1.7.1_invalid_object',
-     'expected_result': {
-         'returncode': 117,
-         'stdout': ['ERROR: warc errors at']}},
-    {'testcase': 'Invalid xml file submitted as text/xml.',
-     'filename': 'invalid_1.7.1_invalid_xml_as_xml',
-     'expected_result': {
-         'returncode': 117,
-         'stdout': ['Failed: document is not well-formed.']}},
-    {'testcase': 'Missing digital object.',
-     'filename': 'invalid_1.7.1_missing_object',
-     'expected_result': {
-         'returncode': 117,
-         'stdout': [
-             'ERROR: File {}/sips/invalid_1.7.1_missing_object/'
-             'data/valid_1.2.png does not exist.'.format(TESTDATADIR)]}},
-    {'testcase': 'Unsupported mimetype, with version.',
-     'filename': 'invalid_1.7.1_unsupported_mimetype',
-     'patch': {'mimetype': 'application/kissa',
-               'version': '1.01'},
-     'expected_result': {
-         'returncode': 117,
-         'stdout': ['File data/valid_1.01.jpg with the given file format '
-                    'application/kissa is unacceptable for digital '
-                    'preservation.']}},
-    {'testcase': 'Unsupported mimetype, without version.',
-     'filename': 'invalid_1.7.1_unsupported_mimetype_no_version',
-     'patch': {'mimetype': 'application/kissa',
-               'version': ''},
-     'expected_result': {
-         'returncode': 117,
-         'stdout': ['Given mimetype application/kissa is not supported']}},
-    {'testcase': 'Unsupported version with supported mimetype.',
-     'filename': 'invalid_1.7.1_unsupported_version',
-     'patch': {'mimetype': 'image/jpeg',
-               'version': '3.1415'},
-     'expected_result': {
-         'returncode': 117,
-         'stdout': [("Given version 3.1415 for the mimetype image/jpeg "
-                     "is not supported")]}},
-    {'testcase': 'Report alt-format when validating as primary mimetype.',
-     'filename': 'valid_1.7.0_plaintext_alt_format',
-     'expected_result': {
-         'returncode': 0,
-         'stdout': ['METS alternative mimetype: text/html',
-                    'Validating as mimetype: text/plain',
-                    'The digital object will be preserved as '
-                    'mimetype: text/plain']}},
-    {'testcase': 'Digital object with audiomd metadata.',
-     'filename': 'valid_1.7.1_audio_stream',
-     'expected_result': {
-         'returncode': 0,
-         'stdout': []}},
-    {'testcase': 'Digital object with mix metadata.',
-     'filename': 'valid_1.7.1_image',
-     'expected_result': {
-         'returncode': 0,
-         'stdout': []}},
-    {'testcase': 'Invalid xml submitted as valid text/plain.',
-     'filename': 'valid_1.7.1_invalid_xml_as_plaintext',
-     'expected_result': {
-         'returncode': 0,
-         'stdout': ['Detected mimetype: text/xml, version: 1.0',
-                    'Validating as mimetype: text/plain',
-                    'The digital object will be preserved as '
-                    'mimetype: text/plain']}},
-    {'testcase': 'SIP with multiple digital objects.',
-     'filename': 'valid_1.7.1_multiple_objects',
-     'expected_result': {
-         'returncode': 0,
-         'stdout': []}},
-    {'testcase': 'Valid plaintext.',
-     'filename': 'valid_1.7.1_plaintext',
-     'expected_result': {
-         'returncode': 0,
-         'stdout': []}},
-    {'testcase': 'Videocontainer with audiomd/videomd metadata.',
-     'filename': 'valid_1.7.1_video_container',
-     'expected_result': {
-         'returncode': 0,
-         'stdout': []}},
-    {'testcase': 'Whitespace in sip and digital object names.',
-     'filename': 'valid_1.7.1_white space',
-     'expected_result': {
-         'returncode': 0,
-         'stdout': []}},
-    {'testcase': 'SIP with local schemas.',
-     'filename': 'valid_1.7.1_xml_local_schemas',
-     'expected_result': {
-         'returncode': 0,
-         'stdout': []}},
-    {'testcase': 'SIP with filename diacritics.',
-     'filename': 'valid_1.7.1_filename_diacritics',
-     'expected_result': {
-         'returncode': 0,
-         'stdout': []}},
-    {'testcase': 'SIP with local schema that is not well-formed.',
-     'filename': 'invalid_1.7.1_xml_local_schema_not_wellformed',
-     'expected_result': {
-         'returncode': 117,
-         'stdout': ['ERROR: WXS schema']}},
-    {'testcase': 'SIP with local schema with missing schema link.',
-     'filename': 'invalid_1.7.1_xml_local_schema_invalid_schema_link',
-     'expected_result': {
-         'returncode': 117,
-         'stdout': ['ERROR: warning: failed to load external entity']}},
-    {'testcase': 'SIP with text file containing illegal control character.',
-     'filename': 'invalid_1.7.2_control_character',
-     'expected_result': {
-         'returncode': 117,
-         'stdout': ['ERROR: Character decoding error: Illegal character']}},
-    {'testcase': 'Acceptable file for bit-level preservation',
-     'filename': 'valid_1.7.1_invalid_xml_as_bit_level',
-     'expected_result': {
-         'returncode': 0,
-         'stdout': []}},
-    {'testcase': 'Valid and supported file that is acceptable for bit-level '
-    'preservation',
-     'filename': 'valid_1.7.1_valid_supported_plaintext_as_bit_level',
-     'expected_result': {
-         'returncode': 0,
-         'stdout': []}},
+    {
+        "testcase": "Invalid digital object.",
+        "filename": "invalid_1.7.1_invalid_object",
+        "expected_result": {
+            "returncode": 117,
+            "stdout": ["ERROR: warc errors at"]
+        },
+    },
+    {
+        "testcase": "Invalid xml file submitted as text/xml.",
+        "filename": "invalid_1.7.1_invalid_xml_as_xml",
+        "expected_result": {
+            "returncode": 117,
+            "stdout": ["Failed: document is not well-formed."],
+        },
+    },
+    {
+        "testcase": "Missing digital object.",
+        "filename": "invalid_1.7.1_missing_object",
+        "expected_result": {
+            "returncode": 117,
+            "stdout": [
+                "ERROR: File {}/sips/invalid_1.7.1_missing_object/"
+                "data/valid_1.2.png does not exist.".format(TESTDATADIR)
+            ],
+        },
+    },
+    {
+        "testcase": "Unsupported mimetype, with version.",
+        "filename": "invalid_1.7.1_unsupported_mimetype",
+        "patch": {"mimetype": "application/kissa", "version": "1.01"},
+        "expected_result": {
+            "returncode": 117,
+            "stdout": [
+                "File data/valid_1.01.jpg with the given file format "
+                "application/kissa is unacceptable for digital "
+                "preservation."
+            ],
+        },
+    },
+    {
+        "testcase": "Unsupported mimetype, without version.",
+        "filename": "invalid_1.7.1_unsupported_mimetype_no_version",
+        "patch": {"mimetype": "application/kissa", "version": ""},
+        "expected_result": {
+            "returncode": 117,
+            "stdout": ["Given mimetype application/kissa is not supported"],
+        },
+    },
+    {
+        "testcase": "Unsupported version with supported mimetype.",
+        "filename": "invalid_1.7.1_unsupported_version",
+        "patch": {"mimetype": "image/jpeg", "version": "3.1415"},
+        "expected_result": {
+            "returncode": 117,
+            "stdout": [
+                "Given version 3.1415 for the mimetype image/jpeg "
+                "is not supported"
+            ],
+        },
+    },
+    {
+        "testcase": "Report alt-format when validating as primary mimetype.",
+        "filename": "valid_1.7.0_plaintext_alt_format",
+        "expected_result": {
+            "returncode": 0,
+            "stdout": [
+                "METS alternative mimetype: text/html",
+                "Validating as mimetype: text/plain",
+                "The digital object will be preserved as "
+                "mimetype: text/plain",
+            ],
+        },
+    },
+    {
+        "testcase": "Digital object with audiomd metadata.",
+        "filename": "valid_1.7.1_audio_stream",
+        "expected_result": {"returncode": 0, "stdout": []},
+    },
+    {
+        "testcase": "Digital object with mix metadata.",
+        "filename": "valid_1.7.1_image",
+        "expected_result": {"returncode": 0, "stdout": []},
+    },
+    {
+        "testcase": "Invalid xml submitted as valid text/plain.",
+        "filename": "valid_1.7.1_invalid_xml_as_plaintext",
+        "expected_result": {
+            "returncode": 0,
+            "stdout": [
+                "Detected mimetype: text/xml, version: 1.0",
+                "Validating as mimetype: text/plain",
+                "The digital object will be preserved as "
+                "mimetype: text/plain",
+            ],
+        },
+    },
+    {
+        "testcase": "SIP with multiple digital objects.",
+        "filename": "valid_1.7.1_multiple_objects",
+        "expected_result": {"returncode": 0, "stdout": []},
+    },
+    {
+        "testcase": "Valid plaintext.",
+        "filename": "valid_1.7.1_plaintext",
+        "expected_result": {"returncode": 0, "stdout": []},
+    },
+    {
+        "testcase": "Videocontainer with audiomd/videomd metadata.",
+        "filename": "valid_1.7.1_video_container",
+        "expected_result": {"returncode": 0, "stdout": []},
+    },
+    {
+        "testcase": "Whitespace in sip and digital object names.",
+        "filename": "valid_1.7.1_white space",
+        "expected_result": {"returncode": 0, "stdout": []},
+    },
+    {
+        "testcase": "SIP with local schemas.",
+        "filename": "valid_1.7.1_xml_local_schemas",
+        "expected_result": {"returncode": 0, "stdout": []},
+    },
+    {
+        "testcase": "SIP with filename diacritics.",
+        "filename": "valid_1.7.1_filename_diacritics",
+        "expected_result": {"returncode": 0, "stdout": []},
+    },
+    {
+        "testcase": "SIP with local schema that is not well-formed.",
+        "filename": "invalid_1.7.1_xml_local_schema_not_wellformed",
+        "expected_result": {
+            "returncode": 117,
+            "stdout": ["ERROR: WXS schema"]
+        },
+    },
+    {
+        "testcase": "SIP with local schema with missing schema link.",
+        "filename": "invalid_1.7.1_xml_local_schema_invalid_schema_link",
+        "expected_result": {
+            "returncode": 117,
+            "stdout": ["ERROR: warning: failed to load external entity"],
+        },
+    },
+    {
+        "testcase": "SIP with text file containing illegal control character.",
+        "filename": "invalid_1.7.2_control_character",
+        "expected_result": {
+            "returncode": 117,
+            "stdout": ["ERROR: Character decoding error: Illegal character"],
+        },
+    },
+    {
+        "testcase": "Acceptable file for bit-level preservation",
+        "filename": "valid_1.7.1_invalid_xml_as_bit_level",
+        "expected_result": {"returncode": 0, "stdout": []},
+    },
+    {
+        "testcase": "Valid and supported file that is acceptable for"
+        " bit-level preservation",
+        "filename": "valid_1.7.1_valid_supported_plaintext_as_bit_level",
+        "expected_result": {"returncode": 0, "stdout": []},
+    },
 ]
 """
 This list contains the following cases:
@@ -217,7 +256,9 @@ def test_testcases_stdout():
 
 
 @pytest.mark.parametrize(
-    'case', TEST_CASES, ids=[x['testcase'] for x in TEST_CASES])
+    'case', TEST_CASES,
+    ids=[x['testcase'] for x in TEST_CASES]
+)
 def test_check_sip_digital_objects(case, tmpdir, monkeypatch):
     """
     Test for check_sip_digital_objects
