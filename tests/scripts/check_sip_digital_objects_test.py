@@ -264,8 +264,8 @@ def test_check_sip_digital_objects(case, tmpdir, monkeypatch):
     Test for check_sip_digital_objects
     """
     try:
-        monkeypatch.setattr(Scraper, '_identify',
-                            patch_scraper_identify(**case['patch']))
+        monkeypatch.setattr(Scraper, 'detect_filetype',
+                            patch_scraper_detect_filetype(**case['patch']))
     except KeyError:
         # Nothing to patch.
         pass
@@ -455,19 +455,26 @@ def patch_metadata_info(monkeypatch):
         _iter_metadata_info)
 
 
-def patch_scraper_identify(mimetype='', version=''):
+def patch_scraper_detect_filetype(mimetype=None, version=None):
     """Monkeypatch Scraper to identify desired MIME type and version."""
 
-    def _identify(obj):
+    def detect_filetype(obj):
         obj.info = {}
         for detector in iter_detectors():
             tool = detector(obj.path)
             tool.detect()
             obj.info[len(obj.info)] = tool.info()
-            obj.mimetype = mimetype
-            obj.version = version
 
-    return _identify
+        obj.streams = {
+            0: {
+                "mimetype": mimetype,
+                "version": version,
+            }
+        }
+
+        return mimetype, version
+
+    return detect_filetype
 
 
 @pytest.mark.usefixtures('patch_metadata_info')
