@@ -200,6 +200,21 @@ TEST_CASES = [
         "filename": "valid_1.7.1_valid_supported_plaintext_as_bit_level",
         "expected_result": {"returncode": 0, "stdout": []},
     },
+    {
+        "testcase": "Video/DV-file with concealing bitstream errors and others",
+        "filename": "invalid_1.8.0_dv-concealed_bitstream_and_other_errors",
+        "expected_result": {"returncode": 117, "stdout": []},
+    },
+    {
+        "testcase": "Video/DV-file with concealed errors but no USE set",
+        "filename": "invalid_1.8.0_dv-just_concealed_bitstream_errors-no_use",
+        "expected_result": {"returncode": 117, "stdout": []},
+    },
+    {
+        "testcase": "Video/DV-file with concealed errors & correct USE set",
+        "filename": "valid_1.8.0_dv-just_concealed_bitstream_errors",
+        "expected_result": {"returncode": 0, "stdout": []},
+    },
 ]
 """
 This list contains the following cases:

@@ -1,0 +1,605 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mets:mets xmlns:addml="http://www.arkivverket.no/standarder/addml"
+        xmlns:audiomd="http://www.loc.gov/audioMD/" xmlns:ead3="http://ead3.archivists.org/schema/"
+        xmlns:fi="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+        xmlns:mets="http://www.loc.gov/METS/" xmlns:mix="http://www.loc.gov/mix/v20"
+        xmlns:premis="info:lc/xmlns/premis-v2" xmlns:videomd="http://www.loc.gov/videoMD/"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        PROFILE="http://digitalpreservation.fi/mets-profiles/cultural-heritage"
+        OBJID="0206c632-a9d1-40b6-8dbb-2c1f5a99ec18"
+        fi:CONTRACTID="urn:uuid:abcd1234-abcd-1234-5678-abcd1234abc3" fi:CATALOG="1.8.0"
+        fi:SPECIFICATION="1.8.0"
+        xsi:schemaLocation="http://www.loc.gov/METS/ http://digitalpreservation.fi/schemas/mets/mets.xsd">
+        <mets:metsHdr xmlns:mets="http://www.loc.gov/METS/" CREATEDATE="2026-04-08T07:14:34+00:00"
+                RECORDSTATUS="submission">
+                <mets:agent ROLE="CREATOR" TYPE="INDIVIDUAL">
+                        <mets:name>Master of the Culturverse</mets:name>
+                </mets:agent>
+        </mets:metsHdr>
+        <mets:dmdSec xmlns:mets="http://www.loc.gov/METS/"
+                xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                ID="_2e65b1f8-9e0f-4e5a-b694-b2d746054914"
+                ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                <mets:mdWrap MDTYPE="DC" MDTYPEVERSION="2008">
+                        <mets:xmlData>
+                                <dc:title xmlns:dc="http://purl.org/dc/elements/1.1/">
+                                        DV analyzer - No errors
+                                </dc:title>
+                        </mets:xmlData>
+                </mets:mdWrap>
+        </mets:dmdSec>
+        <mets:amdSec>
+                <mets:techMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_838a3e0b-baab-400b-8424-0ed8fffbe638"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="OTHER" MDTYPEVERSION="2.0" OTHERMDTYPE="VideoMD">
+                                <mets:xmlData>
+                                        <vmd:VIDEOMD xmlns:vmd="http://www.loc.gov/videoMD/"
+                                                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                                xsi:schemaLocation="http://www.loc.gov/VideoMD/ https://www.loc.gov/standards/vmdvmd/VideoMD.xsd"
+                                                ANALOGDIGITALFLAG="FileDigital">
+                                                <vmd:fileData>
+                                                        <vmd:duration>PT3.6S</vmd:duration>
+                                                        <vmd:dataRate>24.417183</vmd:dataRate>
+                                                        <vmd:bitsPerSample>8</vmd:bitsPerSample>
+                                                        <vmd:color>Color</vmd:color>
+                                                        <vmd:compression>
+                                                                <vmd:codecCreatorApp>(:unav)</vmd:codecCreatorApp>
+                                                                <vmd:codecCreatorAppVersion>(:unav)</vmd:codecCreatorAppVersion>
+                                                                <vmd:codecName>DV</vmd:codecName>
+                                                                <vmd:codecQuality>lossy</vmd:codecQuality>
+                                                        </vmd:compression>
+                                                        <vmd:dataRateMode>Fixed</vmd:dataRateMode>
+                                                        <vmd:frame>
+                                                                <vmd:pixelsHorizontal>720</vmd:pixelsHorizontal>
+                                                                <vmd:pixelsVertical>480</vmd:pixelsVertical>
+                                                                <vmd:PAR>0.889</vmd:PAR>
+                                                                <vmd:DAR>1.333</vmd:DAR>
+                                                        </vmd:frame>
+                                                        <vmd:frameRate>29.97</vmd:frameRate>
+                                                        <vmd:sampling>4:1:1</vmd:sampling>
+                                                        <vmd:signalFormat>NTSC</vmd:signalFormat>
+                                                        <vmd:sound>Yes</vmd:sound>
+                                                </vmd:fileData>
+                                        </vmd:VIDEOMD>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:techMD>
+                <mets:techMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_ec88c466-9c37-4349-9e82-980951bcddb4"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="OTHER" MDTYPEVERSION="2.0" OTHERMDTYPE="AudioMD">
+                                <mets:xmlData>
+                                        <amd:AUDIOMD xmlns:amd="http://www.loc.gov/audioMD/"
+                                                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                                xsi:schemaLocation="http://www.loc.gov/audioMD/ https://www.loc.gov/standards/amdvmd/audioMD.xsd"
+                                                ANALOGDIGITALFLAG="FileDigital">
+                                                <amd:fileData>
+                                                        <amd:audioDataEncoding>PCM</amd:audioDataEncoding>
+                                                        <amd:bitsPerSample>16</amd:bitsPerSample>
+                                                        <amd:compression>
+                                                                <amd:codecCreatorApp>(:unav)</amd:codecCreatorApp>
+                                                                <amd:codecCreatorAppVersion>(:unav)</amd:codecCreatorAppVersion>
+                                                                <amd:codecName>PCM</amd:codecName>
+                                                                <amd:codecQuality>lossless</amd:codecQuality>
+                                                        </amd:compression>
+                                                        <amd:dataRate>1536</amd:dataRate>
+                                                        <amd:dataRateMode>Fixed</amd:dataRateMode>
+                                                        <amd:samplingFrequency>48</amd:samplingFrequency>
+                                                </amd:fileData>
+                                                <amd:audioInfo>
+                                                        <amd:duration>PT3.6S</amd:duration>
+                                                        <amd:numChannels>2</amd:numChannels>
+                                                </amd:audioInfo>
+                                        </amd:AUDIOMD>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:techMD>
+                <mets:techMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_f4096a9d-e3ef-4611-bfe1-86425f066d0b"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:OBJECT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:object xmlns:premis="info:lc/xmlns/premis-v2"
+                                                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                                xsi:type="premis:file">
+                                                <premis:objectIdentifier>
+                                                        <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+                                                        <premis:objectIdentifierValue>
+                                                                dc6bd026-c6cb-4ae3-9dca-49bc7cff85e4</premis:objectIdentifierValue>
+                                                </premis:objectIdentifier>
+                                                <premis:objectCharacteristics>
+                                                        <premis:compositionLevel>0</premis:compositionLevel>
+                                                        <premis:fixity>
+                                                                <premis:messageDigestAlgorithm>MD5</premis:messageDigestAlgorithm>
+                                                                <premis:messageDigest>
+                                                                        3e29c7e8b5ec27480e3fb0c3ba30c4ae</premis:messageDigest>
+                                                        </premis:fixity>
+                                                        <premis:format>
+                                                                <premis:formatDesignation>
+                                                                        <premis:formatName>video/dv</premis:formatName>
+                                                                </premis:formatDesignation>
+                                                        </premis:format>
+                                                        <premis:creatingApplication>
+                                                                <premis:dateCreatedByApplication>
+                                                                        2026-04-08T09:02:53</premis:dateCreatedByApplication>
+                                                        </premis:creatingApplication>
+                                                </premis:objectCharacteristics>
+                                                <premis:originalName>concealment_original.dv</premis:originalName>
+                                                <premis:relationship>
+                                                        <premis:relationshipType>structural</premis:relationshipType>
+                                                        <premis:relationshipSubType>includes</premis:relationshipSubType>
+                                                        <premis:relatedObjectIdentification>
+                                                                <premis:relatedObjectIdentifierType>
+                                                                        UUID</premis:relatedObjectIdentifierType>
+                                                                <premis:relatedObjectIdentifierValue>
+                                                                        22cb63ba-f645-4c53-b229-374530caf0b9</premis:relatedObjectIdentifierValue>
+                                                        </premis:relatedObjectIdentification>
+                                                        <premis:relatedObjectIdentification>
+                                                                <premis:relatedObjectIdentifierType>
+                                                                        UUID</premis:relatedObjectIdentifierType>
+                                                                <premis:relatedObjectIdentifierValue>
+                                                                        2e2684cc-4410-4c7f-9468-0be107464cbc</premis:relatedObjectIdentifierValue>
+                                                        </premis:relatedObjectIdentification>
+                                                </premis:relationship>
+                                        </premis:object>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:techMD>
+                <mets:techMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_01f355c7-0b30-4b7d-a235-42381958e9bf"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:OBJECT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:object xmlns:premis="info:lc/xmlns/premis-v2"
+                                                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                                xsi:type="premis:bitstream">
+                                                <premis:objectIdentifier>
+                                                        <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+                                                        <premis:objectIdentifierValue>
+                                                                2e2684cc-4410-4c7f-9468-0be107464cbc</premis:objectIdentifierValue>
+                                                </premis:objectIdentifier>
+                                                <premis:objectCharacteristics>
+                                                        <premis:compositionLevel>0</premis:compositionLevel>
+                                                        <premis:format>
+                                                                <premis:formatDesignation>
+                                                                        <premis:formatName>audio/l16</premis:formatName>
+                                                                </premis:formatDesignation>
+                                                        </premis:format>
+                                                </premis:objectCharacteristics>
+                                        </premis:object>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:techMD>
+                <mets:techMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_f1eff62a-e1d5-40db-a258-3e582d078d81"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:OBJECT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:object xmlns:premis="info:lc/xmlns/premis-v2"
+                                                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                                xsi:type="premis:bitstream">
+                                                <premis:objectIdentifier>
+                                                        <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+                                                        <premis:objectIdentifierValue>
+                                                                22cb63ba-f645-4c53-b229-374530caf0b9</premis:objectIdentifierValue>
+                                                </premis:objectIdentifier>
+                                                <premis:objectCharacteristics>
+                                                        <premis:compositionLevel>0</premis:compositionLevel>
+                                                        <premis:format>
+                                                                <premis:formatDesignation>
+                                                                        <premis:formatName>video/dv</premis:formatName>
+                                                                </premis:formatDesignation>
+                                                        </premis:format>
+                                                </premis:objectCharacteristics>
+                                        </premis:object>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:techMD>
+                <mets:digiprovMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_314ad30e-37c3-47a1-b246-596d324fbf22"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:EVENT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:event xmlns:premis="info:lc/xmlns/premis-v2">
+                                                <premis:eventIdentifier>
+                                                        <premis:eventIdentifierType>UUID</premis:eventIdentifierType>
+                                                        <premis:eventIdentifierValue>
+                                                                3689739e-06e4-476e-9cb6-a54b05284337</premis:eventIdentifierValue>
+                                                </premis:eventIdentifier>
+                                                <premis:eventType>metadata extraction</premis:eventType>
+                                                <premis:eventDateTime>
+                                                        2026-04-08T07:14:34.584511+00:00</premis:eventDateTime>
+                                                <premis:eventDetail>Technical metadata extraction as
+                                                        PREMIS metadata from digital objects</premis:eventDetail>
+                                                <premis:eventOutcomeInformation>
+                                                        <premis:eventOutcome>success</premis:eventOutcome>
+                                                        <premis:eventOutcomeDetail>
+                                                                <premis:eventOutcomeDetailNote>PREMIS
+                                                                        metadata successfully
+                                                                        created from extracted
+                                                                        technical metadata.</premis:eventOutcomeDetailNote>
+                                                        </premis:eventOutcomeDetail>
+                                                </premis:eventOutcomeInformation>
+                                                <premis:linkingAgentIdentifier>
+                                                        <premis:linkingAgentIdentifierType>UUID</premis:linkingAgentIdentifierType>
+                                                        <premis:linkingAgentIdentifierValue>
+                                                                b2e2ae7f-2a91-4632-8df7-75519fadc5a3</premis:linkingAgentIdentifierValue>
+                                                        <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+                                                </premis:linkingAgentIdentifier>
+                                                <premis:linkingAgentIdentifier>
+                                                        <premis:linkingAgentIdentifierType>UUID</premis:linkingAgentIdentifierType>
+                                                        <premis:linkingAgentIdentifierValue>
+                                                                bf6083c2-03d1-4f39-8017-c632b9b752d0</premis:linkingAgentIdentifierValue>
+                                                        <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+                                                </premis:linkingAgentIdentifier>
+                                        </premis:event>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:digiprovMD>
+                <mets:digiprovMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_98d6244c-11a6-4694-bba8-33e9952faa29"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:agent xmlns:premis="info:lc/xmlns/premis-v2">
+                                                <premis:agentIdentifier>
+                                                        <premis:agentIdentifierType>UUID</premis:agentIdentifierType>
+                                                        <premis:agentIdentifierValue>
+                                                                c56a0a91-f71e-4847-8ae4-265387b6109d</premis:agentIdentifierValue>
+                                                </premis:agentIdentifier>
+                                                <premis:agentName>
+                                                        FidoDetector-v2.7.3.dev48+g0acbc73d1</premis:agentName>
+                                                <premis:agentType>software</premis:agentType>
+                                                <premis:agentNote>Used tools (name-version):
+                                                        fido-1.4.0</premis:agentNote>
+                                        </premis:agent>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:digiprovMD>
+                <mets:digiprovMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_7efa5ca2-7eb0-4f51-9b9a-b2a35b67e9aa"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:agent xmlns:premis="info:lc/xmlns/premis-v2">
+                                                <premis:agentIdentifier>
+                                                        <premis:agentIdentifierType>UUID</premis:agentIdentifierType>
+                                                        <premis:agentIdentifierValue>
+                                                                a9c3daf0-57db-40da-9f28-7e0d33e695e8</premis:agentIdentifierValue>
+                                                </premis:agentIdentifier>
+                                                <premis:agentName>
+                                                        MagicDetector-v2.7.3.dev48+g0acbc73d1</premis:agentName>
+                                                <premis:agentType>software</premis:agentType>
+                                                <premis:agentNote>Used tools (name-version):
+                                                        magiclib-5.45</premis:agentNote>
+                                        </premis:agent>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:digiprovMD>
+                <mets:digiprovMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_672d523e-f795-4e9f-b24c-fe278e543bba"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:agent xmlns:premis="info:lc/xmlns/premis-v2">
+                                                <premis:agentIdentifier>
+                                                        <premis:agentIdentifierType>UUID</premis:agentIdentifierType>
+                                                        <premis:agentIdentifierValue>
+                                                                f50d3e77-7211-42f5-85ca-e994bf4bc2ed</premis:agentIdentifierValue>
+                                                </premis:agentIdentifier>
+                                                <premis:agentName>
+                                                        ODFDetector-v2.7.3.dev48+g0acbc73d1</premis:agentName>
+                                                <premis:agentType>software</premis:agentType>
+                                                <premis:agentNote>Used tools (name-version):
+                                                        lxml-4.6.5.0</premis:agentNote>
+                                        </premis:agent>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:digiprovMD>
+                <mets:digiprovMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_e63a66b8-2282-4c0a-9beb-93c791ecf1b8"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:EVENT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:event xmlns:premis="info:lc/xmlns/premis-v2">
+                                                <premis:eventIdentifier>
+                                                        <premis:eventIdentifierType>UUID</premis:eventIdentifierType>
+                                                        <premis:eventIdentifierValue>
+                                                                b3fa8de8-a733-4faf-8d41-c4023a6f7fa8</premis:eventIdentifierValue>
+                                                </premis:eventIdentifier>
+                                                <premis:eventType>message digest calculation</premis:eventType>
+                                                <premis:eventDateTime>
+                                                        2026-04-08T07:14:34.584511+00:00</premis:eventDateTime>
+                                                <premis:eventDetail>Checksum calculation for digital
+                                                        objects</premis:eventDetail>
+                                                <premis:eventOutcomeInformation>
+                                                        <premis:eventOutcome>success</premis:eventOutcome>
+                                                        <premis:eventOutcomeDetail>
+                                                                <premis:eventOutcomeDetailNote>Checksum
+                                                                        successfully calculated for
+                                                                        digital objects.</premis:eventOutcomeDetailNote>
+                                                        </premis:eventOutcomeDetail>
+                                                </premis:eventOutcomeInformation>
+                                                <premis:linkingAgentIdentifier>
+                                                        <premis:linkingAgentIdentifierType>UUID</premis:linkingAgentIdentifierType>
+                                                        <premis:linkingAgentIdentifierValue>
+                                                                b2e2ae7f-2a91-4632-8df7-75519fadc5a3</premis:linkingAgentIdentifierValue>
+                                                        <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+                                                </premis:linkingAgentIdentifier>
+                                        </premis:event>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:digiprovMD>
+                <mets:digiprovMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_82b0ae19-ecdd-4afd-9ea6-5e5cc73c29ac"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:agent xmlns:premis="info:lc/xmlns/premis-v2">
+                                                <premis:agentIdentifier>
+                                                        <premis:agentIdentifierType>UUID</premis:agentIdentifierType>
+                                                        <premis:agentIdentifierValue>
+                                                                b2e2ae7f-2a91-4632-8df7-75519fadc5a3</premis:agentIdentifierValue>
+                                                </premis:agentIdentifier>
+                                                <premis:agentName>
+                                                        file-scraper-v2.7.3.dev48+g0acbc73d1</premis:agentName>
+                                                <premis:agentType>software</premis:agentType>
+                                        </premis:agent>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:digiprovMD>
+                <mets:digiprovMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_e50ed9d7-d5ef-48e4-b4b6-08d99b1ad2e5"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:EVENT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:event xmlns:premis="info:lc/xmlns/premis-v2">
+                                                <premis:eventIdentifier>
+                                                        <premis:eventIdentifierType>UUID</premis:eventIdentifierType>
+                                                        <premis:eventIdentifierValue>
+                                                                2bccf488-b201-47b0-97b9-231b49a566d8</premis:eventIdentifierValue>
+                                                </premis:eventIdentifier>
+                                                <premis:eventType>creation</premis:eventType>
+                                                <premis:eventDateTime>
+                                                        2026-04-08T07:14:34.584511+00:00</premis:eventDateTime>
+                                                <premis:eventDetail>Creation of structural metadata
+                                                        with the
+                                                        StructuralMap.from_directory_structure
+                                                        method</premis:eventDetail>
+                                                <premis:eventOutcomeInformation>
+                                                        <premis:eventOutcome>success</premis:eventOutcome>
+                                                        <premis:eventOutcomeDetail>
+                                                                <premis:eventOutcomeDetailNote>Created
+                                                                        METS structural map with
+                                                                        type 'PHYSICAL'</premis:eventOutcomeDetailNote>
+                                                        </premis:eventOutcomeDetail>
+                                                </premis:eventOutcomeInformation>
+                                                <premis:linkingAgentIdentifier>
+                                                        <premis:linkingAgentIdentifierType>UUID</premis:linkingAgentIdentifierType>
+                                                        <premis:linkingAgentIdentifierValue>
+                                                                1297cb5e-7c3f-4735-8c9f-0f5d31ccf198</premis:linkingAgentIdentifierValue>
+                                                        <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+                                                </premis:linkingAgentIdentifier>
+                                                <premis:linkingAgentIdentifier>
+                                                        <premis:linkingAgentIdentifierType>UUID</premis:linkingAgentIdentifierType>
+                                                        <premis:linkingAgentIdentifierValue>
+                                                                ef1964d1-f705-4f8b-8885-c9c9374b624f</premis:linkingAgentIdentifierValue>
+                                                        <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+                                                </premis:linkingAgentIdentifier>
+                                        </premis:event>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:digiprovMD>
+                <mets:digiprovMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_fceee3fc-a824-4286-b2f3-91a55fe7467f"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:agent xmlns:premis="info:lc/xmlns/premis-v2">
+                                                <premis:agentIdentifier>
+                                                        <premis:agentIdentifierType>UUID</premis:agentIdentifierType>
+                                                        <premis:agentIdentifierValue>
+                                                                649eabae-d4b1-482b-82fe-a90bba6b6e6f</premis:agentIdentifierValue>
+                                                </premis:agentIdentifier>
+                                                <premis:agentName>
+                                                        EpubDetector-v2.7.3.dev48+g0acbc73d1</premis:agentName>
+                                                <premis:agentType>software</premis:agentType>
+                                                <premis:agentNote>Used tools (name-version):
+                                                        lxml-4.6.5.0</premis:agentNote>
+                                        </premis:agent>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:digiprovMD>
+                <mets:digiprovMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_f65e0002-ab82-437a-8fb2-07c889f0e9b4"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:EVENT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:event xmlns:premis="info:lc/xmlns/premis-v2">
+                                                <premis:eventIdentifier>
+                                                        <premis:eventIdentifierType>UUID</premis:eventIdentifierType>
+                                                        <premis:eventIdentifierValue>
+                                                                9f59ca06-6899-45fc-b76a-bfe851467c70</premis:eventIdentifierValue>
+                                                </premis:eventIdentifier>
+                                                <premis:eventType>format identification</premis:eventType>
+                                                <premis:eventDateTime>
+                                                        2026-04-08T07:14:34.584511+00:00</premis:eventDateTime>
+                                                <premis:eventDetail>MIME type and version
+                                                        identification</premis:eventDetail>
+                                                <premis:eventOutcomeInformation>
+                                                        <premis:eventOutcome>success</premis:eventOutcome>
+                                                        <premis:eventOutcomeDetail>
+                                                                <premis:eventOutcomeDetailNote>File
+                                                                        MIME type and format version
+                                                                        successfully identified.</premis:eventOutcomeDetailNote>
+                                                        </premis:eventOutcomeDetail>
+                                                </premis:eventOutcomeInformation>
+                                                <premis:linkingAgentIdentifier>
+                                                        <premis:linkingAgentIdentifierType>UUID</premis:linkingAgentIdentifierType>
+                                                        <premis:linkingAgentIdentifierValue>
+                                                                b2e2ae7f-2a91-4632-8df7-75519fadc5a3</premis:linkingAgentIdentifierValue>
+                                                        <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+                                                </premis:linkingAgentIdentifier>
+                                                <premis:linkingAgentIdentifier>
+                                                        <premis:linkingAgentIdentifierType>UUID</premis:linkingAgentIdentifierType>
+                                                        <premis:linkingAgentIdentifierValue>
+                                                                649eabae-d4b1-482b-82fe-a90bba6b6e6f</premis:linkingAgentIdentifierValue>
+                                                        <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+                                                </premis:linkingAgentIdentifier>
+                                                <premis:linkingAgentIdentifier>
+                                                        <premis:linkingAgentIdentifierType>UUID</premis:linkingAgentIdentifierType>
+                                                        <premis:linkingAgentIdentifierValue>
+                                                                c56a0a91-f71e-4847-8ae4-265387b6109d</premis:linkingAgentIdentifierValue>
+                                                        <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+                                                </premis:linkingAgentIdentifier>
+                                                <premis:linkingAgentIdentifier>
+                                                        <premis:linkingAgentIdentifierType>UUID</premis:linkingAgentIdentifierType>
+                                                        <premis:linkingAgentIdentifierValue>
+                                                                a9c3daf0-57db-40da-9f28-7e0d33e695e8</premis:linkingAgentIdentifierValue>
+                                                        <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+                                                </premis:linkingAgentIdentifier>
+                                                <premis:linkingAgentIdentifier>
+                                                        <premis:linkingAgentIdentifierType>UUID</premis:linkingAgentIdentifierType>
+                                                        <premis:linkingAgentIdentifierValue>
+                                                                f50d3e77-7211-42f5-85ca-e994bf4bc2ed</premis:linkingAgentIdentifierValue>
+                                                        <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+                                                </premis:linkingAgentIdentifier>
+                                        </premis:event>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:digiprovMD>
+                <mets:digiprovMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_a96d45b2-052e-41d6-81da-6f390346f0e7"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:agent xmlns:premis="info:lc/xmlns/premis-v2">
+                                                <premis:agentIdentifier>
+                                                        <premis:agentIdentifierType>UUID</premis:agentIdentifierType>
+                                                        <premis:agentIdentifierValue>
+                                                                1297cb5e-7c3f-4735-8c9f-0f5d31ccf198</premis:agentIdentifierValue>
+                                                </premis:agentIdentifier>
+                                                <premis:agentName>dpres-mets-builder-v2.3.0</premis:agentName>
+                                                <premis:agentType>software</premis:agentType>
+                                        </premis:agent>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:digiprovMD>
+                <mets:digiprovMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_dc398849-75a4-4e8a-9123-9542c7763a11"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:agent xmlns:premis="info:lc/xmlns/premis-v2">
+                                                <premis:agentIdentifier>
+                                                        <premis:agentIdentifierType>UUID</premis:agentIdentifierType>
+                                                        <premis:agentIdentifierValue>
+                                                                ef1964d1-f705-4f8b-8885-c9c9374b624f</premis:agentIdentifierValue>
+                                                </premis:agentIdentifier>
+                                                <premis:agentName>dpres-siptools-ng-v1.2.2</premis:agentName>
+                                                <premis:agentType>software</premis:agentType>
+                                        </premis:agent>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:digiprovMD>
+                <mets:digiprovMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_0eada1a0-9cdc-43d4-a781-08eee034942f"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:agent xmlns:premis="info:lc/xmlns/premis-v2">
+                                                <premis:agentIdentifier>
+                                                        <premis:agentIdentifierType>UUID</premis:agentIdentifierType>
+                                                        <premis:agentIdentifierValue>
+                                                                bf6083c2-03d1-4f39-8017-c632b9b752d0</premis:agentIdentifierValue>
+                                                </premis:agentIdentifier>
+                                                <premis:agentName>
+                                                        MediainfoExtractor-v2.7.3.dev48+g0acbc73d1</premis:agentName>
+                                                <premis:agentType>software</premis:agentType>
+                                                <premis:agentNote>Used tools (name-version):
+                                                        pymediainfo-7.0.1, MediaInfoLib-25.03</premis:agentNote>
+                                        </premis:agent>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:digiprovMD>
+                <mets:digiprovMD xmlns:mets="http://www.loc.gov/METS/"
+                        xmlns:ns0="http://digitalpreservation.fi/schemas/mets/fi-extensions"
+                        ID="_00ce7219-b74a-407c-bf92-323963ab8938"
+                        ns0:CREATED="2026-04-08T07:14:34.584511+00:00">
+                        <mets:mdWrap MDTYPE="PREMIS:EVENT" MDTYPEVERSION="2.3">
+                                <mets:xmlData>
+                                        <premis:event xmlns:premis="info:lc/xmlns/premis-v2">
+                                                <premis:eventIdentifier>
+                                                        <premis:eventIdentifierType>UUID</premis:eventIdentifierType>
+                                                        <premis:eventIdentifierValue>
+                                                                9e533e25-6fdd-44e2-8d58-526c1843a180</premis:eventIdentifierValue>
+                                                </premis:eventIdentifier>
+                                                <premis:eventType>metadata extraction</premis:eventType>
+                                                <premis:eventDateTime>
+                                                        2026-04-08T07:14:34.584511+00:00</premis:eventDateTime>
+                                                <premis:eventDetail>Descriptive metadata import from
+                                                        external source</premis:eventDetail>
+                                                <premis:eventOutcomeInformation>
+                                                        <premis:eventOutcome>success</premis:eventOutcome>
+                                                        <premis:eventOutcomeDetail>
+                                                                <premis:eventOutcomeDetailNote>Descriptive
+                                                                        metadata imported to mets
+                                                                        dmdSec from external source</premis:eventOutcomeDetailNote>
+                                                        </premis:eventOutcomeDetail>
+                                                </premis:eventOutcomeInformation>
+                                        </premis:event>
+                                </mets:xmlData>
+                        </mets:mdWrap>
+                </mets:digiprovMD>
+        </mets:amdSec>
+        <mets:fileSec>
+                <mets:fileGrp>
+
+                        <mets:file
+                                ID="_8a741a1d-5e0d-4c54-a4af-88f507829649"
+                                ADMID="_f4096a9d-e3ef-4611-bfe1-86425f066d0b"
+                                USE="fi-dpres-preserve-forensically-analysed-object"
+                        >
+                                <mets:FLocat xmlns:xlink="http://www.w3.org/1999/xlink"
+                                        LOCTYPE="URL"
+                                        xlink:href="file:///data/concealment_original.dv"
+                                        xlink:type="simple" />
+                                <mets:stream
+                                        ADMID="_01f355c7-0b30-4b7d-a235-42381958e9bf _ec88c466-9c37-4349-9e82-980951bcddb4" />
+                                <mets:stream
+                                        ADMID="_f1eff62a-e1d5-40db-a258-3e582d078d81 _838a3e0b-baab-400b-8424-0ed8fffbe638" />
+                        </mets:file>
+                </mets:fileGrp>
+        </mets:fileSec>
+        <mets:structMap TYPE="PHYSICAL">
+                <mets:div TYPE="directory"
+                        DMDID="_2e65b1f8-9e0f-4e5a-b694-b2d746054914"
+                        ADMID="_e50ed9d7-d5ef-48e4-b4b6-08d99b1ad2e5 _314ad30e-37c3-47a1-b246-596d324fbf22 _00ce7219-b74a-407c-bf92-323963ab8938 _dc398849-75a4-4e8a-9123-9542c7763a11 _98d6244c-11a6-4694-bba8-33e9952faa29 _f65e0002-ab82-437a-8fb2-07c889f0e9b4 _a96d45b2-052e-41d6-81da-6f390346f0e7 _82b0ae19-ecdd-4afd-9ea6-5e5cc73c29ac _0eada1a0-9cdc-43d4-a781-08eee034942f _e63a66b8-2282-4c0a-9beb-93c791ecf1b8 _672d523e-f795-4e9f-b24c-fe278e543bba _fceee3fc-a824-4286-b2f3-91a55fe7467f _7efa5ca2-7eb0-4f51-9b9a-b2a35b67e9aa">
+                        <mets:div TYPE="directory" LABEL="data">
+                                <mets:div TYPE="file" LABEL="concealment_original.dv">
+                                        <mets:fptr xmlns:mets="http://www.loc.gov/METS/"
+                                                FILEID="_8a741a1d-5e0d-4c54-a4af-88f507829649" />
+                                </mets:div>
+                        </mets:div>
+                </mets:div>
+        </mets:structMap>
+</mets:mets>

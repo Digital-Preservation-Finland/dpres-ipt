@@ -357,10 +357,6 @@ def validation(mets_path, catalog_path):
                 if "Concealing bitstream errors" in error:
                     cleared_previous_error = True
                     continue
-                if "AC EOB marker is absent pos=" in error:
-                    # THIS MUST BE REMOVED
-                    cleared_previous_error = True
-                    continue
                 if "Last message repeated" in error and cleared_previous_error:
                     cleared_previous_error = False
                     continue
