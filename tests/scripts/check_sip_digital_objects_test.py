@@ -201,7 +201,8 @@ TEST_CASES = [
         "expected_result": {"returncode": 0, "stdout": []},
     },
     {
-        "testcase": "Video/DV-file with concealing bitstream errors and others",
+        "testcase": (
+            "Video/DV-file with concealing bitstream errors and others"),
         "filename": "invalid_1.8.0_dv-concealed_bitstream_and_other_errors",
         "expected_result": {"returncode": 117, "stdout": []},
     },

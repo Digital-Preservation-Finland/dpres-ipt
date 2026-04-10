@@ -329,8 +329,9 @@ def validation(mets_path, catalog_path):
 
     def _clear_concealing_bitstream_errors(scraper_result: dict) -> dict:
         """
-        Clears "Concealing bitstream error" -errors from Video/DV files'
-        file_scraper results and turns them valid if no other errors are found
+        Moves "Concealing bitstream error" -notifications from Video/DV
+        -files' file_scraper errors to messages and turns file_scraper
+        result to valid if no other errors are found
 
         Example input case:
         01: scraper_result["errors"] = [
@@ -352,13 +353,16 @@ def validation(mets_path, catalog_path):
         other_errors_found: bool = False
         result_error_list: list = []
         for error_report in scraper_result["errors"]:
-            forwarded_error_report = ""
+            forwarded_error_report: str = ""
+            forwarded_message_report: str = ""
             for error in error_report.split("\n"):
                 if "Concealing bitstream errors" in error:
                     cleared_previous_error = True
+                    forwarded_message_report += error + "\n"
                     continue
                 if "Last message repeated" in error and cleared_previous_error:
                     cleared_previous_error = False
+                    forwarded_message_report += error + "\n"
                     continue
                 cleared_previous_error = False
                 if error:
@@ -366,6 +370,7 @@ def validation(mets_path, catalog_path):
                     forwarded_error_report += error + "\n"
                     other_errors_found = True
             result_error_list.append(forwarded_error_report)
+            scraper_result["messages"].append(forwarded_message_report)
         scraper_result["errors"] = result_error_list
         if not other_errors_found:
             scraper_result["is_valid"][0] = True
