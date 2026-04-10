@@ -31,6 +31,7 @@ from ipt.constants import (
     METS_USE_NO_VALIDATION,
     METS_USE_IDENTIFICATION,
     METS_USE_IGNORE_ERRORS,
+    METS_USE_FORENSICALLY_ANALYSED_OBJECT,
     UNAV,
     UNAP
 )
@@ -251,7 +252,11 @@ def check_grade(metadata_info, grade):
     errors = []
     valid = False
 
-    if use in ["", METS_USE_IGNORE_ERRORS]:
+    if use in [
+        "",
+        METS_USE_IGNORE_ERRORS,
+        METS_USE_FORENSICALLY_ANALYSED_OBJECT
+    ]:
         valid = grade in [RECOMMENDED, ACCEPTABLE]
     elif use == METS_USE_NO_VALIDATION:
         valid = grade in [BIT_LEVEL_WITH_RECOMMENDED, BIT_LEVEL, UNACCEPTABLE]
@@ -322,6 +327,54 @@ def validation(mets_path, catalog_path):
             }
     """
 
+    def _clear_concealing_bitstream_errors(scraper_result: dict) -> dict:
+        """
+        Clears "Concealing bitstream error" -errors from Video/DV files'
+        file_scraper results and turns them valid if no other errors are found
+
+        Example input case:
+        01: scraper_result["errors"] = [
+        02:    "[dvvideo @ 0x56026d284440] Concealing bitstream errors\n"
+        03:    "    Last message repeated 12 times\n"
+        04:    "[dvvideo @ 0x56026d284440] AC EOB marker is absent pos=64\n"
+        05:    "    Last message repeated 37 times\n"
+        06: ]
+
+        lines 2-3 are filtered
+        lines 4-5 are other errors that are left untouched and prevent
+                  result turning to valid
+        """
+        if scraper_result["is_valid"][0] is True:
+            # Valid already; no need to do anything
+            return scraper_result
+
+        cleared_previous_error: bool = False
+        other_errors_found: bool = False
+        result_error_list: list = []
+        for error_report in scraper_result["errors"]:
+            forwarded_error_report = ""
+            for error in error_report.split("\n"):
+                if "Concealing bitstream errors" in error:
+                    cleared_previous_error = True
+                    continue
+                if "AC EOB marker is absent pos=" in error:
+                    # THIS MUST BE REMOVED
+                    cleared_previous_error = True
+                    continue
+                if "Last message repeated" in error and cleared_previous_error:
+                    cleared_previous_error = False
+                    continue
+                cleared_previous_error = False
+                if error:
+                    # To skip empty lines
+                    forwarded_error_report += error + "\n"
+                    other_errors_found = True
+            result_error_list.append(forwarded_error_report)
+        scraper_result["errors"] = result_error_list
+        if not other_errors_found:
+            scraper_result["is_valid"][0] = True
+        return scraper_result
+
     def _validate(metadata_info):
         """
         Perform validation operations in the following order:
@@ -330,9 +383,11 @@ def validation(mets_path, catalog_path):
         2. Perform validation using scraper and get the grade.
         3. Check if file validation is required using the grade; if not, do not
            append the validation results to the output and skip other steps.
-        4. Check if user has specified to ignore validation for cases where
-           file is not deemed well-formed, but is still eligible for bit-level
-           preservation; if yes change scraper's "is_valid" result.
+        4.1 Check if file is Video/DV and user has requested ignoring "conceal
+            bitstream error" -errors
+        4.2 Check if user has specified to ignore validation for cases where
+            file is not deemed well-formed, but is still eligible for bit-level
+            preservation; if yes change scraper's "is_valid" result.
         5. Append scraper results to final output.
         6. Check that mets metadata matches scraper metadata.
         7. Check that mets use attribute and scraper grading match.
@@ -381,9 +436,17 @@ def validation(mets_path, catalog_path):
             results.append(check_grade(metadata_info, grade))
             return join_validation_results(metadata_info, results)
 
-        # 4. Check if user has specified to ignore validation for cases where
-        #    file is not deemed well-formed, but is still eligible for
-        #    bit-level preservation; if yes change scraper "is_valid" result.
+        # 4.1 Check if this is a special case of Video/DV where user has asked
+        #     to ignore "Concealing bitstream error" -errors
+        if (
+            metadata_info["use"] == METS_USE_FORENSICALLY_ANALYSED_OBJECT and
+            metadata_info["format"]["mimetype"] == "video/dv"
+        ):
+            scraper_result = _clear_concealing_bitstream_errors(scraper_result)
+
+        # 4.2 Check if user has specified to ignore validation for cases where
+        #     file is not deemed well-formed, but is still eligible for
+        #     bit-level preservation; if yes change scraper "is_valid" result.
         if metadata_info["use"] == METS_USE_IGNORE_ERRORS and grade in [
             RECOMMENDED,
             ACCEPTABLE,
@@ -461,7 +524,7 @@ def create_report_event(result, report_object, report_agent):
     outresult = 'success' if result["is_valid"] is True else 'failure'
 
     if result["errors"]:
-        detail_note = (result["messages"] + '\n' + result["errors"])
+        detail_note = result["messages"] + '\n' + result["errors"]
     else:
         detail_note = result["messages"]
 
