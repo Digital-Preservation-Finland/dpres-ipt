@@ -328,18 +328,19 @@ def validation(mets_path, catalog_path):
     """
 
     def _clear_concealing_bitstream_errors(scraper_result: dict) -> dict:
-        """
+        r"""
         Moves "Concealing bitstream error" -notifications from Video/DV
         -files' file_scraper errors to messages and turns file_scraper
         result to valid if no other errors are found
 
-        Example input case:
-        01: scraper_result["errors"] = [
-        02:    "[dvvideo @ 0x56026d284440] Concealing bitstream errors\n"
-        03:    "    Last message repeated 12 times\n"
-        04:    "[dvvideo @ 0x56026d284440] AC EOB marker is absent pos=64\n"
-        05:    "    Last message repeated 37 times\n"
-        06: ]
+        Example input case::
+
+            1: scraper_result["errors"] = [
+            2:    "[dvvideo @ 0x56026d284440] Concealing bitstream errors\n"
+            3:    "    Last message repeated 12 times\n"
+            4:    "[dvvideo @ 0x56026d284440] AC EOB marker is absent pos=64\n"
+            5:    "    Last message repeated 37 times\n"
+            6: ]
 
         lines 2-3 are filtered
         lines 4-5 are other errors that are left untouched and prevent
