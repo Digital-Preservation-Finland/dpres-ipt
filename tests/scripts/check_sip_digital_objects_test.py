@@ -460,10 +460,9 @@ def patch_scraper_detect_filetype(mimetype=None, version=None):
 
     def detect_filetype(obj):
         obj.info = {}
-        for detector in iter_detectors():
-            tool = detector(obj.path)
-            tool.detect()
-            obj.info[len(obj.info)] = tool.info()
+        for detector in iter_detectors(path=obj.path):
+            detector.detect()
+            obj.info[len(obj.info)] = detector.info()
 
         obj.streams = {
             0: {
