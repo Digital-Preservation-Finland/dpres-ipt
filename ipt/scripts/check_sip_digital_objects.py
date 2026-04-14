@@ -385,8 +385,8 @@ def validation(mets_path, catalog_path):
         2. Perform validation using scraper and get the grade.
         3. Check if file validation is required using the grade; if not, do not
            append the validation results to the output and skip other steps.
-        4.1 Check if file is Video/DV and user has requested ignoring "conceal
-            bitstream error" -errors
+        4.1 Check if the file is marked as forensically analysed and could 
+            therefore have exceptions in error handling
         4.2 Check if user has specified to ignore validation for cases where
             file is not deemed well-formed, but is still eligible for bit-level
             preservation; if yes change scraper's "is_valid" result.
@@ -438,13 +438,22 @@ def validation(mets_path, catalog_path):
             results.append(check_grade(metadata_info, grade))
             return join_validation_results(metadata_info, results)
 
-        # 4.1 Check if this is a special case of Video/DV where user has asked
-        #     to ignore "Concealing bitstream error" -errors
-        if (
-            metadata_info["use"] == METS_USE_FORENSICALLY_ANALYSED_OBJECT and
-            metadata_info["format"]["mimetype"] == "video/dv"
-        ):
-            scraper_result = _clear_concealing_bitstream_errors(scraper_result)
+        # 4.1 Check if the file is marked as forensically analysed and could
+        #     therefore have exceptions in error handling
+        if metadata_info["use"] == METS_USE_FORENSICALLY_ANALYSED_OBJECT:
+            # Filter functions for different mimetypes in format of:
+            # scraper_result = Fx(scraper_result)
+            filter_function = {
+                "video/dv": _clear_concealing_bitstream_errors
+            }
+
+            try:
+                scraper_result = filter_function[
+                    metadata_info["format"]["mimetype"]
+                 ](scraper_result)
+            except KeyError:
+                # No filter_function defined for this mimetype
+                pass
 
         # 4.2 Check if user has specified to ignore validation for cases where
         #     file is not deemed well-formed, but is still eligible for
