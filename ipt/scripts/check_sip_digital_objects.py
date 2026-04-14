@@ -350,20 +350,25 @@ def validation(mets_path, catalog_path):
             # Valid already; no need to do anything
             return scraper_result
 
+        scraper_result["messages"].append(
+            "Found forensically analysed object."
+        )
+        scraper_result["messages"].append(
+            "Ignoring the following error messages:"
+        )
         cleared_previous_error: bool = False
         other_errors_found: bool = False
         result_error_list: list = []
         for error_report in scraper_result["errors"]:
             forwarded_error_report: str = ""
-            forwarded_message_report: str = ""
             for error in error_report.split("\n"):
                 if "Concealing bitstream errors" in error:
                     cleared_previous_error = True
-                    forwarded_message_report += error + "\n"
+                    scraper_result["messages"].append(error)
                     continue
                 if "Last message repeated" in error and cleared_previous_error:
                     cleared_previous_error = False
-                    forwarded_message_report += error + "\n"
+                    scraper_result["messages"].append(error)
                     continue
                 cleared_previous_error = False
                 if error:
@@ -371,10 +376,14 @@ def validation(mets_path, catalog_path):
                     forwarded_error_report += error + "\n"
                     other_errors_found = True
             result_error_list.append(forwarded_error_report)
-            scraper_result["messages"].append(forwarded_message_report)
         scraper_result["errors"] = result_error_list
+        scraper_result["messages"].append("End of ignored error messages.")
         if not other_errors_found:
             scraper_result["is_valid"][0] = True
+            scraper_result["messages"].append(
+                "Only ignored error messages found: "
+                "The object can be accepted for digital preservation."
+            )
         return scraper_result
 
     def _validate(metadata_info):
@@ -385,7 +394,7 @@ def validation(mets_path, catalog_path):
         2. Perform validation using scraper and get the grade.
         3. Check if file validation is required using the grade; if not, do not
            append the validation results to the output and skip other steps.
-        4.1 Check if the file is marked as forensically analysed and could 
+        4.1 Check if the file is marked as forensically analysed and could
             therefore have exceptions in error handling
         4.2 Check if user has specified to ignore validation for cases where
             file is not deemed well-formed, but is still eligible for bit-level
