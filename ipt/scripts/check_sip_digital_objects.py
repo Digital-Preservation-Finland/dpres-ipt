@@ -247,7 +247,19 @@ def check_grade(metadata_info, grade):
     :grade: Grade returned by file scraper.
     :returns: result_dict dictionary.
     """
-    use = metadata_info["use"]
+    # Spec allows "use" to be any string value. Some string value have special
+    # logic built around it. For case of "use" values with no special logic
+    # associated, we'll assume it's the same value as empty string "" for
+    # the duration of this grade checking.
+    if metadata_info["use"] in (
+        METS_USE_NO_VALIDATION,
+        METS_USE_IDENTIFICATION,
+        METS_USE_IGNORE_ERRORS,
+        METS_USE_FORENSICALLY_ANALYSED_OBJECT,
+    ):
+        use = metadata_info["use"]
+    else:
+        use = ""
     messages = []
     errors = []
     valid = False

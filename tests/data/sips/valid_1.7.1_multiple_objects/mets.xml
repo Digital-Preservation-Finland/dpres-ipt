@@ -245,10 +245,10 @@
   </mets:amdSec>
 <mets:fileSec>
     <mets:fileGrp>
-      <mets:file ID="_c5927fb6-5a36-4391-ba73-3b7c1845caad" ADMID="_bc3bdf24be948a2bda831c5a9c2b592e _6e881783f98af8d2eaf6551c202c4982">
+      <mets:file ID="_c5927fb6-5a36-4391-ba73-3b7c1845caad" ADMID="_bc3bdf24be948a2bda831c5a9c2b592e _6e881783f98af8d2eaf6551c202c4982" USE="">
         <mets:FLocat LOCTYPE="URL" xlink:href="file://data/valid_1.mp3" xlink:type="simple"/>
       </mets:file>
-      <mets:file ID="_c93868ff-705a-4246-b551-c350fd4b1fb7" ADMID="_47d9d8529578cd02e558e5a182b98699 _488846a5042dc77892286feccf70af56">
+      <mets:file ID="_c93868ff-705a-4246-b551-c350fd4b1fb7" ADMID="_47d9d8529578cd02e558e5a182b98699 _488846a5042dc77892286feccf70af56" USE="my-custom-value">
         <mets:FLocat LOCTYPE="URL" xlink:href="file://data/valid_1987a.gif" xlink:type="simple"/>
       </mets:file>
       <mets:file ID="_e9ed2d16-67e1-459f-8294-ebf5c3440fb0" ADMID="_57d7d03779ea7843ec5a9800aa8011b2">
