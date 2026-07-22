@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fix bug where non-predefined "USE" attribute value would cause grading to report failure
 
+### Fixed
+- Apply conditional handling of DV concealing bitstream errors to DV streams inside container formats/files.
+
+
 ## [1.3.0] - 2026-04-28
 ### Added
 - Ignore "concealing bitstream errors" validation messages for forensically analysed DV files

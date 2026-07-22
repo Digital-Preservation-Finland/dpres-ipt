@@ -468,13 +468,14 @@ def validation(mets_path, catalog_path):
                 "video/dv": _clear_concealing_bitstream_errors
             }
 
-            try:
-                scraper_result = filter_function[
-                    metadata_info["format"]["mimetype"]
-                 ](scraper_result)
-            except KeyError:
-                # No filter_function defined for this mimetype
-                pass
+            for stream in streams.values():
+                try:
+                    scraper_result = filter_function[
+                        stream["mimetype"]
+                    ](scraper_result)
+                except KeyError:
+                    # No filter_function defined for this mimetype
+                    pass
 
         # 4.2 Check if user has specified to ignore validation for cases where
         #     file is not deemed well-formed, but is still eligible for

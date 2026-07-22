@@ -216,6 +216,12 @@ TEST_CASES = [
         "filename": "valid_1.8.0_dv-just_concealed_bitstream_errors",
         "expected_result": {"returncode": 0, "stdout": []},
     },
+    {
+        "testcase": (
+            "Video/DV-stream in MOV-file with concealed errors & correct USE set"),
+        "filename": "valid_1.8.0_dv_in_mov-just_concealed_bitstream_errors",
+        "expected_result": {"returncode": 0, "stdout": []},
+    },
 ]
 """
 This list contains the following cases:
